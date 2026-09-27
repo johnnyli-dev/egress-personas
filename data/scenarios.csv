@@ -1,0 +1,4 @@
+scenario_id,plan_id,building_json,num_floors,time_of_day,alarm_quality,fire_floor_label,absent_share,asleep_share,out_of_flat_share,default_seed,notes
+night_fire12,plan2_drawing_v2_2,buildings/plan2_drawing_v2_2.json,27,night,good,12,0.04,0.95,0.00,1234,"The reference case: 3 a.m., almost everyone home and asleep, alarm audible in every flat, fire starting on floor 12."
+night_poor_alarm,plan2_drawing_v2_2,buildings/plan2_drawing_v2_2.json,27,night,poor,12,0.04,0.95,0.00,1234,"The same night with a corridor-only alarm, which is the condition Proulx measured at 515 s rather than 169 s. The comparison against night_fire12 isolates audibility."
+day_fire12,plan2_drawing_v2_2,buildings/plan2_drawing_v2_2.json,27,day,good,12,0.28,0.02,0.01,1234,"A weekday afternoon: a quarter of residents are out, nobody is asleep, and the people at home skew older and less mobile."
