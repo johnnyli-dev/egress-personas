@@ -53,6 +53,8 @@ class Population:
     targets: hh.Targets
     theta: float = 1.0
     tilted: list[float] = field(default_factory=list)
+    tenure_scales: dict[str, float] = field(default_factory=dict)
+    child_scale: float = 1.0
     tie_stats: list[dict[str, Any]] = field(default_factory=list)
     repairs: list[dict[str, Any]] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
@@ -230,9 +232,7 @@ def sample(tables: Tables, scenario_id: str, seed: int | None = None) -> Populat
         if not p.body.get("mobility"):
             p.body["mobility"] = hh.draw_mobility(
                 p.key, seed, p.identity["age_years"], targets)
-        if p.identity.get("tenure_years") is None:
-            p.identity["tenure_years"] = hh.draw_tenure(
-                p.key, seed, p.identity["age_years"], targets)
+
 
     pinned_people = len(people)
 
@@ -251,6 +251,12 @@ def sample(tables: Tables, scenario_id: str, seed: int | None = None) -> Populat
     tilted, theta = hh.tilt(list(targets.size_weights), targets.persons_per_flat)
 
     # --- 5 & 6. fill the vacant flats ---------------------------------------
+    # Only the non-head slots of a household can hold a child, so the under-18 weight
+    # has to be raised to compensate. The factor follows from the tilted mean household
+    # size rather than being guessed.
+    mean_size = sum(w * (i + 1) for i, w in enumerate(tilted))
+    child_scale = hh.child_slot_scale(mean_size)
+
     for u in units:
         if remaining <= 0:
             break
@@ -265,7 +271,7 @@ def sample(tables: Tables, scenario_id: str, seed: int | None = None) -> Populat
             key = f"synth:{label}:{slot}"
             adult_only = slot == 0
             age, band = hh.draw_age(key, seed, targets, adult_only=adult_only,
-                                    child_bias=0.8 if slot >= 2 else 0.0)
+                                    child_scale=1.0 if adult_only else child_scale)
             if slot == 0:
                 head_age = age
             mobility = hh.draw_mobility(key, seed, age, targets)
@@ -274,7 +280,6 @@ def sample(tables: Tables, scenario_id: str, seed: int | None = None) -> Populat
                 "age_years": age, "age_band": band,
                 "sex": hh.draw_sex(key, seed, targets),
                 "household_role": hh.role_for(slot, age, head_age),
-                "tenure_years": hh.draw_tenure(key, seed, age, targets),
             })
             p.body["mobility"] = mobility
             p.situation.update({
@@ -364,8 +369,17 @@ def sample(tables: Tables, scenario_id: str, seed: int | None = None) -> Populat
 
     repairs.extend(
         {"repair": "age_band", **m}
-        for m in hh.repair_child_share(people, seed, targets, household_of=homes)
+        for m in hh.repair_child_share(people, seed, targets)
     )
+
+    # Tenure, once every age is final: one multiplier per band so the marginal shares
+    # come out right given who is old enough to reach them. The same move as the
+    # household-size tilt, and reported the same way.
+    tenure_scales = hh.tenure_band_scales(people, targets)
+    for p in people:
+        if p.identity.get("tenure_years") is None:
+            p.identity["tenure_years"] = hh.draw_tenure_scaled(
+                p, seed, targets, tenure_scales)
 
     repairs.extend(
         {"repair": "tenure", **m}
@@ -502,6 +516,7 @@ def sample(tables: Tables, scenario_id: str, seed: int | None = None) -> Populat
     pop = Population(
         scenario=scenario, units=units, households=house_list, people=people,
         groups=groups, traces=traces, targets=targets, theta=theta, tilted=tilted,
+        tenure_scales=tenure_scales, child_scale=child_scale,
         tie_stats=tie_stats, repairs=repairs, warnings=warnings, gaps=gaps,
         snapshot=tables.snapshot, seed=seed, matched=matched, missing_attrs=missing,
         notes=notes, inapplicable=inapplicable,
@@ -514,27 +529,30 @@ def sample(tables: Tables, scenario_id: str, seed: int | None = None) -> Populat
 
 
 def conformance(pop: Population) -> list[dict[str, Any]]:
-    """Realized shares against the Population targets."""
+    """Realized shares against the Population targets.
+
+    Each row also reports the share with the hand-authored cases taken out. That matters
+    more than it sounds: one authored persona is three and a half percentage points of a
+    subgroup of twenty-eight, so a deliberate case - a 79-year-old with a walker - can
+    push a target out of tolerance on its own. Attributing that to the cases turns a
+    puzzling miss into a decision somebody made on purpose.
+    """
     people = pop.people
-    n = len(people) or 1
     t = pop.targets
     out: list[dict[str, Any]] = []
 
-    def row(tid: str, dim: str, cat: str, target: float, realized: float,
-            unit: str = "share", base: int | None = None) -> None:
-        """One target against what was drawn, with its sampling noise.
+    def row(tid: str, dim: str, cat: str, target: float,
+            members: list[Any], base: list[Any], unit: str = "share") -> None:
+        n_base = len(base) or 1
+        realized = len(members) / n_base
+        cases_in = sum(1 for p in members if p.case_id)
+        cases_base = sum(1 for p in base if p.case_id)
+        sampled_base = n_base - cases_base
+        sampled = ((len(members) - cases_in) / sampled_base) if sampled_base else None
 
-        `base` is how many people the share was measured over. A share measured on
-        twenty-five occupants moves four percentage points when one person changes, so
-        a miss on such a row usually says the building is small, not that the sampler
-        is biased. Separating the two is the difference between a report you act on and
-        one you learn to ignore.
-        """
         tol = t.tolerance.get(f"{dim}.{cat}")
-        n_base = base if base is not None else len(people)
-        stderr = None
-        z = None
-        if unit == "share" and n_base > 0 and 0.0 < target < 1.0:
+        stderr = z = None
+        if unit == "share" and 0.0 < target < 1.0:
             stderr = (target * (1.0 - target) / n_base) ** 0.5
             if stderr > 0:
                 z = (realized - target) / stderr
@@ -543,30 +561,51 @@ def conformance(pop: Population) -> list[dict[str, Any]]:
             "target": round(target, 4), "realized": round(realized, 4),
             "tolerance": tol,
             "measured_over": n_base,
+            "cases_in_category": cases_in,
+            "cases_in_base": cases_base,
+            "realized_excluding_cases": (None if sampled is None
+                                         else round(sampled, 4)),
             "stderr": None if stderr is None else round(stderr, 4),
             "z": None if z is None else round(z, 2),
             "within": None if tol is None else abs(realized - target) <= tol,
             # Three standard errors, not two. A report carries a few dozen of these
             # rows and a run carries many reports, so a 2-sigma line would flag one or
             # two every single time and the reader would learn to skip the section.
-            # Beyond 3 sigma, something is actually wrong.
             "noise": None if z is None else abs(z) <= 3.0,
+            "explained_by_cases": (
+                None if (tol is None or sampled is None)
+                else abs(realized - target) > tol and abs(sampled - target) <= tol
+            ),
         })
 
-    occupiable = [u for u in pop.units]
-    row("occupancy", "occupancy", "persons_per_flat", t.persons_per_flat,
-        len(people) / max(len(occupiable), 1), "persons")
+    def number(tid: str, dim: str, cat: str, target: float, value: float,
+               unit: str, base: int | None = None) -> None:
+        """A figure measured over something other than the resident list."""
+        tol = t.tolerance.get(f"{dim}.{cat}")
+        out.append({
+            "id": tid, "dimension": dim, "category": cat, "unit": unit,
+            "target": round(target, 4), "realized": round(value, 4),
+            "tolerance": tol, "measured_over": base if base is not None else len(people),
+            "cases_in_category": 0, "cases_in_base": 0,
+            "realized_excluding_cases": None, "stderr": None, "z": None,
+            "within": None if tol is None else abs(value - target) <= tol,
+            "noise": None, "explained_by_cases": None,
+        })
+
+    number("occupancy", "occupancy", "persons_per_flat", t.persons_per_flat,
+           len(people) / max(len(pop.units), 1), "persons", base=len(pop.units))
 
     for band in hh.AGE_BANDS:
         if band in t.age_weights:
-            share = sum(1 for p in people if p.identity["age_band"] == band) / n
-            row(f"age.{band}", "age_band", band, t.age_weights[band], share)
+            row(f"age.{band}", "age_band", band, t.age_weights[band],
+                [p for p in people if p.identity["age_band"] == band], people)
     for sex in ("female", "male", "other"):
         if sex in t.sex_weights:
-            share = sum(1 for p in people if p.identity["sex"] == sex) / n
-            row(f"sex.{sex}", "sex", sex, t.sex_weights[sex], share)
+            row(f"sex.{sex}", "sex", sex, t.sex_weights[sex],
+                [p for p in people if p.identity["sex"] == sex], people)
+
     row("mobility.wheelchair", "mobility", "wheelchair", t.wheelchair_share,
-        sum(1 for p in people if p.body["mobility"] == "wheelchair") / n)
+        [p for p in people if p.body["mobility"] == "wheelchair"], people)
     for key, target in sorted(t.ambulatory_share.items()):
         if key == "65_plus":
             pool = [p for p in people if p.identity["age_years"] >= 65]
@@ -574,10 +613,10 @@ def conformance(pop: Population) -> list[dict[str, Any]]:
             pool = [p for p in people if 18 <= p.identity["age_years"] < 65]
         else:
             pool = [p for p in people if p.identity["age_years"] < 18]
-        share = (sum(1 for p in pool if p.body["mobility"] in
-                     ("ambulatory_difficulty", "walker_cane")) / len(pool)) if pool else 0.0
-        row(f"mobility.amb@{key}", "mobility", f"ambulatory_difficulty@{key}",
-            target, share, base=len(pool))
+        row(f"mobility.amb@{key}", "mobility", f"ambulatory_difficulty@{key}", target,
+            [p for p in pool if p.body["mobility"] in
+             ("ambulatory_difficulty", "walker_cane")], pool)
+
     # The scenario's own absent share wins where it sets one: a weekday afternoon
     # empties a tower that a 3 a.m. fire does not, and the Population tab's figure is
     # only the fallback.
@@ -585,20 +624,24 @@ def conformance(pop: Population) -> list[dict[str, Any]]:
     if absent_target is None:
         absent_target = t.absence_share
     row("absence.share", "absence", "share", absent_target,
-        sum(1 for p in people if not p.situation["present"]) / n)
-    row("pet.share", "pet", "share", t.pet_share,
-        sum(1 for h in pop.households if h.has_pet) / max(len(pop.households), 1),
-        base=len(pop.households))
+        [p for p in people if not p.situation["present"]], people)
+
+    pet_households = [h for h in pop.households if h.has_pet]
+    number("pet.share", "pet", "share", t.pet_share,
+           len(pet_households) / max(len(pop.households), 1), "share",
+           base=len(pop.households))
+
     for band, (lo, hi) in hh.TENURE_BANDS.items():
         if band in t.tenure_weights:
-            share = sum(1 for p in people
-                        if lo <= (p.identity["tenure_years"] or 0) < hi) / n
-            row(f"tenure.{band}", "tenure", band, t.tenure_weights[band], share)
+            row(f"tenure.{band}", "tenure", band, t.tenure_weights[band],
+                [p for p in people if lo <= (p.identity["tenure_years"] or 0) < hi],
+                people)
+
     sizes = [len(h.members) for h in pop.households]
     for k in (1, 2, 3, 4):
         want = pop.tilted[k - 1] if len(pop.tilted) >= k else 0.0
         got = (sum(1 for s in sizes if (s >= 4 if k == 4 else s == k))
                / max(len(sizes), 1))
-        row(f"household_size.{k}", "household_size",
-            "4plus" if k == 4 else str(k), want, got, base=len(sizes))
+        number(f"household_size.{k}", "household_size",
+               "4plus" if k == 4 else str(k), want, got, "share", base=len(sizes))
     return out

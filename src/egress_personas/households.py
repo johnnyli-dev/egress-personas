@@ -141,18 +141,35 @@ def tilt(weights: list[float], target_mean: float,
 
 # --- drawing one person ----------------------------------------------------------
 
+def child_slot_scale(mean_household_size: float) -> float:
+    """How much to raise the under-18 weight on a slot that is allowed to be a child.
+
+    The head of a household is an adult by definition, so only the (m-1) non-head slots
+    of an average household of m can hold a child. Drawing those slots at the marginal
+    under-18 share therefore undershoots it by a factor of m/(m-1) - badly, at m = 1.66.
+    Correcting the draw is better than letting a repair pass move a seventh of the
+    building afterwards.
+    """
+    spare = mean_household_size - 1.0
+    if spare <= 0.01:
+        return 1.0
+    return min(mean_household_size / spare, 20.0)
+
+
 def draw_age(key: str, seed: int, targets: Targets, *, adult_only: bool,
-             child_bias: float = 0.0) -> tuple[int, str]:
-    """An age in years and its band. `child_bias` pushes a slot towards under-18."""
+             child_scale: float = 1.0) -> tuple[int, str]:
+    """An age in years and its band.
+
+    `child_scale` multiplies the under-18 weight, to compensate for the slots that
+    cannot hold a child at all. `adult_only` forbids one outright.
+    """
     bands = list(AGE_BANDS)
     weights = [targets.age_weights.get(b, 0.0) for b in bands]
     if adult_only:
         weights = [0.0 if b == "0_17" else w for b, w in zip(bands, weights)]
-    elif child_bias:
-        weights = [
-            w * (1.0 + child_bias) if b == "0_17" else w
-            for b, w in zip(bands, weights)
-        ]
+    elif child_scale != 1.0:
+        weights = [w * child_scale if b == "0_17" else w
+                   for b, w in zip(bands, weights)]
     if not any(weights):
         weights = [0.0 if (adult_only and b == "0_17") else 1.0 for b in bands]
     rng = draw_rng(seed, f"{key}/age_band")
@@ -300,8 +317,6 @@ def repair_child_share(
     people: list[Any],
     seed: int,
     targets: Targets,
-    *,
-    household_of,
 ) -> list[dict[str, Any]]:
     """Bring the under-18 share to its target by re-aging eligible members.
 
@@ -328,14 +343,15 @@ def repair_child_share(
     def redraw(p: Any, adult_only: bool, tag: str) -> int:
         key = f"{p.key}#agerepair/{tag}"
         age, band = draw_age(key, seed, targets, adult_only=adult_only,
-                             child_bias=0.0 if adult_only else 6.0)
+                             child_scale=1.0 if adult_only else 20.0)
         if adult_only and age < 18:
             age, band = 30, "18_34"
         if not adult_only and age >= 18:
             age, band = 9, "0_17"
         p.identity["age_years"], p.identity["age_band"] = age, band
         p.body["mobility"] = draw_mobility(key, seed, age, targets)
-        p.identity["tenure_years"] = draw_tenure(key, seed, age, targets)
+        # Tenure is drawn after every age is final, so nothing to redraw here.
+        p.identity["tenure_years"] = None
         return age
 
     have = sum(1 for p in people if p.identity["age_years"] < 18)
@@ -388,7 +404,6 @@ def repair_child_share(
                       f"because a child needs an adult in the flat. Either the age "
                       f"target or the occupancy target has to move.",
         })
-    del household_of
     return moves
 
 
@@ -432,10 +447,11 @@ def repair_tenure_share(people: list[Any], seed: int, targets: Targets) -> list[
         have = sum(1 for p in people
                    if band_of_tenure(p.identity["tenure_years"] or 0.0) == band)
         want = target * n
-        # Aim at the target, not at the edge of its tolerance. A shortfall that always
-        # sits just inside tolerance is still a bias, and it would quietly skew every
-        # familiarity figure downstream.
-        if have >= want:
+        # Only step in outside tolerance. The systematic shortfall this used to correct
+        # is now handled where it belongs, in `tenure_band_scales`, so what is left is
+        # ordinary sampling variation - and a run that erases its own variation is
+        # useless to a Monte Carlo study, which is what this population is for.
+        if have >= (target - tol) * n:
             continue
         pool = sorted(
             (p for p in people
@@ -465,3 +481,69 @@ def repair_tenure_share(people: list[Any], seed: int, targets: Targets) -> list[
                           f"distribution has to move.",
             })
     return moves
+
+
+def tenure_band_scales(people: list[Any], targets: Targets,
+                       iters: int = 60) -> dict[str, float]:
+    """Per-band multipliers so the marginal tenure shares come out right.
+
+    Tenure and age constrain each other: somebody of 22 cannot have lived here five
+    years. Drawing each person independently from the raw band weights therefore
+    undershoots the long-tenure share by however much of the building is too young, and
+    no tolerance would attribute the shortfall to the right cause.
+
+    So solve for one multiplier per band such that the *expected* marginal share matches
+    its target, given who can reach what. This is iterative proportional fitting, and it
+    is the same move as the household-size tilt: one population-level number per band,
+    reported, rather than a repair pass moving people after the fact. Each person still
+    draws independently once the scales are fixed.
+    """
+    bands = list(TENURE_BANDS)
+    base = {b: targets.tenure_weights.get(b, 0.0) for b in bands}
+    if not any(base.values()) or not people:
+        return {b: 1.0 for b in bands}
+
+    feasible = [
+        {b: TENURE_BANDS[b][0] <= tenure_ceiling(p.identity["age_years"])
+         for b in bands}
+        for p in people
+    ]
+    n = len(people)
+    scales = {b: 1.0 for b in bands}
+    for _ in range(iters):
+        expected = {b: 0.0 for b in bands}
+        for f in feasible:
+            w = {b: base[b] * scales[b] for b in bands if f[b]}
+            total = sum(w.values())
+            if total <= 0:
+                continue
+            for b, x in w.items():
+                expected[b] += x / total
+        for b in bands:
+            want = base[b] * n
+            if expected[b] > 1e-9 and want > 0:
+                scales[b] *= want / expected[b]
+        # Keep the scales in a sane range; an unreachable target is reported elsewhere.
+        big = max(scales.values())
+        if big > 0:
+            scales = {b: v / big for b, v in scales.items()}
+    return scales
+
+
+def draw_tenure_scaled(person: Any, seed: int, targets: Targets,
+                       scales: dict[str, float]) -> float:
+    """Years in the building, drawn from the reachable bands at corrected weights."""
+    age = person.identity["age_years"]
+    ceiling = tenure_ceiling(age)
+    bands = list(TENURE_BANDS)
+    weights = [
+        (targets.tenure_weights.get(b, 1.0) * scales.get(b, 1.0))
+        if TENURE_BANDS[b][0] <= ceiling else 0.0
+        for b in bands
+    ]
+    if not any(weights):
+        return round(min(ceiling, 0.5), 1)
+    band = bands[draw_rng(seed, f"{person.key}/tenure_band").weighted(weights)]
+    lo, hi = TENURE_BANDS[band]
+    years = draw_rng(seed, f"{person.key}/tenure").range_f(lo, min(hi, max(ceiling, lo)))
+    return round(min(years, ceiling), 1)

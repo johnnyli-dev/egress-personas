@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import re
 
-import pytest
-
 from egress_personas.sample import sample
 from egress_personas.tables import load_dir
 

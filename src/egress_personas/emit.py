@@ -191,6 +191,9 @@ def provenance_json(pop: Population) -> dict[str, Any]:
             "household_size_theta": round(pop.theta, 6),
             "household_size_weights": [round(w, 6) for w in pop.tilted],
             "occupancy_target_persons_per_flat": pop.targets.persons_per_flat,
+            "child_slot_scale": round(pop.child_scale, 4),
+            "tenure_band_scales": {k: round(v, 4)
+                                   for k, v in sorted(pop.tenure_scales.items())},
         },
         "conformance": pop.conformance,
         "ties": pop.tie_stats,

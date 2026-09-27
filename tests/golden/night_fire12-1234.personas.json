@@ -29,8 +29,8 @@
       "cases": 8,
       "present": 142,
       "absent": 9,
-      "wheelchair": 2,
-      "caregivers": 1,
+      "wheelchair": 1,
+      "caregivers": 0,
       "unpaired_wheelchair": 1
     }
   },
@@ -1615,8 +1615,8 @@
       ],
       "members": [
         "synth:8D:0",
-        "synth:8D:3",
         "synth:8D:1",
+        "synth:8D:3",
         "synth:8D:2"
       ],
       "has_pet": false,
@@ -2866,17 +2866,16 @@
       "id": "G_group_chat_building",
       "kind": "group_chat",
       "members": [
-        "synth:4B:1",
         "synth:4D:0",
         "synth:5A:0",
         "synth:5B:0",
         "synth:5C:0",
+        "synth:5D:2",
         "synth:6D:0",
         "synth:7A:0",
         "synth:7B:0",
         "synth:8A:0",
         "synth:8C:0",
-        "synth:8C:1",
         "synth:8D:0",
         "synth:8D:2",
         "case:C08",
@@ -2885,6 +2884,7 @@
         "synth:10B:0",
         "synth:10D:1",
         "synth:11C:1",
+        "synth:11C:2",
         "case:C03",
         "synth:14B:0",
         "synth:14C:0",
@@ -2905,10 +2905,11 @@
         "synth:19D:0",
         "synth:20A:0",
         "synth:20C:0",
+        "synth:21A:1",
+        "synth:21C:0",
         "synth:23B:0",
         "synth:24A:0",
         "synth:24C:0",
-        "synth:24C:1",
         "synth:24D:0",
         "synth:25B:0",
         "synth:25C:0",
@@ -3181,11 +3182,6 @@
       ],
       "ties": [
         {
-          "to": "G_group_chat_building",
-          "kind": "group_chat",
-          "strength": 0.326
-        },
-        {
           "to": "synth:4B:0",
           "kind": "household",
           "strength": 1.0
@@ -3203,7 +3199,7 @@
       ],
       "household": "HH-4B",
       "household_index": 1,
-      "narrative": "Somebody of 37 has lived in 4B for about a year and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 37 has lived in 4B for about a year and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for.",
       "notes": ""
     },
     {
@@ -3480,11 +3476,16 @@
           "to": "synth:5D:0",
           "kind": "knock",
           "strength": 0.575
+        },
+        {
+          "to": "synth:7B:1",
+          "kind": "phone",
+          "strength": 0.79
         }
       ],
       "household": "HH-4D",
       "household_index": 4,
-      "narrative": "Somebody of 73 has lived in 4D for 21 years and is a partner in the household. They walk with difficulty and tire on stairs. They share the flat with 1 other adult. They know the building well, and do not know there is a second staircase. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for.",
+      "narrative": "Somebody of 73 has lived in 4D for 21 years and is a partner in the household. They walk with difficulty and tire on stairs. They share the flat with 1 other adult. They know the building well, and do not know there is a second staircase. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -3561,9 +3562,19 @@
           "strength": 0.768
         },
         {
+          "to": "synth:5D:2",
+          "kind": "knock",
+          "strength": 0.368
+        },
+        {
           "to": "synth:15C:0",
           "kind": "phone",
           "strength": 0.762
+        },
+        {
+          "to": "synth:21C:0",
+          "kind": "phone",
+          "strength": 0.865
         },
         {
           "to": "synth:4B:0",
@@ -3573,7 +3584,7 @@
       ],
       "household": "HH-5A",
       "household_index": null,
-      "narrative": "Somebody of 63 has lived in 5A for 27 years and heads the household. They live alone. They know the building reasonably well, and take the south stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, 2 people in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 63 has lived in 5A for 27 years and heads the household. They live alone. They know the building reasonably well, and take the south stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 3 people in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -3657,6 +3668,11 @@
           "strength": 0.329
         },
         {
+          "to": "synth:5D:2",
+          "kind": "knock",
+          "strength": 0.516
+        },
+        {
           "to": "synth:8D:2",
           "kind": "phone",
           "strength": 0.959
@@ -3664,7 +3680,7 @@
       ],
       "household": "HH-5B",
       "household_index": null,
-      "narrative": "Somebody of 63 has lived in 5B for less than a year and heads the household. They live alone. They barely know the building's layout, and take the north stair by habit. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for, 1 person in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 63 has lived in 5B for less than a year and heads the household. They live alone. They barely know the building's layout, and take the north stair by habit. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 3 neighbours they would knock for, 1 person in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -3749,6 +3765,11 @@
           "to": "synth:5B:0",
           "kind": "knock",
           "strength": 0.329
+        },
+        {
+          "to": "synth:5D:2",
+          "kind": "knock",
+          "strength": 0.728
         }
       ],
       "household": "HH-5C",
@@ -3835,7 +3856,7 @@
         "age_band": "50_64",
         "sex": "female",
         "household_role": "head",
-        "tenure_years": 3.5
+        "tenure_years": 20.4
       },
       "sim": {
         "agent_type": "adult",
@@ -3867,10 +3888,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.759,
+        "floorplan_familiarity": 0.782,
         "habitual_stair": "south",
         "knows_second_stair": true,
-        "prior_false_alarms": 2
+        "prior_false_alarms": 5
       },
       "dispositions": {
         "altruism": 0.563,
@@ -3905,7 +3926,7 @@
       ],
       "household": "HH-5D",
       "household_index": 10,
-      "narrative": "Somebody of 61 has lived in 5D for 4 years and heads the household. They share the flat with 2 children. They know the building well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. The alarm cannot be heard where they are. They have 2 neighbours they would knock for.",
+      "narrative": "Somebody of 61 has lived in 5D for 20 years and heads the household. They share the flat with 1 other adult and 1 child. They know the building well, and take the south stair by habit. 5 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. The alarm cannot be heard where they are. They have 2 neighbours they would knock for.",
       "notes": ""
     },
     {
@@ -3915,11 +3936,11 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 7,
+        "age_years": 14,
         "age_band": "0_17",
         "sex": "female",
         "household_role": "child",
-        "tenure_years": 1.6
+        "tenure_years": 7.4
       },
       "sim": {
         "agent_type": "child",
@@ -3951,10 +3972,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.664,
+        "floorplan_familiarity": 0.971,
         "habitual_stair": "north",
         "knows_second_stair": true,
-        "prior_false_alarms": 0
+        "prior_false_alarms": 3
       },
       "dispositions": {
         "altruism": 0.257,
@@ -3979,7 +4000,7 @@
       ],
       "household": "HH-5D",
       "household_index": 10,
-      "narrative": "Somebody of 7 has lived in 5D for about a year and is a child of the household. They share the flat with 1 other adult and 1 child. They know the building reasonably well, and take the north stair by habit. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are awake at home.",
+      "narrative": "Somebody of 14 has lived in 5D for 7 years and is a child of the household. They share the flat with 2 other adults. They know the building well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are awake at home.",
       "notes": ""
     },
     {
@@ -3989,14 +4010,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 15,
-        "age_band": "0_17",
+        "age_years": 33,
+        "age_band": "18_34",
         "sex": "female",
-        "household_role": "child",
-        "tenure_years": 10.3
+        "household_role": "lodger",
+        "tenure_years": 3.8
       },
       "sim": {
-        "agent_type": "child",
+        "agent_type": "adult",
         "gender": "female",
         "mobility": "none",
         "escorts": null,
@@ -4005,7 +4026,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 1.06,
+        "base_speed": 0.887,
         "patience_s": 64.4,
         "tries_other_stair": false
       },
@@ -4025,10 +4046,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.639,
+        "floorplan_familiarity": 0.852,
         "habitual_stair": "north",
         "knows_second_stair": true,
-        "prior_false_alarms": 7
+        "prior_false_alarms": 0
       },
       "dispositions": {
         "altruism": 0.2,
@@ -4041,6 +4062,11 @@
       "commitments": [],
       "ties": [
         {
+          "to": "G_group_chat_building",
+          "kind": "group_chat",
+          "strength": 0.366
+        },
+        {
           "to": "synth:5D:0",
           "kind": "household",
           "strength": 1.0
@@ -4049,11 +4075,31 @@
           "to": "synth:5D:1",
           "kind": "household",
           "strength": 1.0
+        },
+        {
+          "to": "synth:5A:0",
+          "kind": "knock",
+          "strength": 0.368
+        },
+        {
+          "to": "synth:5B:0",
+          "kind": "knock",
+          "strength": 0.516
+        },
+        {
+          "to": "synth:5C:0",
+          "kind": "knock",
+          "strength": 0.728
+        },
+        {
+          "to": "synth:11B:1",
+          "kind": "phone",
+          "strength": 0.588
         }
       ],
       "household": "HH-5D",
       "household_index": 10,
-      "narrative": "Somebody of 15 has lived in 5D for 10 years and is a child of the household. They share the flat with 1 other adult and 1 child. They know the building reasonably well, and take the north stair by habit. 7 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 33 has lived in 5D for 4 years and shares the flat. They share the flat with 1 other adult and 1 child. They know the building well, and take the north stair by habit. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 1 person in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -4121,16 +4167,10 @@
           "abandon_probability": 0.2
         }
       ],
-      "ties": [
-        {
-          "to": "synth:6C:1",
-          "kind": "knock",
-          "strength": 0.555
-        }
-      ],
+      "ties": [],
       "household": "HH-6A",
       "household_index": null,
-      "narrative": "Somebody of 48 has lived in 6A for about a year and heads the household. They live alone. They know the building reasonably well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They will not leave without the pet. They have 1 neighbour they would knock for.",
+      "narrative": "Somebody of 48 has lived in 6A for about a year and heads the household. They live alone. They know the building reasonably well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They will not leave without the pet. They know nobody else in the building.",
       "notes": ""
     },
     {
@@ -4207,7 +4247,7 @@
         "age_band": "50_64",
         "sex": "male",
         "household_role": "head",
-        "tenure_years": 18.0
+        "tenure_years": 1.2
       },
       "sim": {
         "agent_type": "adult",
@@ -4239,10 +4279,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.817,
+        "floorplan_familiarity": 0.863,
         "habitual_stair": "north",
         "knows_second_stair": true,
-        "prior_false_alarms": 2
+        "prior_false_alarms": 3
       },
       "dispositions": {
         "altruism": 0.817,
@@ -4258,16 +4298,11 @@
           "to": "synth:6C:1",
           "kind": "household",
           "strength": 1.0
-        },
-        {
-          "to": "synth:6D:0",
-          "kind": "knock",
-          "strength": 0.755
         }
       ],
       "household": "HH-6C",
       "household_index": 15,
-      "narrative": "Somebody of 52 has lived in 6C for 18 years and heads the household. They share the flat with 1 other adult. They know the building well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would go out of their way to help others. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for.",
+      "narrative": "Somebody of 52 has lived in 6C for about a year and heads the household. They share the flat with 1 child. They know the building well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would go out of their way to help others. At the moment the fire starts they are asleep.",
       "notes": ""
     },
     {
@@ -4277,14 +4312,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 26,
-        "age_band": "18_34",
+        "age_years": 9,
+        "age_band": "0_17",
         "sex": "male",
-        "household_role": "partner",
+        "household_role": "child",
         "tenure_years": 1.7
       },
       "sim": {
-        "agent_type": "adult",
+        "agent_type": "child",
         "gender": "male",
         "mobility": "none",
         "escorts": null,
@@ -4293,7 +4328,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 1.243,
+        "base_speed": 0.829,
         "patience_s": 67.3,
         "tries_other_stair": false
       },
@@ -4332,31 +4367,11 @@
           "to": "synth:6C:0",
           "kind": "household",
           "strength": 1.0
-        },
-        {
-          "to": "synth:6A:0",
-          "kind": "knock",
-          "strength": 0.555
-        },
-        {
-          "to": "synth:7D:0",
-          "kind": "knock",
-          "strength": 0.33
-        },
-        {
-          "to": "synth:17D:0",
-          "kind": "phone",
-          "strength": 0.791
-        },
-        {
-          "to": "synth:19D:0",
-          "kind": "phone",
-          "strength": 0.672
         }
       ],
       "household": "HH-6C",
       "household_index": 15,
-      "narrative": "Somebody of 26 has lived in 6C for about a year and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. They are not in the building when the fire starts.",
+      "narrative": "Somebody of 9 has lived in 6C for about a year and is a child of the household. They share the flat with 1 other adult. They know the building reasonably well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. They are not in the building when the fire starts.",
       "notes": ""
     },
     {
@@ -4370,7 +4385,7 @@
         "age_band": "18_34",
         "sex": "female",
         "household_role": "head",
-        "tenure_years": 8.9
+        "tenure_years": 1.1
       },
       "sim": {
         "agent_type": "adult",
@@ -4402,10 +4417,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.911,
+        "floorplan_familiarity": 0.706,
         "habitual_stair": "north",
         "knows_second_stair": true,
-        "prior_false_alarms": 6
+        "prior_false_alarms": 3
       },
       "dispositions": {
         "altruism": 0.54,
@@ -4423,11 +4438,6 @@
           "strength": 0.117
         },
         {
-          "to": "synth:6C:0",
-          "kind": "knock",
-          "strength": 0.755
-        },
-        {
           "to": "synth:8B:1",
           "kind": "phone",
           "strength": 0.95
@@ -4435,7 +4445,7 @@
       ],
       "household": "HH-6D",
       "household_index": null,
-      "narrative": "Somebody of 28 has lived in 6D for 9 years and heads the household. They live alone. They know the building well, and take the north stair by habit. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are awake at home. They have 1 neighbour they would knock for, 1 person in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 28 has lived in 6D for about a year and heads the household. They live alone. They know the building well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are awake at home. They have 1 person in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -4534,10 +4544,10 @@
         "tenure_years": 1.0
       },
       "sim": {
-        "agent_type": "caregiver",
+        "agent_type": "adult",
         "gender": "female",
         "mobility": "none",
-        "escorts": "synth:7B:1",
+        "escorts": null,
         "escorted_by": null
       },
       "body": {
@@ -4596,7 +4606,7 @@
       ],
       "household": "HH-7B",
       "household_index": 19,
-      "narrative": "Somebody of 19 has lived in 7B for about a year and heads the household. They share the flat with 1 other adult and 1 child. They know the building reasonably well, and take the south stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They tend to act rather than confer, and look after themselves first. At the moment the fire starts they are asleep. They have the building group chat.",
+      "narrative": "Somebody of 19 has lived in 7B for about a year and heads the household. They share the flat with 2 other adults. They know the building reasonably well, and take the south stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They tend to act rather than confer, and look after themselves first. At the moment the fire starts they are asleep. They have the building group chat.",
       "notes": ""
     },
     {
@@ -4606,23 +4616,23 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 10,
-        "age_band": "0_17",
+        "age_years": 29,
+        "age_band": "18_34",
         "sex": "male",
-        "household_role": "child",
-        "tenure_years": 0.2
+        "household_role": "partner",
+        "tenure_years": 5.3
       },
       "sim": {
-        "agent_type": "wheelchair",
+        "agent_type": "adult",
         "gender": "male",
-        "mobility": "wheelchair",
+        "mobility": "none",
         "escorts": null,
-        "escorted_by": "synth:7B:0"
+        "escorted_by": null
       },
       "body": {
-        "can_use_stairs": false,
+        "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 0.641,
+        "base_speed": 1.154,
         "patience_s": 43.4,
         "tries_other_stair": false
       },
@@ -4642,15 +4652,16 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.536,
+        "floorplan_familiarity": 0.951,
         "habitual_stair": "north",
-        "knows_second_stair": true
+        "knows_second_stair": true,
+        "prior_false_alarms": 6
       },
       "dispositions": {
         "altruism": 0.195,
         "authority_compliance": 0.579,
         "leadership": 0.18,
-        "mill_tendency": 0.313,
+        "mill_tendency": 0.482,
         "risk_tolerance": 0.348,
         "seeks_confirmation": 0.609
       },
@@ -4665,11 +4676,26 @@
           "to": "synth:7B:2",
           "kind": "household",
           "strength": 1.0
+        },
+        {
+          "to": "synth:7C:0",
+          "kind": "knock",
+          "strength": 0.612
+        },
+        {
+          "to": "synth:7D:0",
+          "kind": "knock",
+          "strength": 0.847
+        },
+        {
+          "to": "synth:4D:1",
+          "kind": "phone",
+          "strength": 0.79
         }
       ],
       "household": "HH-7B",
       "household_index": 19,
-      "narrative": "Somebody of 10 has lived in 7B for less than a year and is a child of the household. They use a wheelchair and cannot use the stairs at all. They share the flat with 2 other adults. They know the building reasonably well, and take the north stair by habit. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 29 has lived in 7B for 5 years and is a partner in the household. They share the flat with 2 other adults. They know the building well, and take the north stair by habit. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -4768,7 +4794,7 @@
       ],
       "household": "HH-7B",
       "household_index": 19,
-      "narrative": "Somebody of 36 has lived in 7B for 3 years and shares the flat. They share the flat with 1 other adult and 1 child. They know the building reasonably well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, 1 person in the building they would phone.",
+      "narrative": "Somebody of 36 has lived in 7B for 3 years and shares the flat. They share the flat with 2 other adults. They know the building reasonably well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -4835,6 +4861,11 @@
           "strength": 1.0
         },
         {
+          "to": "synth:7B:1",
+          "kind": "knock",
+          "strength": 0.612
+        },
+        {
           "to": "synth:7D:0",
           "kind": "knock",
           "strength": 0.784
@@ -4857,7 +4888,7 @@
       ],
       "household": "HH-7C",
       "household_index": 22,
-      "narrative": "Somebody of 48 has lived in 7C for 20 years and heads the household. They share the flat with 1 child. They know the building well, and take the north stair by habit. 4 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 1 person in the building they would phone.",
+      "narrative": "Somebody of 48 has lived in 7C for 20 years and heads the household. They share the flat with 1 child. They know the building well, and take the north stair by habit. 4 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -4867,11 +4898,11 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 17,
+        "age_years": 11,
         "age_band": "0_17",
         "sex": "female",
         "household_role": "child",
-        "tenure_years": 7.1
+        "tenure_years": 1.7
       },
       "sim": {
         "agent_type": "child",
@@ -4903,10 +4934,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.856,
+        "floorplan_familiarity": 0.625,
         "habitual_stair": "south",
         "knows_second_stair": false,
-        "prior_false_alarms": 7
+        "prior_false_alarms": 1
       },
       "dispositions": {
         "altruism": 0.496,
@@ -4926,7 +4957,7 @@
       ],
       "household": "HH-7C",
       "household_index": 22,
-      "narrative": "Somebody of 17 has lived in 7C for 7 years and is a child of the household. They share the flat with 1 other adult. They know the building well, and do not know there is a second staircase. 7 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 11 has lived in 7C for about a year and is a child of the household. They share the flat with 1 other adult. They know the building reasonably well, and do not know there is a second staircase. One false alarm here already, so a bell alone does not mean much to them. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
       "notes": ""
     },
     {
@@ -4988,9 +5019,9 @@
       "commitments": [],
       "ties": [
         {
-          "to": "synth:6C:1",
+          "to": "synth:7B:1",
           "kind": "knock",
-          "strength": 0.33
+          "strength": 0.847
         },
         {
           "to": "synth:7B:2",
@@ -5194,6 +5225,11 @@
           "strength": 0.497
         },
         {
+          "to": "synth:8D:1",
+          "kind": "knock",
+          "strength": 0.432
+        },
+        {
           "to": "synth:8D:2",
           "kind": "knock",
           "strength": 0.58
@@ -5211,7 +5247,7 @@
       ],
       "household": "HH-8B",
       "household_index": 26,
-      "narrative": "Somebody of 56 has lived in 8B for 4 years and heads the household. They share the flat with 1 other adult. They know the building well, and do not know there is a second staircase. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 1 person in the building they would phone.",
+      "narrative": "Somebody of 56 has lived in 8B for 4 years and heads the household. They share the flat with 1 other adult. They know the building well, and do not know there is a second staircase. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -5278,11 +5314,6 @@
           "strength": 1.0
         },
         {
-          "to": "synth:8C:1",
-          "kind": "knock",
-          "strength": 0.579
-        },
-        {
           "to": "synth:8D:0",
           "kind": "knock",
           "strength": 0.674
@@ -5305,7 +5336,7 @@
       ],
       "household": "HH-8B",
       "household_index": 26,
-      "narrative": "Somebody of 51 has lived in 8B for about a year and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, 1 person in the building they would phone.",
+      "narrative": "Somebody of 51 has lived in 8B for about a year and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -5419,7 +5450,7 @@
       ],
       "household": "HH-8C",
       "household_index": 28,
-      "narrative": "Somebody of 40 has lived in 8C for 6 years and heads the household. They share the flat with 1 other adult and 2 children. They know the building well, and take the north stair by habit. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 3 people in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 40 has lived in 8C for 6 years and heads the household. They share the flat with 3 children. They know the building well, and take the north stair by habit. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 3 people in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -5429,14 +5460,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 34,
-        "age_band": "18_34",
+        "age_years": 17,
+        "age_band": "0_17",
         "sex": "male",
-        "household_role": "partner",
+        "household_role": "child",
         "tenure_years": 2.1
       },
       "sim": {
-        "agent_type": "adult",
+        "agent_type": "child",
         "gender": "male",
         "mobility": "none",
         "escorts": null,
@@ -5445,7 +5476,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 0.996,
+        "base_speed": 0.951,
         "patience_s": 64.8,
         "tries_other_stair": false
       },
@@ -5481,11 +5512,6 @@
       "commitments": [],
       "ties": [
         {
-          "to": "G_group_chat_building",
-          "kind": "group_chat",
-          "strength": 0.118
-        },
-        {
           "to": "synth:8C:0",
           "kind": "household",
           "strength": 1.0
@@ -5499,31 +5525,11 @@
           "to": "synth:8C:3",
           "kind": "household",
           "strength": 1.0
-        },
-        {
-          "to": "synth:8B:1",
-          "kind": "knock",
-          "strength": 0.579
-        },
-        {
-          "to": "synth:8D:0",
-          "kind": "knock",
-          "strength": 0.752
-        },
-        {
-          "to": "synth:8D:2",
-          "kind": "knock",
-          "strength": 0.798
-        },
-        {
-          "to": "synth:8D:3",
-          "kind": "knock",
-          "strength": 0.462
         }
       ],
       "household": "HH-8C",
       "household_index": 28,
-      "narrative": "Somebody of 34 has lived in 8C for 2 years and is a partner in the household. They share the flat with 1 other adult and 2 children. They know the building reasonably well, and take the south stair by habit. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 17 has lived in 8C for 2 years and is a child of the household. They share the flat with 1 other adult and 2 children. They know the building reasonably well, and take the south stair by habit. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep.",
       "notes": ""
     },
     {
@@ -5533,11 +5539,11 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 5,
+        "age_years": 9,
         "age_band": "0_17",
         "sex": "male",
         "household_role": "child",
-        "tenure_years": 0.8
+        "tenure_years": 4.9
       },
       "sim": {
         "agent_type": "child",
@@ -5569,15 +5575,16 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.316,
+        "floorplan_familiarity": 0.622,
         "habitual_stair": "south",
-        "knows_second_stair": true
+        "knows_second_stair": true,
+        "prior_false_alarms": 0
       },
       "dispositions": {
         "altruism": 0.34,
         "authority_compliance": 0.587,
         "leadership": 0.494,
-        "mill_tendency": 0.491,
+        "mill_tendency": 0.755,
         "risk_tolerance": 0.331,
         "seeks_confirmation": 0.66
       },
@@ -5601,7 +5608,7 @@
       ],
       "household": "HH-8C",
       "household_index": 28,
-      "narrative": "Somebody of 5 has lived in 8C for less than a year and is a child of the household. They share the flat with 2 other adults and 1 child. They barely know the building's layout, and take the south stair by habit. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 9 has lived in 8C for 5 years and is a child of the household. They share the flat with 1 other adult and 2 children. They know the building reasonably well, and take the south stair by habit. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
       "notes": ""
     },
     {
@@ -5615,7 +5622,7 @@
         "age_band": "0_17",
         "sex": "female",
         "household_role": "child",
-        "tenure_years": 2.0
+        "tenure_years": 5.9
       },
       "sim": {
         "agent_type": "child",
@@ -5647,10 +5654,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.622,
+        "floorplan_familiarity": 0.751,
         "habitual_stair": "south",
         "knows_second_stair": true,
-        "prior_false_alarms": 2
+        "prior_false_alarms": 8
       },
       "dispositions": {
         "altruism": 0.115,
@@ -5680,7 +5687,7 @@
       ],
       "household": "HH-8C",
       "household_index": 28,
-      "narrative": "Somebody of 9 has lived in 8C for 2 years and is a child of the household. They share the flat with 2 other adults and 1 child. They know the building reasonably well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 9 has lived in 8C for 6 years and is a child of the household. They share the flat with 1 other adult and 2 children. They know the building well, and take the south stair by habit. 8 false alarms here already, so a bell alone does not mean much to them. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
       "notes": ""
     },
     {
@@ -5770,22 +5777,111 @@
           "to": "synth:8C:0",
           "kind": "knock",
           "strength": 0.562
-        },
-        {
-          "to": "synth:8C:1",
-          "kind": "knock",
-          "strength": 0.752
         }
       ],
       "household": "HH-8D",
       "household_index": 32,
-      "narrative": "Somebody of 29 has lived in 8D for 3 years and heads the household. They share the flat with 2 other adults and 1 child. They know the building well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 29 has lived in 8D for 3 years and heads the household. They share the flat with 3 other adults. They know the building well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
       "id": "P0033",
-      "key": "synth:8D:3",
+      "key": "synth:8D:1",
       "index": 33,
+      "case_id": null,
+      "identity": {
+        "name": null,
+        "age_years": 24,
+        "age_band": "18_34",
+        "sex": "male",
+        "household_role": "partner",
+        "tenure_years": 5.2
+      },
+      "sim": {
+        "agent_type": "adult",
+        "gender": "male",
+        "mobility": "none",
+        "escorts": null,
+        "escorted_by": null
+      },
+      "body": {
+        "can_use_stairs": true,
+        "limiting_condition": false,
+        "base_speed": 1.025,
+        "patience_s": 49.3,
+        "tries_other_stair": false
+      },
+      "situation": {
+        "unit": "8D",
+        "floor_label": 8,
+        "sim_floor": 8,
+        "home_tile": [
+          8,
+          2,
+          2
+        ],
+        "present": true,
+        "asleep": true,
+        "activity": "asleep",
+        "alarm_audible": true
+      },
+      "knowledge": {
+        "fire_safety_training": false,
+        "floorplan_familiarity": 0.968,
+        "habitual_stair": "south",
+        "knows_second_stair": false,
+        "prior_false_alarms": 2
+      },
+      "dispositions": {
+        "altruism": 0.499,
+        "authority_compliance": 0.901,
+        "leadership": 0.363,
+        "mill_tendency": 0.487,
+        "risk_tolerance": 0.092,
+        "seeks_confirmation": 0.093
+      },
+      "commitments": [],
+      "ties": [
+        {
+          "to": "synth:8D:0",
+          "kind": "household",
+          "strength": 1.0
+        },
+        {
+          "to": "synth:8D:2",
+          "kind": "household",
+          "strength": 1.0
+        },
+        {
+          "to": "synth:8D:3",
+          "kind": "household",
+          "strength": 1.0
+        },
+        {
+          "to": "synth:8B:0",
+          "kind": "knock",
+          "strength": 0.432
+        },
+        {
+          "to": "synth:15C:2",
+          "kind": "phone",
+          "strength": 0.661
+        },
+        {
+          "to": "synth:20A:0",
+          "kind": "phone",
+          "strength": 0.748
+        }
+      ],
+      "household": "HH-8D",
+      "household_index": 32,
+      "narrative": "Somebody of 24 has lived in 8D for 5 years and is a partner in the household. They share the flat with 3 other adults. They know the building well, and do not know there is a second staircase. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for, 2 people in the building they would phone.",
+      "notes": ""
+    },
+    {
+      "id": "P0034",
+      "key": "synth:8D:3",
+      "index": 34,
       "case_id": null,
       "identity": {
         "name": null,
@@ -5793,7 +5889,7 @@
         "age_band": "75_plus",
         "sex": "male",
         "household_role": "parent",
-        "tenure_years": 3.9
+        "tenure_years": 23.0
       },
       "sim": {
         "agent_type": "elderly",
@@ -5825,10 +5921,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.544,
+        "floorplan_familiarity": 0.811,
         "habitual_stair": "north",
         "knows_second_stair": false,
-        "prior_false_alarms": 2
+        "prior_false_alarms": 8
       },
       "dispositions": {
         "altruism": 0.518,
@@ -5886,11 +5982,6 @@
           "strength": 0.451
         },
         {
-          "to": "synth:8C:1",
-          "kind": "knock",
-          "strength": 0.462
-        },
-        {
           "to": "synth:7C:0",
           "kind": "phone",
           "strength": 0.625
@@ -5898,85 +5989,7 @@
       ],
       "household": "HH-8D",
       "household_index": 32,
-      "narrative": "Somebody of 88 has lived in 8D for 4 years and is an older parent living with the household. They share the flat with 2 other adults and 1 child. They know the building reasonably well, and do not know there is a second staircase. 2 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They have 7 neighbours they would knock for, 1 person in the building they would phone.",
-      "notes": ""
-    },
-    {
-      "id": "P0034",
-      "key": "synth:8D:1",
-      "index": 34,
-      "case_id": null,
-      "identity": {
-        "name": null,
-        "age_years": 9,
-        "age_band": "0_17",
-        "sex": "male",
-        "household_role": "child",
-        "tenure_years": 0.4
-      },
-      "sim": {
-        "agent_type": "child",
-        "gender": "male",
-        "mobility": "none",
-        "escorts": null,
-        "escorted_by": null
-      },
-      "body": {
-        "can_use_stairs": true,
-        "limiting_condition": false,
-        "base_speed": 0.83,
-        "patience_s": 49.3,
-        "tries_other_stair": false
-      },
-      "situation": {
-        "unit": "8D",
-        "floor_label": 8,
-        "sim_floor": 8,
-        "home_tile": [
-          8,
-          2,
-          2
-        ],
-        "present": true,
-        "asleep": true,
-        "activity": "asleep",
-        "alarm_audible": true
-      },
-      "knowledge": {
-        "fire_safety_training": false,
-        "floorplan_familiarity": 0.311,
-        "habitual_stair": "south",
-        "knows_second_stair": true
-      },
-      "dispositions": {
-        "altruism": 0.499,
-        "authority_compliance": 0.901,
-        "leadership": 0.363,
-        "mill_tendency": 0.316,
-        "risk_tolerance": 0.092,
-        "seeks_confirmation": 0.093
-      },
-      "commitments": [],
-      "ties": [
-        {
-          "to": "synth:8D:0",
-          "kind": "household",
-          "strength": 1.0
-        },
-        {
-          "to": "synth:8D:2",
-          "kind": "household",
-          "strength": 1.0
-        },
-        {
-          "to": "synth:8D:3",
-          "kind": "household",
-          "strength": 1.0
-        }
-      ],
-      "household": "HH-8D",
-      "household_index": 32,
-      "narrative": "Somebody of 9 has lived in 8D for less than a year and is a child of the household. They share the flat with 3 other adults. They barely know the building's layout, and take the south stair by habit. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 88 has lived in 8D for 23 years and is an older parent living with the household. They share the flat with 3 other adults. They know the building well, and do not know there is a second staircase. 8 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They have 6 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -6078,11 +6091,6 @@
           "strength": 0.689
         },
         {
-          "to": "synth:8C:1",
-          "kind": "knock",
-          "strength": 0.798
-        },
-        {
           "to": "case:C01",
           "kind": "phone",
           "strength": 0.672
@@ -6095,7 +6103,7 @@
       ],
       "household": "HH-8D",
       "household_index": 32,
-      "narrative": "Somebody of 23 has lived in 8D for 5 years and shares the flat. They share the flat with 2 other adults and 1 child. They know the building well, and take the north stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They have 5 neighbours they would knock for, 2 people in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 23 has lived in 8D for 5 years and shares the flat. They share the flat with 3 other adults. They know the building well, and take the north stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, 2 people in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -6160,11 +6168,16 @@
           "to": "G_group_chat_building",
           "kind": "group_chat",
           "strength": 0.233
+        },
+        {
+          "to": "synth:9B:0",
+          "kind": "knock",
+          "strength": 0.862
         }
       ],
       "household": "HH-09A",
       "household_index": null,
-      "narrative": "Night-shift nurse, awake and dressed, 33, has lived in 9A for 2 years and heads the household. They live alone. They know the building reasonably well, and take the south stair by habit. One false alarm here already, so a bell alone does not mean much to them. They tend to act rather than confer, and would go out of their way to help others. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are awake at home. They have the building group chat.",
+      "narrative": "Night-shift nurse, awake and dressed, 33, has lived in 9A for 2 years and heads the household. They live alone. They know the building reasonably well, and take the south stair by habit. One false alarm here already, so a bell alone does not mean much to them. They tend to act rather than confer, and would go out of their way to help others. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are awake at home. They have 1 neighbour they would knock for, the building group chat.",
       "notes": "Awake, dressed and trained when the alarm goes. The fastest realistic responder in the building, and a plausible informal leader on her floor."
     },
     {
@@ -6178,7 +6191,7 @@
         "age_band": "18_34",
         "sex": "female",
         "household_role": "head",
-        "tenure_years": 0.7
+        "tenure_years": 3.8
       },
       "sim": {
         "agent_type": "adult",
@@ -6210,15 +6223,16 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.362,
+        "floorplan_familiarity": 0.586,
         "habitual_stair": "north",
-        "knows_second_stair": false
+        "knows_second_stair": true,
+        "prior_false_alarms": 3
       },
       "dispositions": {
         "altruism": 0.511,
         "authority_compliance": 0.422,
         "leadership": 0.364,
-        "mill_tendency": 0.358,
+        "mill_tendency": 0.55,
         "risk_tolerance": 0.315,
         "seeks_confirmation": 0.745
       },
@@ -6236,11 +6250,21 @@
           "to": "G_group_chat_building",
           "kind": "group_chat",
           "strength": 0.293
+        },
+        {
+          "to": "case:C08",
+          "kind": "knock",
+          "strength": 0.862
+        },
+        {
+          "to": "synth:10D:2",
+          "kind": "knock",
+          "strength": 0.469
         }
       ],
       "household": "HH-9B",
       "household_index": null,
-      "narrative": "Somebody of 27 has lived in 9B for less than a year and heads the household. They live alone. They know the building reasonably well, and do not know there is a second staircase. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have the building group chat.",
+      "narrative": "Somebody of 27 has lived in 9B for 4 years and heads the household. They live alone. They know the building reasonably well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -6332,7 +6356,7 @@
       ],
       "household": "HH-9C",
       "household_index": 38,
-      "narrative": "Somebody of 28 has lived in 9C for 6 years and heads the household. They share the flat with 1 child. They know the building well, and take the south stair by habit. 7 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 people in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 28 has lived in 9C for 6 years and heads the household. They share the flat with 1 other adult. They know the building well, and take the south stair by habit. 7 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 people in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -6342,14 +6366,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 4,
-        "age_band": "0_17",
+        "age_years": 41,
+        "age_band": "35_49",
         "sex": "male",
-        "household_role": "child",
-        "tenure_years": 1.2
+        "household_role": "partner",
+        "tenure_years": 5.0
       },
       "sim": {
-        "agent_type": "child",
+        "agent_type": "adult",
         "gender": "male",
         "mobility": "none",
         "escorts": null,
@@ -6358,7 +6382,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 0.864,
+        "base_speed": 1.147,
         "patience_s": 60.1,
         "tries_other_stair": false
       },
@@ -6378,10 +6402,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.571,
+        "floorplan_familiarity": 0.86,
         "habitual_stair": "north",
         "knows_second_stair": true,
-        "prior_false_alarms": 2
+        "prior_false_alarms": 7
       },
       "dispositions": {
         "altruism": 0.53,
@@ -6391,17 +6415,30 @@
         "risk_tolerance": 0.498,
         "seeks_confirmation": 0.434
       },
-      "commitments": [],
+      "commitments": [
+        {
+          "kind": "pet",
+          "what": "pet",
+          "where": "unit",
+          "delay_s": 45.0,
+          "abandon_probability": 0.2
+        }
+      ],
       "ties": [
         {
           "to": "synth:9C:0",
           "kind": "household",
           "strength": 1.0
+        },
+        {
+          "to": "synth:10D:1",
+          "kind": "knock",
+          "strength": 0.27
         }
       ],
       "household": "HH-9C",
       "household_index": 38,
-      "narrative": "Somebody of 4 has lived in 9C for about a year and is a child of the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 41 has lived in 9C for 5 years and is a partner in the household. They share the flat with 1 other adult. They know the building well, and take the north stair by habit. 7 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 1 neighbour they would knock for.",
       "notes": ""
     },
     {
@@ -6607,9 +6644,9 @@
           "strength": 0.892
         },
         {
-          "to": "synth:11D:0",
+          "to": "synth:10D:3",
           "kind": "knock",
-          "strength": 0.51
+          "strength": 0.817
         },
         {
           "to": "synth:10D:2",
@@ -6629,11 +6666,11 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 4,
+        "age_years": 15,
         "age_band": "0_17",
         "sex": "male",
         "household_role": "child",
-        "tenure_years": 2.4
+        "tenure_years": 13.8
       },
       "sim": {
         "agent_type": "child",
@@ -6665,10 +6702,10 @@
       },
       "knowledge": {
         "fire_safety_training": true,
-        "floorplan_familiarity": 0.578,
+        "floorplan_familiarity": 0.674,
         "habitual_stair": "north",
         "knows_second_stair": true,
-        "prior_false_alarms": 3
+        "prior_false_alarms": 1
       },
       "dispositions": {
         "altruism": 0.729,
@@ -6688,7 +6725,7 @@
       ],
       "household": "HH-10B",
       "household_index": 42,
-      "narrative": "Somebody of 4 has lived in 10B for 2 years and is a child of the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 15 has lived in 10B for 14 years and is a child of the household. They share the flat with 1 other adult. They know the building well, and take the north stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would go out of their way to help others. At the moment the fire starts they are asleep.",
       "notes": ""
     },
     {
@@ -6765,6 +6802,11 @@
           "strength": 0.607
         },
         {
+          "to": "synth:10D:3",
+          "kind": "knock",
+          "strength": 0.694
+        },
+        {
           "to": "synth:11C:1",
           "kind": "knock",
           "strength": 0.56
@@ -6777,7 +6819,7 @@
       ],
       "household": "HH-10C",
       "household_index": null,
-      "narrative": "Somebody of 43 has lived in 10C for 8 years and heads the household. They live alone. They know the building well, and do not know there is a second staircase. 6 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 5 neighbours they would knock for.",
+      "narrative": "Somebody of 43 has lived in 10C for 8 years and heads the household. They live alone. They know the building well, and do not know there is a second staircase. 6 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 6 neighbours they would knock for.",
       "notes": ""
     },
     {
@@ -6860,7 +6902,7 @@
       ],
       "household": "HH-10D",
       "household_index": 45,
-      "narrative": "Somebody of 37 has lived in 10D for less than a year and heads the household. They share the flat with 2 other adults and 1 child. They know the building reasonably well, and take the north stair by habit. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for.",
+      "narrative": "Somebody of 37 has lived in 10D for less than a year and heads the household. They share the flat with 3 other adults. They know the building reasonably well, and take the north stair by habit. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for.",
       "notes": ""
     },
     {
@@ -6950,11 +6992,16 @@
           "to": "synth:10C:0",
           "kind": "knock",
           "strength": 0.607
+        },
+        {
+          "to": "synth:9C:1",
+          "kind": "knock",
+          "strength": 0.27
         }
       ],
       "household": "HH-10D",
       "household_index": 45,
-      "narrative": "Somebody of 26 has lived in 10D for 2 years and is a partner in the household. They share the flat with 2 other adults and 1 child. They know the building reasonably well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 26 has lived in 10D for 2 years and is a partner in the household. They share the flat with 3 other adults. They know the building reasonably well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -6964,14 +7011,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 9,
-        "age_band": "0_17",
+        "age_years": 60,
+        "age_band": "50_64",
         "sex": "male",
-        "household_role": "child",
-        "tenure_years": 0.1
+        "household_role": "parent",
+        "tenure_years": 12.0
       },
       "sim": {
-        "agent_type": "child",
+        "agent_type": "adult",
         "gender": "male",
         "mobility": "none",
         "escorts": null,
@@ -6980,7 +7027,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 0.913,
+        "base_speed": 0.907,
         "patience_s": 69.8,
         "tries_other_stair": false
       },
@@ -7000,15 +7047,16 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.365,
+        "floorplan_familiarity": 0.932,
         "habitual_stair": "north",
-        "knows_second_stair": false
+        "knows_second_stair": true,
+        "prior_false_alarms": 3
       },
       "dispositions": {
         "altruism": 0.27,
         "authority_compliance": 0.426,
         "leadership": 0.413,
-        "mill_tendency": 0.56,
+        "mill_tendency": 0.862,
         "risk_tolerance": 0.345,
         "seeks_confirmation": 0.795
       },
@@ -7028,11 +7076,21 @@
           "to": "synth:10D:2",
           "kind": "household",
           "strength": 1.0
+        },
+        {
+          "to": "synth:10B:0",
+          "kind": "knock",
+          "strength": 0.817
+        },
+        {
+          "to": "synth:10C:0",
+          "kind": "knock",
+          "strength": 0.694
         }
       ],
       "household": "HH-10D",
       "household_index": 45,
-      "narrative": "Somebody of 9 has lived in 10D for less than a year and is a child of the household. They share the flat with 3 other adults. They know the building reasonably well, and do not know there is a second staircase. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 60 has lived in 10D for 12 years and is an older parent living with the household. They share the flat with 3 other adults. They know the building well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for.",
       "notes": ""
     },
     {
@@ -7109,6 +7167,16 @@
           "strength": 1.0
         },
         {
+          "to": "synth:11C:2",
+          "kind": "knock",
+          "strength": 0.517
+        },
+        {
+          "to": "synth:9B:0",
+          "kind": "knock",
+          "strength": 0.469
+        },
+        {
           "to": "synth:10B:0",
           "kind": "phone",
           "strength": 0.781
@@ -7121,7 +7189,7 @@
       ],
       "household": "HH-10D",
       "household_index": 45,
-      "narrative": "Somebody of 49 has lived in 10D for 5 years and shares the flat. They share the flat with 2 other adults and 1 child. They know the building reasonably well, and do not know there is a second staircase. 3 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 2 people in the building they would phone.",
+      "narrative": "Somebody of 49 has lived in 10D for 5 years and shares the flat. They share the flat with 3 other adults. They know the building reasonably well, and do not know there is a second staircase. 3 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, 2 people in the building they would phone.",
       "notes": ""
     },
     {
@@ -7277,7 +7345,7 @@
         "age_band": "50_64",
         "sex": "female",
         "household_role": "parent",
-        "tenure_years": 1.9
+        "tenure_years": 10.7
       },
       "sim": {
         "agent_type": "adult",
@@ -7309,10 +7377,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.585,
+        "floorplan_familiarity": 0.824,
         "habitual_stair": "south",
         "knows_second_stair": true,
-        "prior_false_alarms": 3
+        "prior_false_alarms": 7
       },
       "dispositions": {
         "altruism": 0.31,
@@ -7335,14 +7403,29 @@
           "strength": 0.792
         },
         {
+          "to": "synth:11C:2",
+          "kind": "knock",
+          "strength": 0.683
+        },
+        {
+          "to": "synth:12C:0",
+          "kind": "knock",
+          "strength": 0.552
+        },
+        {
           "to": "synth:12D:0",
           "kind": "knock",
           "strength": 0.393
+        },
+        {
+          "to": "synth:5D:2",
+          "kind": "phone",
+          "strength": 0.588
         }
       ],
       "household": "HH-11B",
       "household_index": 50,
-      "narrative": "Somebody of 51 has lived in 11B for about a year and is an older parent living with the household. They share the flat with 1 other adult. They know the building reasonably well, and take the south stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for.",
+      "narrative": "Somebody of 51 has lived in 11B for 11 years and is an older parent living with the household. They share the flat with 1 other adult. They know the building well, and take the south stair by habit. 7 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -7423,7 +7506,7 @@
       ],
       "household": "HH-11C",
       "household_index": 52,
-      "narrative": "Somebody of 62 has lived in 11C for less than a year and heads the household. They share the flat with 1 other adult and 1 child. They know the building well, and take the north stair by habit. They will usually check with somebody before acting, and would help if asked. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They will not leave without the pet.",
+      "narrative": "Somebody of 62 has lived in 11C for less than a year and heads the household. They share the flat with 2 other adults. They know the building well, and take the north stair by habit. They will usually check with somebody before acting, and would help if asked. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They will not leave without the pet.",
       "notes": ""
     },
     {
@@ -7516,16 +7599,11 @@
           "to": "synth:11D:0",
           "kind": "knock",
           "strength": 0.381
-        },
-        {
-          "to": "synth:20B:0",
-          "kind": "phone",
-          "strength": 0.988
         }
       ],
       "household": "HH-11C",
       "household_index": 52,
-      "narrative": "Somebody of 44 has lived in 11C for about a year and is a partner in the household. They share the flat with 1 other adult and 1 child. They know the building reasonably well, and take the south stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for, 1 person in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 44 has lived in 11C for about a year and is a partner in the household. They share the flat with 2 other adults. They know the building reasonably well, and take the south stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -7535,14 +7613,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 15,
-        "age_band": "0_17",
+        "age_years": 74,
+        "age_band": "65_74",
         "sex": "male",
-        "household_role": "child",
-        "tenure_years": 9.0
+        "household_role": "lodger",
+        "tenure_years": 14.8
       },
       "sim": {
-        "agent_type": "child",
+        "agent_type": "elderly",
         "gender": "male",
         "mobility": "none",
         "escorts": null,
@@ -7551,7 +7629,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 0.956,
+        "base_speed": 0.73,
         "patience_s": 64.4,
         "tries_other_stair": false
       },
@@ -7581,11 +7659,16 @@
         "authority_compliance": 0.47,
         "leadership": 0.36,
         "mill_tendency": 0.88,
-        "risk_tolerance": 0.343,
+        "risk_tolerance": 0.274,
         "seeks_confirmation": 0.475
       },
       "commitments": [],
       "ties": [
+        {
+          "to": "G_group_chat_building",
+          "kind": "group_chat",
+          "strength": 0.126
+        },
         {
           "to": "synth:11C:0",
           "kind": "household",
@@ -7595,11 +7678,36 @@
           "to": "synth:11C:1",
           "kind": "household",
           "strength": 1.0
+        },
+        {
+          "to": "synth:10D:2",
+          "kind": "knock",
+          "strength": 0.517
+        },
+        {
+          "to": "synth:11B:1",
+          "kind": "knock",
+          "strength": 0.683
+        },
+        {
+          "to": "synth:11D:0",
+          "kind": "knock",
+          "strength": 0.467
+        },
+        {
+          "to": "synth:11D:1",
+          "kind": "knock",
+          "strength": 0.81
+        },
+        {
+          "to": "case:C06",
+          "kind": "phone",
+          "strength": 0.674
         }
       ],
       "household": "HH-11C",
       "household_index": 52,
-      "narrative": "Somebody of 15 has lived in 11C for 9 years and is a child of the household. They share the flat with 2 other adults. They know the building reasonably well, and take the north stair by habit. 8 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 74 has lived in 11C for 15 years and shares the flat. They share the flat with 2 other adults. They know the building reasonably well, and take the north stair by habit. 8 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, 1 person in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -7666,11 +7774,6 @@
           "strength": 1.0
         },
         {
-          "to": "synth:10B:0",
-          "kind": "knock",
-          "strength": 0.51
-        },
-        {
           "to": "synth:11B:0",
           "kind": "knock",
           "strength": 0.302
@@ -7681,9 +7784,9 @@
           "strength": 0.381
         },
         {
-          "to": "case:C03",
-          "kind": "phone",
-          "strength": 0.703
+          "to": "synth:11C:2",
+          "kind": "knock",
+          "strength": 0.467
         },
         {
           "to": "synth:26B:1",
@@ -7693,7 +7796,7 @@
       ],
       "household": "HH-11D",
       "household_index": 55,
-      "narrative": "Somebody of 49 has lived in 11D for 4 years and heads the household. They share the flat with 1 other adult. They know the building well, and do not know there is a second staircase. One false alarm here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 2 people in the building they would phone.",
+      "narrative": "Somebody of 49 has lived in 11D for 4 years and heads the household. They share the flat with 1 other adult. They know the building well, and do not know there is a second staircase. One false alarm here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -7765,19 +7868,24 @@
           "strength": 0.414
         },
         {
+          "to": "synth:11C:2",
+          "kind": "knock",
+          "strength": 0.81
+        },
+        {
+          "to": "synth:12C:0",
+          "kind": "knock",
+          "strength": 0.29
+        },
+        {
           "to": "synth:12D:0",
           "kind": "knock",
           "strength": 0.206
-        },
-        {
-          "to": "synth:18D:0",
-          "kind": "phone",
-          "strength": 0.97
         }
       ],
       "household": "HH-11D",
       "household_index": 55,
-      "narrative": "Somebody of 37 has lived in 11D for 14 years and is a partner in the household. They share the flat with 1 other adult. They know the building well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, 1 person in the building they would phone.",
+      "narrative": "Somebody of 37 has lived in 11D for 14 years and is a partner in the household. They share the flat with 1 other adult. They know the building well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for.",
       "notes": ""
     },
     {
@@ -7907,6 +8015,11 @@
       "commitments": [],
       "ties": [
         {
+          "to": "synth:12C:0",
+          "kind": "knock",
+          "strength": 0.538
+        },
+        {
           "to": "synth:12D:0",
           "kind": "knock",
           "strength": 0.832
@@ -7914,7 +8027,7 @@
       ],
       "household": "HH-12B",
       "household_index": null,
-      "narrative": "Resident on the fire floor, 45, has lived in 12B for 13 years and heads the household. They live alone. They know the building well, and take the north stair by habit. 4 false alarms here already, so a bell alone does not mean much to them. They tend to act rather than confer, and would go out of their way to help others. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for.",
+      "narrative": "Resident on the fire floor, 45, has lived in 12B for 13 years and heads the household. They live alone. They know the building well, and take the north stair by habit. 4 false alarms here already, so a bell alone does not mean much to them. They tend to act rather than confer, and would go out of their way to help others. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for.",
       "notes": "Smoke and noise reach him before the alarm does, so his cues are unambiguous. High altruism and high leadership: the neighbour who knocks on doors."
     },
     {
@@ -7928,7 +8041,7 @@
         "age_band": "65_74",
         "sex": "female",
         "household_role": "head",
-        "tenure_years": 0.5
+        "tenure_years": 3.2
       },
       "sim": {
         "agent_type": "elderly",
@@ -7960,15 +8073,16 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.245,
+        "floorplan_familiarity": 0.593,
         "habitual_stair": "south",
-        "knows_second_stair": false
+        "knows_second_stair": true,
+        "prior_false_alarms": 2
       },
       "dispositions": {
         "altruism": 0.242,
         "authority_compliance": 0.565,
         "leadership": 0.332,
-        "mill_tendency": 0.507,
+        "mill_tendency": 0.78,
         "risk_tolerance": 0.484,
         "seeks_confirmation": 0.739
       },
@@ -7978,11 +8092,26 @@
           "to": "synth:12C:1",
           "kind": "household",
           "strength": 1.0
+        },
+        {
+          "to": "case:C07",
+          "kind": "knock",
+          "strength": 0.538
+        },
+        {
+          "to": "synth:11B:1",
+          "kind": "knock",
+          "strength": 0.552
+        },
+        {
+          "to": "synth:11D:1",
+          "kind": "knock",
+          "strength": 0.29
         }
       ],
       "household": "HH-12C",
       "household_index": 59,
-      "narrative": "Somebody of 67 has lived in 12C for less than a year and heads the household. They share the flat with 1 child. They barely know the building's layout, and do not know there is a second staircase. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 67 has lived in 12C for 3 years and heads the household. They share the flat with 1 other adult. They know the building reasonably well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for.",
       "notes": ""
     },
     {
@@ -7992,14 +8121,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 7,
-        "age_band": "0_17",
+        "age_years": 23,
+        "age_band": "18_34",
         "sex": "male",
-        "household_role": "child",
-        "tenure_years": 3.2
+        "household_role": "partner",
+        "tenure_years": 3.0
       },
       "sim": {
-        "agent_type": "child",
+        "agent_type": "adult",
         "gender": "male",
         "mobility": "none",
         "escorts": null,
@@ -8008,7 +8137,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 0.943,
+        "base_speed": 0.801,
         "patience_s": 74.5,
         "tries_other_stair": true
       },
@@ -8047,11 +8176,16 @@
           "to": "synth:12C:0",
           "kind": "household",
           "strength": 1.0
+        },
+        {
+          "to": "synth:12D:0",
+          "kind": "knock",
+          "strength": 0.846
         }
       ],
       "household": "HH-12C",
       "household_index": 59,
-      "narrative": "Somebody of 7 has lived in 12C for 3 years and is a child of the household. They share the flat with 1 other adult. They know the building well, and take the south stair by habit. One false alarm here already, so a bell alone does not mean much to them. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. They are not in the building when the fire starts.",
+      "narrative": "Somebody of 23 has lived in 12C for 3 years and is a partner in the household. They share the flat with 1 other adult. They know the building well, and take the south stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. They are not in the building when the fire starts.",
       "notes": ""
     },
     {
@@ -8134,6 +8268,11 @@
           "to": "synth:11D:1",
           "kind": "knock",
           "strength": 0.206
+        },
+        {
+          "to": "synth:12C:1",
+          "kind": "knock",
+          "strength": 0.846
         }
       ],
       "household": "HH-12D",
@@ -8235,24 +8374,14 @@
           "strength": 0.821
         },
         {
-          "to": "synth:14D:0",
-          "kind": "knock",
-          "strength": 0.675
-        },
-        {
           "to": "synth:15C:2",
           "kind": "knock",
           "strength": 0.447
-        },
-        {
-          "to": "synth:11D:0",
-          "kind": "phone",
-          "strength": 0.703
         }
       ],
       "household": "HH-14A",
       "household_index": 62,
-      "narrative": "Mother of a small child, with a cat, 38, has lived in 14A for 6 years and heads the household. They share the flat with 1 other adult and 1 child. They know the building well, and take the north stair by habit. 5 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would go out of their way to help others. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They will not leave without the cat and the toddler. They have 3 neighbours they would knock for, 1 person in the building they would phone, the building group chat.",
+      "narrative": "Mother of a small child, with a cat, 38, has lived in 14A for 6 years and heads the household. They share the flat with 1 other adult and 1 child. They know the building well, and take the north stair by habit. 5 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would go out of their way to help others. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They will not leave without the cat and the toddler. They have 2 neighbours they would knock for, the building group chat.",
       "notes": "Two floors above the fire with a toddler to carry and a cat that hides. Gathering time, not walking speed, decides this household's outcome."
     },
     {
@@ -8337,11 +8466,6 @@
           "strength": 0.799
         },
         {
-          "to": "synth:14D:0",
-          "kind": "knock",
-          "strength": 0.526
-        },
-        {
           "to": "synth:14D:1",
           "kind": "knock",
           "strength": 0.386
@@ -8354,7 +8478,7 @@
       ],
       "household": "HH-14A",
       "household_index": 62,
-      "narrative": "Her partner, 41, has lived in 14A for 6 years and is a partner in the household. They share the flat with 1 other adult and 1 child. They know the building well, and take the north stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 4 neighbours they would knock for.",
+      "narrative": "Her partner, 41, has lived in 14A for 6 years and is a partner in the household. They share the flat with 1 other adult and 1 child. They know the building well, and take the north stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 3 neighbours they would knock for.",
       "notes": "The second adult in C03's flat. Whether the household waits for each other is the thing to watch."
     },
     {
@@ -8510,24 +8634,14 @@
           "strength": 0.372
         },
         {
-          "to": "synth:14D:0",
-          "kind": "knock",
-          "strength": 0.682
-        },
-        {
           "to": "synth:15D:1",
           "kind": "knock",
           "strength": 0.238
-        },
-        {
-          "to": "synth:17D:0",
-          "kind": "phone",
-          "strength": 0.631
         }
       ],
       "household": "HH-14B",
       "household_index": null,
-      "narrative": "Somebody of 39 has lived in 14B for 8 years and heads the household. They live alone. They know the building well, and take the south stair by habit. 4 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 5 neighbours they would knock for, 1 person in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 39 has lived in 14B for 8 years and heads the household. They live alone. They know the building well, and take the south stair by habit. 4 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -8648,7 +8762,7 @@
         "age_band": "35_49",
         "sex": "male",
         "household_role": "head",
-        "tenure_years": 16.1
+        "tenure_years": 0.9
       },
       "sim": {
         "agent_type": "adult",
@@ -8680,16 +8794,15 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.835,
+        "floorplan_familiarity": 0.199,
         "habitual_stair": "south",
-        "knows_second_stair": false,
-        "prior_false_alarms": 5
+        "knows_second_stair": false
       },
       "dispositions": {
         "altruism": 0.073,
         "authority_compliance": 0.729,
         "leadership": 0.514,
-        "mill_tendency": 0.827,
+        "mill_tendency": 0.537,
         "risk_tolerance": 0.362,
         "seeks_confirmation": 0.598
       },
@@ -8701,34 +8814,14 @@
           "strength": 1.0
         },
         {
-          "to": "case:C03",
-          "kind": "knock",
-          "strength": 0.675
-        },
-        {
-          "to": "case:C04",
-          "kind": "knock",
-          "strength": 0.526
-        },
-        {
-          "to": "synth:14B:0",
-          "kind": "knock",
-          "strength": 0.682
-        },
-        {
           "to": "synth:14C:0",
           "kind": "knock",
           "strength": 0.442
-        },
-        {
-          "to": "synth:22D:0",
-          "kind": "phone",
-          "strength": 0.647
         }
       ],
       "household": "HH-14D",
       "household_index": 67,
-      "narrative": "Somebody of 40 has lived in 14D for 16 years and heads the household. They share the flat with 1 other adult. They know the building well, and do not know there is a second staircase. 5 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, 1 person in the building they would phone.",
+      "narrative": "Somebody of 40 has lived in 14D for less than a year and heads the household. They share the flat with 1 other adult. They barely know the building's layout, and do not know there is a second staircase. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for.",
       "notes": ""
     },
     {
@@ -8899,6 +8992,11 @@
           "strength": 0.329
         },
         {
+          "to": "synth:15B:1",
+          "kind": "knock",
+          "strength": 0.572
+        },
+        {
           "to": "synth:15C:2",
           "kind": "knock",
           "strength": 0.811
@@ -8909,14 +9007,14 @@
           "strength": 0.323
         },
         {
-          "to": "synth:15D:3",
+          "to": "synth:16C:0",
           "kind": "knock",
-          "strength": 0.517
+          "strength": 0.421
         }
       ],
       "household": "HH-15A",
       "household_index": 69,
-      "narrative": "Somebody of 43 has lived in 15A for 12 years and heads the household. They share the flat with 1 other adult. They know the building well, and do not know there is a second staircase. 5 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 43 has lived in 15A for 12 years and heads the household. They share the flat with 1 other adult. They know the building well, and do not know there is a second staircase. 5 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 5 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -9118,21 +9216,11 @@
           "to": "synth:15D:0",
           "kind": "knock",
           "strength": 0.849
-        },
-        {
-          "to": "synth:15D:3",
-          "kind": "knock",
-          "strength": 0.541
-        },
-        {
-          "to": "synth:16A:1",
-          "kind": "knock",
-          "strength": 0.496
         }
       ],
       "household": "HH-15B",
       "household_index": 71,
-      "narrative": "Somebody of 43 has lived in 15B for 14 years and heads the household. They share the flat with 1 child. They know the building well, and take the south stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 5 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 43 has lived in 15B for 14 years and heads the household. They share the flat with 1 other adult. They know the building well, and take the south stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 3 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -9142,14 +9230,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 6,
-        "age_band": "0_17",
+        "age_years": 19,
+        "age_band": "18_34",
         "sex": "male",
-        "household_role": "child",
-        "tenure_years": 0.2
+        "household_role": "partner",
+        "tenure_years": 1.0
       },
       "sim": {
-        "agent_type": "child",
+        "agent_type": "adult",
         "gender": "male",
         "mobility": "none",
         "escorts": null,
@@ -9158,7 +9246,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 1.006,
+        "base_speed": 1.149,
         "patience_s": 62.6,
         "tries_other_stair": false
       },
@@ -9178,9 +9266,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.378,
+        "floorplan_familiarity": 0.999,
         "habitual_stair": "south",
-        "knows_second_stair": true
+        "knows_second_stair": false,
+        "prior_false_alarms": 1
       },
       "dispositions": {
         "altruism": 0.472,
@@ -9190,17 +9279,35 @@
         "risk_tolerance": 0.279,
         "seeks_confirmation": 0.741
       },
-      "commitments": [],
+      "commitments": [
+        {
+          "kind": "pet",
+          "what": "pet",
+          "where": "unit",
+          "delay_s": 45.0,
+          "abandon_probability": 0.2
+        }
+      ],
       "ties": [
         {
           "to": "synth:15B:0",
           "kind": "household",
           "strength": 1.0
+        },
+        {
+          "to": "synth:15A:0",
+          "kind": "knock",
+          "strength": 0.572
+        },
+        {
+          "to": "synth:16B:1",
+          "kind": "knock",
+          "strength": 0.53
         }
       ],
       "household": "HH-15B",
       "household_index": 71,
-      "narrative": "Somebody of 6 has lived in 15B for less than a year and is a child of the household. They share the flat with 1 other adult. They know the building reasonably well, and take the south stair by habit. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 19 has lived in 15B for about a year and is a partner in the household. They share the flat with 1 other adult. They know the building well, and do not know there is a second staircase. One false alarm here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for.",
       "notes": ""
     },
     {
@@ -9452,11 +9559,16 @@
           "to": "synth:15D:2",
           "kind": "phone",
           "strength": 0.658
+        },
+        {
+          "to": "synth:8D:1",
+          "kind": "phone",
+          "strength": 0.661
         }
       ],
       "household": "HH-15C",
       "household_index": 73,
-      "narrative": "Somebody of 72 has lived in 15C for 30 years and is an older parent living with the household. They share the flat with 2 other adults. They know the building well, and do not know there is a second staircase. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 1 person in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 72 has lived in 15C for 30 years and is an older parent living with the household. They share the flat with 2 other adults. They know the building well, and do not know there is a second staircase. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 2 people in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -9768,7 +9880,7 @@
         "age_band": "75_plus",
         "sex": "female",
         "household_role": "lodger",
-        "tenure_years": 19.5
+        "tenure_years": 0.8
       },
       "sim": {
         "agent_type": "elderly",
@@ -9800,16 +9912,15 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.973,
+        "floorplan_familiarity": 0.347,
         "habitual_stair": "north",
-        "knows_second_stair": true,
-        "prior_false_alarms": 6
+        "knows_second_stair": false
       },
       "dispositions": {
         "altruism": 0.178,
         "authority_compliance": 0.692,
         "leadership": 0.634,
-        "mill_tendency": 0.328,
+        "mill_tendency": 0.213,
         "risk_tolerance": 0.231,
         "seeks_confirmation": 0.353
       },
@@ -9831,24 +9942,14 @@
           "strength": 1.0
         },
         {
-          "to": "synth:15A:0",
-          "kind": "knock",
-          "strength": 0.517
-        },
-        {
           "to": "synth:15A:1",
           "kind": "knock",
           "strength": 0.547
-        },
-        {
-          "to": "synth:15B:0",
-          "kind": "knock",
-          "strength": 0.541
         }
       ],
       "household": "HH-15D",
       "household_index": 76,
-      "narrative": "Somebody of 83 has lived in 15D for 20 years and shares the flat. They use a walker or a cane, so stairs are slow and tiring. They share the flat with 3 other adults. They know the building well, and take the north stair by habit. 6 false alarms here already, so a bell alone does not mean much to them. They tend to act rather than confer, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for.",
+      "narrative": "Somebody of 83 has lived in 15D for less than a year and shares the flat. They use a walker or a cane, so stairs are slow and tiring. They share the flat with 3 other adults. They know the building reasonably well, and do not know there is a second staircase. They tend to act rather than confer, and look after themselves first. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for.",
       "notes": ""
     },
     {
@@ -9945,11 +10046,11 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 35,
-        "age_band": "35_49",
+        "age_years": 18,
+        "age_band": "18_34",
         "sex": "female",
         "household_role": "partner",
-        "tenure_years": 3.5
+        "tenure_years": 0.0
       },
       "sim": {
         "agent_type": "adult",
@@ -9981,16 +10082,15 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.616,
+        "floorplan_familiarity": 0.19,
         "habitual_stair": "south",
-        "knows_second_stair": true,
-        "prior_false_alarms": 1
+        "knows_second_stair": true
       },
       "dispositions": {
         "altruism": 0.353,
         "authority_compliance": 0.529,
         "leadership": 0.651,
-        "mill_tendency": 0.358,
+        "mill_tendency": 0.233,
         "risk_tolerance": 0.43,
         "seeks_confirmation": 0.538
       },
@@ -10008,26 +10108,11 @@
           "to": "synth:16A:0",
           "kind": "household",
           "strength": 1.0
-        },
-        {
-          "to": "synth:15B:0",
-          "kind": "knock",
-          "strength": 0.496
-        },
-        {
-          "to": "synth:16D:0",
-          "kind": "knock",
-          "strength": 0.352
-        },
-        {
-          "to": "synth:16D:1",
-          "kind": "knock",
-          "strength": 0.337
         }
       ],
       "household": "HH-16A",
       "household_index": 80,
-      "narrative": "Somebody of 35 has lived in 16A for 4 years and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and take the south stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 3 neighbours they would knock for.",
+      "narrative": "Somebody of 18 has lived in 16A for less than a year and is a partner in the household. They share the flat with 1 other adult. They barely know the building's layout, and take the south stair by habit. They tend to act rather than confer, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet.",
       "notes": ""
     },
     {
@@ -10094,6 +10179,11 @@
           "strength": 1.0
         },
         {
+          "to": "synth:16C:0",
+          "kind": "knock",
+          "strength": 0.407
+        },
+        {
           "to": "synth:16D:0",
           "kind": "knock",
           "strength": 0.352
@@ -10102,11 +10192,6 @@
           "to": "synth:16D:1",
           "kind": "knock",
           "strength": 0.643
-        },
-        {
-          "to": "synth:17D:1",
-          "kind": "knock",
-          "strength": 0.224
         },
         {
           "to": "synth:19C:0",
@@ -10183,6 +10268,11 @@
           "strength": 1.0
         },
         {
+          "to": "synth:15B:1",
+          "kind": "knock",
+          "strength": 0.53
+        },
+        {
           "to": "synth:16A:0",
           "kind": "knock",
           "strength": 0.727
@@ -10191,11 +10281,16 @@
           "to": "synth:16C:0",
           "kind": "knock",
           "strength": 0.309
+        },
+        {
+          "to": "synth:22C:0",
+          "kind": "phone",
+          "strength": 0.925
         }
       ],
       "household": "HH-16B",
       "household_index": 82,
-      "narrative": "Somebody of 26 has lived in 16B for 3 years and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and do not know there is a second staircase. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. The alarm cannot be heard where they are. They have 2 neighbours they would knock for.",
+      "narrative": "Somebody of 26 has lived in 16B for 3 years and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and do not know there is a second staircase. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. The alarm cannot be heard where they are. They have 3 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -10209,7 +10304,7 @@
         "age_band": "18_34",
         "sex": "female",
         "household_role": "head",
-        "tenure_years": 1.7
+        "tenure_years": 5.8
       },
       "sim": {
         "agent_type": "adult",
@@ -10241,10 +10336,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.916,
+        "floorplan_familiarity": 0.842,
         "habitual_stair": "south",
         "knows_second_stair": true,
-        "prior_false_alarms": 3
+        "prior_false_alarms": 6
       },
       "dispositions": {
         "altruism": 0.146,
@@ -10262,6 +10357,16 @@
           "strength": 0.397
         },
         {
+          "to": "synth:15A:0",
+          "kind": "knock",
+          "strength": 0.421
+        },
+        {
+          "to": "synth:16B:0",
+          "kind": "knock",
+          "strength": 0.407
+        },
+        {
           "to": "synth:16B:1",
           "kind": "knock",
           "strength": 0.309
@@ -10274,7 +10379,7 @@
       ],
       "household": "HH-16C",
       "household_index": null,
-      "narrative": "Somebody of 28 has lived in 16C for about a year and heads the household. They live alone. They know the building well, and take the south stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 28 has lived in 16C for 6 years and heads the household. They live alone. They know the building well, and take the south stair by habit. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -10288,7 +10393,7 @@
         "age_band": "35_49",
         "sex": "female",
         "household_role": "head",
-        "tenure_years": 9.2
+        "tenure_years": 3.5
       },
       "sim": {
         "agent_type": "adult",
@@ -10320,10 +10425,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.762,
+        "floorplan_familiarity": 0.647,
         "habitual_stair": "north",
         "knows_second_stair": true,
-        "prior_false_alarms": 6
+        "prior_false_alarms": 0
       },
       "dispositions": {
         "altruism": 0.241,
@@ -10351,11 +10456,6 @@
           "strength": 0.603
         },
         {
-          "to": "synth:16A:1",
-          "kind": "knock",
-          "strength": 0.352
-        },
-        {
           "to": "synth:16B:0",
           "kind": "knock",
           "strength": 0.352
@@ -10364,11 +10464,6 @@
           "to": "synth:16C:0",
           "kind": "knock",
           "strength": 0.371
-        },
-        {
-          "to": "synth:17D:1",
-          "kind": "knock",
-          "strength": 0.592
         },
         {
           "to": "synth:25B:0",
@@ -10383,7 +10478,7 @@
       ],
       "household": "HH-16D",
       "household_index": 85,
-      "narrative": "Somebody of 40 has lived in 16D for 9 years and heads the household. They share the flat with 1 other adult. They know the building well, and take the north stair by habit. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They have 5 neighbours they would knock for, 2 people in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 40 has lived in 16D for 4 years and heads the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. They will usually check with somebody before acting, and look after themselves first. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 2 people in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -10393,10 +10488,10 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 64,
-        "age_band": "50_64",
+        "age_years": 49,
+        "age_band": "35_49",
         "sex": "male",
-        "household_role": "parent",
+        "household_role": "partner",
         "tenure_years": 2.7
       },
       "sim": {
@@ -10450,11 +10545,6 @@
           "strength": 1.0
         },
         {
-          "to": "synth:16A:1",
-          "kind": "knock",
-          "strength": 0.337
-        },
-        {
           "to": "synth:16B:0",
           "kind": "knock",
           "strength": 0.643
@@ -10467,7 +10557,7 @@
       ],
       "household": "HH-16D",
       "household_index": 85,
-      "narrative": "Somebody of 64 has lived in 16D for 3 years and is an older parent living with the household. They share the flat with 1 other adult. They know the building well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are awake at home. They have 3 neighbours they would knock for.",
+      "narrative": "Somebody of 49 has lived in 16D for 3 years and is a partner in the household. They share the flat with 1 other adult. They know the building well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are awake at home. They have 2 neighbours they would knock for.",
       "notes": ""
     },
     {
@@ -10481,7 +10571,7 @@
         "age_band": "35_49",
         "sex": "female",
         "household_role": "head",
-        "tenure_years": 18.7
+        "tenure_years": 4.8
       },
       "sim": {
         "agent_type": "adult",
@@ -10513,10 +10603,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.961,
+        "floorplan_familiarity": 0.428,
         "habitual_stair": "south",
         "knows_second_stair": true,
-        "prior_false_alarms": 8
+        "prior_false_alarms": 1
       },
       "dispositions": {
         "altruism": 0.174,
@@ -10544,11 +10634,6 @@
           "strength": 0.523
         },
         {
-          "to": "synth:17B:1",
-          "kind": "knock",
-          "strength": 0.63
-        },
-        {
           "to": "synth:17C:1",
           "kind": "knock",
           "strength": 0.462
@@ -10559,6 +10644,11 @@
           "strength": 0.57
         },
         {
+          "to": "synth:18B:3",
+          "kind": "knock",
+          "strength": 0.533
+        },
+        {
           "to": "synth:25D:0",
           "kind": "phone",
           "strength": 0.875
@@ -10566,7 +10656,7 @@
       ],
       "household": "HH-17A",
       "household_index": 87,
-      "narrative": "Somebody of 39 has lived in 17A for 19 years and heads the household. They share the flat with 1 other adult. They know the building well, and take the south stair by habit. 8 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 5 neighbours they would knock for, 1 person in the building they would phone.",
+      "narrative": "Somebody of 39 has lived in 17A for 5 years and heads the household. They share the flat with 1 other adult. They know the building reasonably well, and take the south stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 5 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -10635,16 +10725,11 @@
           "to": "synth:17C:0",
           "kind": "knock",
           "strength": 0.329
-        },
-        {
-          "to": "synth:17D:1",
-          "kind": "knock",
-          "strength": 0.547
         }
       ],
       "household": "HH-17A",
       "household_index": 87,
-      "narrative": "Somebody of 60 has lived in 17A for less than a year and is an older parent living with the household. They share the flat with 1 other adult. They barely know the building's layout, and take the north stair by habit. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for.",
+      "narrative": "Somebody of 60 has lived in 17A for less than a year and is an older parent living with the household. They share the flat with 1 other adult. They barely know the building's layout, and take the north stair by habit. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for.",
       "notes": ""
     },
     {
@@ -10658,7 +10743,7 @@
         "age_band": "65_74",
         "sex": "female",
         "household_role": "head",
-        "tenure_years": 22.3
+        "tenure_years": 26.1
       },
       "sim": {
         "agent_type": "elderly",
@@ -10732,21 +10817,11 @@
           "to": "synth:17C:1",
           "kind": "knock",
           "strength": 0.574
-        },
-        {
-          "to": "synth:17D:1",
-          "kind": "knock",
-          "strength": 0.626
-        },
-        {
-          "to": "synth:18D:0",
-          "kind": "knock",
-          "strength": 0.281
         }
       ],
       "household": "HH-17B",
       "household_index": 89,
-      "narrative": "Somebody of 69 has lived in 17B for 22 years and heads the household. They share the flat with 1 other adult. They know the building well, and take the north stair by habit. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They will not leave without the pet. They have 4 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 69 has lived in 17B for 26 years and heads the household. They share the flat with 1 other adult. They know the building well, and take the north stair by habit. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -10760,7 +10835,7 @@
         "age_band": "50_64",
         "sex": "female",
         "household_role": "partner",
-        "tenure_years": 12.8
+        "tenure_years": 1.5
       },
       "sim": {
         "agent_type": "adult",
@@ -10792,10 +10867,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.82,
+        "floorplan_familiarity": 0.628,
         "habitual_stair": "north",
         "knows_second_stair": true,
-        "prior_false_alarms": 3
+        "prior_false_alarms": 2
       },
       "dispositions": {
         "altruism": 0.486,
@@ -10826,21 +10901,6 @@
           "strength": 0.524
         },
         {
-          "to": "synth:17A:0",
-          "kind": "knock",
-          "strength": 0.63
-        },
-        {
-          "to": "synth:17C:1",
-          "kind": "knock",
-          "strength": 0.878
-        },
-        {
-          "to": "synth:17D:1",
-          "kind": "knock",
-          "strength": 0.889
-        },
-        {
           "to": "synth:14C:0",
           "kind": "phone",
           "strength": 0.52
@@ -10848,7 +10908,7 @@
       ],
       "household": "HH-17B",
       "household_index": 89,
-      "narrative": "Somebody of 60 has lived in 17B for 13 years and is a partner in the household. They share the flat with 1 other adult. They know the building well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 4 neighbours they would knock for, 1 person in the building they would phone.",
+      "narrative": "Somebody of 60 has lived in 17B for about a year and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 1 neighbour they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -11020,11 +11080,6 @@
           "strength": 0.574
         },
         {
-          "to": "synth:17B:1",
-          "kind": "knock",
-          "strength": 0.878
-        },
-        {
           "to": "synth:18B:0",
           "kind": "knock",
           "strength": 0.588
@@ -11033,6 +11088,11 @@
           "to": "synth:18B:2",
           "kind": "knock",
           "strength": 0.517
+        },
+        {
+          "to": "synth:18B:3",
+          "kind": "knock",
+          "strength": 0.491
         },
         {
           "to": "synth:12A:0",
@@ -11106,21 +11166,11 @@
           "to": "synth:17D:1",
           "kind": "household",
           "strength": 1.0
-        },
-        {
-          "to": "synth:14B:0",
-          "kind": "phone",
-          "strength": 0.631
-        },
-        {
-          "to": "synth:6C:1",
-          "kind": "phone",
-          "strength": 0.791
         }
       ],
       "household": "HH-17D",
       "household_index": 93,
-      "narrative": "Somebody of 36 has lived in 17D for less than a year and heads the household. They share the flat with 1 other adult. They know the building reasonably well, and do not know there is a second staircase. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 2 people in the building they would phone.",
+      "narrative": "Somebody of 36 has lived in 17D for less than a year and heads the household. They share the flat with 1 child. They know the building reasonably well, and do not know there is a second staircase. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep.",
       "notes": ""
     },
     {
@@ -11130,14 +11180,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 30,
-        "age_band": "18_34",
+        "age_years": 13,
+        "age_band": "0_17",
         "sex": "female",
-        "household_role": "partner",
+        "household_role": "child",
         "tenure_years": 1.9
       },
       "sim": {
-        "agent_type": "adult",
+        "agent_type": "child",
         "gender": "female",
         "mobility": "none",
         "escorts": null,
@@ -11146,7 +11196,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 1.374,
+        "base_speed": 1.324,
         "patience_s": 42.9,
         "tries_other_stair": false
       },
@@ -11185,36 +11235,11 @@
           "to": "synth:17D:0",
           "kind": "household",
           "strength": 1.0
-        },
-        {
-          "to": "synth:16B:0",
-          "kind": "knock",
-          "strength": 0.224
-        },
-        {
-          "to": "synth:16D:0",
-          "kind": "knock",
-          "strength": 0.592
-        },
-        {
-          "to": "synth:17A:1",
-          "kind": "knock",
-          "strength": 0.547
-        },
-        {
-          "to": "synth:17B:0",
-          "kind": "knock",
-          "strength": 0.626
-        },
-        {
-          "to": "synth:17B:1",
-          "kind": "knock",
-          "strength": 0.889
         }
       ],
       "household": "HH-17D",
       "household_index": 93,
-      "narrative": "Somebody of 30 has lived in 17D for about a year and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 5 neighbours they would knock for.",
+      "narrative": "Somebody of 13 has lived in 17D for about a year and is a child of the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep.",
       "notes": ""
     },
     {
@@ -11289,16 +11314,11 @@
           "to": "synth:18B:2",
           "kind": "knock",
           "strength": 0.622
-        },
-        {
-          "to": "synth:18D:0",
-          "kind": "knock",
-          "strength": 0.538
         }
       ],
       "household": "HH-18A",
       "household_index": null,
-      "narrative": "Somebody of 45 has lived in 18A for 2 years and heads the household. They live alone. They know the building reasonably well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 45 has lived in 18A for 2 years and heads the household. They live alone. They know the building reasonably well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -11397,7 +11417,7 @@
       ],
       "household": "HH-18B",
       "household_index": 96,
-      "narrative": "Somebody of 26 has lived in 18B for 8 years and heads the household. They walk with difficulty and tire on stairs. They share the flat with 2 other adults and 1 child. They know the building well, and do not know there is a second staircase. 4 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 26 has lived in 18B for 8 years and heads the household. They walk with difficulty and tire on stairs. They share the flat with 3 other adults. They know the building well, and do not know there is a second staircase. 4 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -11480,7 +11500,7 @@
       ],
       "household": "HH-18B",
       "household_index": 96,
-      "narrative": "Somebody of 50 has lived in 18B for less than a year and is an older parent living with the household. They share the flat with 2 other adults and 1 child. They know the building reasonably well, and do not know there is a second staircase. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for.",
+      "narrative": "Somebody of 50 has lived in 18B for less than a year and is an older parent living with the household. They share the flat with 3 other adults. They know the building reasonably well, and do not know there is a second staircase. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for.",
       "notes": ""
     },
     {
@@ -11490,14 +11510,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 5,
-        "age_band": "0_17",
+        "age_years": 69,
+        "age_band": "65_74",
         "sex": "female",
-        "household_role": "child",
-        "tenure_years": 2.0
+        "household_role": "parent",
+        "tenure_years": 3.6
       },
       "sim": {
-        "agent_type": "child",
+        "agent_type": "elderly",
         "gender": "female",
         "mobility": "none",
         "escorts": null,
@@ -11506,7 +11526,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 0.969,
+        "base_speed": 0.745,
         "patience_s": 50.7,
         "tries_other_stair": false
       },
@@ -11536,7 +11556,7 @@
         "authority_compliance": 0.619,
         "leadership": 0.316,
         "mill_tendency": 0.613,
-        "risk_tolerance": 0.356,
+        "risk_tolerance": 0.284,
         "seeks_confirmation": 0.826
       },
       "commitments": [],
@@ -11555,11 +11575,31 @@
           "to": "synth:18B:2",
           "kind": "household",
           "strength": 1.0
+        },
+        {
+          "to": "synth:17A:0",
+          "kind": "knock",
+          "strength": 0.533
+        },
+        {
+          "to": "synth:17C:1",
+          "kind": "knock",
+          "strength": 0.491
+        },
+        {
+          "to": "synth:19C:0",
+          "kind": "knock",
+          "strength": 0.246
+        },
+        {
+          "to": "synth:21A:1",
+          "kind": "phone",
+          "strength": 0.579
         }
       ],
       "household": "HH-18B",
       "household_index": 96,
-      "narrative": "Somebody of 5 has lived in 18B for 2 years and is a child of the household. They share the flat with 3 other adults. They know the building reasonably well, and take the south stair by habit. One false alarm here already, so a bell alone does not mean much to them. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 69 has lived in 18B for 4 years and is an older parent living with the household. They share the flat with 3 other adults. They know the building reasonably well, and take the south stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -11653,7 +11693,7 @@
       ],
       "household": "HH-18B",
       "household_index": 96,
-      "narrative": "Somebody of 37 has lived in 18B for 9 years and shares the flat. They share the flat with 2 other adults and 1 child. They know the building well, and take the north stair by habit. 4 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for.",
+      "narrative": "Somebody of 37 has lived in 18B for 9 years and shares the flat. They share the flat with 3 other adults. They know the building well, and take the north stair by habit. 4 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for.",
       "notes": ""
     },
     {
@@ -11751,7 +11791,7 @@
         "age_band": "75_plus",
         "sex": "male",
         "household_role": "head",
-        "tenure_years": 23.7
+        "tenure_years": 0.8
       },
       "sim": {
         "agent_type": "elderly",
@@ -11783,16 +11823,15 @@
       },
       "knowledge": {
         "fire_safety_training": true,
-        "floorplan_familiarity": 0.85,
+        "floorplan_familiarity": 0.338,
         "habitual_stair": "north",
-        "knows_second_stair": false,
-        "prior_false_alarms": 1
+        "knows_second_stair": true
       },
       "dispositions": {
         "altruism": 0.346,
         "authority_compliance": 0.57,
         "leadership": 0.465,
-        "mill_tendency": 0.679,
+        "mill_tendency": 0.441,
         "risk_tolerance": 0.081,
         "seeks_confirmation": 0.529
       },
@@ -11804,24 +11843,9 @@
           "strength": 0.477
         },
         {
-          "to": "synth:17B:0",
-          "kind": "knock",
-          "strength": 0.281
-        },
-        {
-          "to": "synth:18A:0",
-          "kind": "knock",
-          "strength": 0.538
-        },
-        {
           "to": "synth:18B:2",
           "kind": "knock",
           "strength": 0.535
-        },
-        {
-          "to": "synth:11D:1",
-          "kind": "phone",
-          "strength": 0.97
         },
         {
           "to": "synth:4D:0",
@@ -11831,7 +11855,7 @@
       ],
       "household": "HH-18D",
       "household_index": null,
-      "narrative": "Somebody of 80 has lived in 18D for 24 years and heads the household. They live alone. They know the building well, and do not know there is a second staircase. One false alarm here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 2 people in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 80 has lived in 18D for less than a year and heads the household. They live alone. They barely know the building's layout, and take the north stair by habit. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for, 1 person in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -12056,6 +12080,11 @@
       "commitments": [],
       "ties": [
         {
+          "to": "synth:18B:3",
+          "kind": "knock",
+          "strength": 0.246
+        },
+        {
           "to": "synth:19A:0",
           "kind": "knock",
           "strength": 0.536
@@ -12073,7 +12102,7 @@
       ],
       "household": "HH-19C",
       "household_index": null,
-      "narrative": "Somebody of 40 has lived in 19C for 5 years and heads the household. They live alone. They know the building well, and take the south stair by habit. They will usually check with somebody before acting, and would go out of their way to help others. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, 1 person in the building they would phone.",
+      "narrative": "Somebody of 40 has lived in 19C for 5 years and heads the household. They live alone. They know the building well, and take the south stair by habit. They will usually check with somebody before acting, and would go out of their way to help others. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -12143,16 +12172,11 @@
           "to": "synth:19B:0",
           "kind": "knock",
           "strength": 0.789
-        },
-        {
-          "to": "synth:6C:1",
-          "kind": "phone",
-          "strength": 0.672
         }
       ],
       "household": "HH-19D",
       "household_index": null,
-      "narrative": "Somebody of 45 has lived in 19D for 4 years and heads the household. They live alone. They know the building reasonably well, and take the north stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for, 1 person in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 45 has lived in 19D for 4 years and heads the household. They live alone. They know the building reasonably well, and take the north stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -12237,11 +12261,16 @@
           "to": "synth:27D:0",
           "kind": "phone",
           "strength": 0.768
+        },
+        {
+          "to": "synth:8D:1",
+          "kind": "phone",
+          "strength": 0.748
         }
       ],
       "household": "HH-20A",
       "household_index": null,
-      "narrative": "Somebody of 62 has lived in 20A for 4 years and heads the household. They live alone. They know the building reasonably well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 1 person in the building they would phone, the building group chat.",
+      "narrative": "Somebody of 62 has lived in 20A for 4 years and heads the household. They live alone. They know the building reasonably well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 2 people in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -12255,7 +12284,7 @@
         "age_band": "50_64",
         "sex": "male",
         "household_role": "head",
-        "tenure_years": 4.9
+        "tenure_years": 29.6
       },
       "sim": {
         "agent_type": "adult",
@@ -12287,10 +12316,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.508,
+        "floorplan_familiarity": 0.798,
         "habitual_stair": "north",
         "knows_second_stair": true,
-        "prior_false_alarms": 2
+        "prior_false_alarms": 3
       },
       "dispositions": {
         "altruism": 0.279,
@@ -12311,16 +12340,11 @@
           "to": "synth:20A:0",
           "kind": "knock",
           "strength": 0.315
-        },
-        {
-          "to": "synth:11C:1",
-          "kind": "phone",
-          "strength": 0.988
         }
       ],
       "household": "HH-20B",
       "household_index": null,
-      "narrative": "Somebody of 55 has lived in 20B for 5 years and heads the household. They use a walker or a cane, so stairs are slow and tiring. They live alone. They know the building reasonably well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, 1 person in the building they would phone.",
+      "narrative": "Somebody of 55 has lived in 20B for 30 years and heads the household. They use a walker or a cane, so stairs are slow and tiring. They live alone. They know the building well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for.",
       "notes": ""
     },
     {
@@ -12628,7 +12652,7 @@
       ],
       "household": "HH-21A",
       "household_index": 111,
-      "narrative": "Somebody of 23 has lived in 21A for less than a year and heads the household. They share the flat with 1 child. They know the building reasonably well, and do not know there is a second staircase. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 1 neighbour they would knock for.",
+      "narrative": "Somebody of 23 has lived in 21A for less than a year and heads the household. They share the flat with 1 other adult. They know the building reasonably well, and do not know there is a second staircase. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 1 neighbour they would knock for.",
       "notes": ""
     },
     {
@@ -12638,14 +12662,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 5,
-        "age_band": "0_17",
+        "age_years": 64,
+        "age_band": "50_64",
         "sex": "female",
-        "household_role": "child",
-        "tenure_years": 2.0
+        "household_role": "parent",
+        "tenure_years": 4.4
       },
       "sim": {
-        "agent_type": "child",
+        "agent_type": "adult",
         "gender": "female",
         "mobility": "none",
         "escorts": null,
@@ -12654,7 +12678,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 0.782,
+        "base_speed": 1.273,
         "patience_s": 73.8,
         "tries_other_stair": false
       },
@@ -12690,14 +12714,34 @@
       "commitments": [],
       "ties": [
         {
+          "to": "G_group_chat_building",
+          "kind": "group_chat",
+          "strength": 0.125
+        },
+        {
           "to": "synth:21A:0",
           "kind": "household",
           "strength": 1.0
+        },
+        {
+          "to": "case:C06",
+          "kind": "knock",
+          "strength": 0.709
+        },
+        {
+          "to": "synth:22C:0",
+          "kind": "knock",
+          "strength": 0.215
+        },
+        {
+          "to": "synth:18B:3",
+          "kind": "phone",
+          "strength": 0.579
         }
       ],
       "household": "HH-21A",
       "household_index": 111,
-      "narrative": "Somebody of 5 has lived in 21A for 2 years and is a child of the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 64 has lived in 21A for 4 years and is an older parent living with the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, 1 person in the building they would phone, the building group chat.",
       "notes": ""
     },
     {
@@ -12795,7 +12839,7 @@
         "age_band": "18_34",
         "sex": "female",
         "household_role": "head",
-        "tenure_years": 0.1
+        "tenure_years": 1.1
       },
       "sim": {
         "agent_type": "adult",
@@ -12827,20 +12871,26 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.332,
+        "floorplan_familiarity": 0.803,
         "habitual_stair": "north",
-        "knows_second_stair": true
+        "knows_second_stair": true,
+        "prior_false_alarms": 1
       },
       "dispositions": {
         "altruism": 0.564,
         "authority_compliance": 0.658,
         "leadership": 0.298,
-        "mill_tendency": 0.554,
+        "mill_tendency": 0.853,
         "risk_tolerance": 0.31,
         "seeks_confirmation": 0.342
       },
       "commitments": [],
       "ties": [
+        {
+          "to": "G_group_chat_building",
+          "kind": "group_chat",
+          "strength": 0.426
+        },
         {
           "to": "synth:21C:1",
           "kind": "household",
@@ -12850,11 +12900,16 @@
           "to": "synth:21B:0",
           "kind": "knock",
           "strength": 0.607
+        },
+        {
+          "to": "synth:5A:0",
+          "kind": "phone",
+          "strength": 0.865
         }
       ],
       "household": "HH-21C",
       "household_index": 114,
-      "narrative": "Somebody of 20 has lived in 21C for less than a year and heads the household. They share the flat with 1 other adult. They barely know the building's layout, and take the north stair by habit. They will usually check with somebody before acting, and would help if asked. They are not in the building when the fire starts.",
+      "narrative": "Somebody of 20 has lived in 21C for about a year and heads the household. They share the flat with 1 other adult. They know the building well, and take the north stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and would help if asked. They are not in the building when the fire starts.",
       "notes": ""
     },
     {
@@ -12999,6 +13054,11 @@
           "strength": 0.275
         },
         {
+          "to": "synth:21A:1",
+          "kind": "knock",
+          "strength": 0.709
+        },
+        {
           "to": "synth:21B:0",
           "kind": "knock",
           "strength": 0.469
@@ -13007,6 +13067,11 @@
           "to": "synth:21C:1",
           "kind": "knock",
           "strength": 0.789
+        },
+        {
+          "to": "synth:11C:2",
+          "kind": "phone",
+          "strength": 0.674
         },
         {
           "to": "synth:22D:0",
@@ -13021,7 +13086,7 @@
       ],
       "household": "HH-21D",
       "household_index": null,
-      "narrative": "Wheelchair user living alone, 56, has lived in 21D for 9 years and heads the household. They use a wheelchair and cannot use the stairs at all. They live alone. They know the building well. 4 false alarms here already, so a bell alone does not mean much to them. They tend to act rather than confer, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for, 2 people in the building they would phone.",
+      "narrative": "Wheelchair user living alone, 56, has lived in 21D for 9 years and heads the household. They use a wheelchair and cannot use the stairs at all. They live alone. They know the building well. 4 false alarms here already, so a bell alone does not mean much to them. They tend to act rather than confer, and look after themselves first. At the moment the fire starts they are asleep. They have 4 neighbours they would knock for, 3 people in the building they would phone.",
       "notes": "Cannot use the stairs and has nobody in the flat to help. The simulation looks for a caregiver on the same floor and will not find one, so this persona is the deliberate test of that gap."
     },
     {
@@ -13105,7 +13170,7 @@
       ],
       "household": "HH-22A",
       "household_index": 117,
-      "narrative": "Somebody of 38 has lived in 22A for 14 years and heads the household. They share the flat with 1 other adult. They know the building well, and take the south stair by habit. 5 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for, 2 people in the building they would phone.",
+      "narrative": "Somebody of 38 has lived in 22A for 14 years and heads the household. They share the flat with 1 child. They know the building well, and take the south stair by habit. 5 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for, 2 people in the building they would phone.",
       "notes": ""
     },
     {
@@ -13115,14 +13180,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 28,
-        "age_band": "18_34",
+        "age_years": 11,
+        "age_band": "0_17",
         "sex": "female",
-        "household_role": "partner",
-        "tenure_years": 0.6
+        "household_role": "child",
+        "tenure_years": 3.0
       },
       "sim": {
-        "agent_type": "adult",
+        "agent_type": "child",
         "gender": "female",
         "mobility": "none",
         "escorts": null,
@@ -13131,7 +13196,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 1.127,
+        "base_speed": 0.945,
         "patience_s": 78.1,
         "tries_other_stair": false
       },
@@ -13151,15 +13216,16 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.488,
+        "floorplan_familiarity": 0.554,
         "habitual_stair": "north",
-        "knows_second_stair": true
+        "knows_second_stair": true,
+        "prior_false_alarms": 3
       },
       "dispositions": {
         "altruism": 0.156,
         "authority_compliance": 0.479,
         "leadership": 0.265,
-        "mill_tendency": 0.46,
+        "mill_tendency": 0.708,
         "risk_tolerance": 0.323,
         "seeks_confirmation": 0.326
       },
@@ -13173,7 +13239,7 @@
       ],
       "household": "HH-22A",
       "household_index": 117,
-      "narrative": "Somebody of 28 has lived in 22A for less than a year and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep.",
+      "narrative": "Somebody of 11 has lived in 22A for 3 years and is a child of the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are asleep.",
       "notes": ""
     },
     {
@@ -13257,7 +13323,7 @@
         "age_band": "18_34",
         "sex": "female",
         "household_role": "head",
-        "tenure_years": 2.5
+        "tenure_years": 8.3
       },
       "sim": {
         "agent_type": "adult",
@@ -13289,10 +13355,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.755,
+        "floorplan_familiarity": 0.712,
         "habitual_stair": "south",
         "knows_second_stair": true,
-        "prior_false_alarms": 1
+        "prior_false_alarms": 4
       },
       "dispositions": {
         "altruism": 0.354,
@@ -13318,6 +13384,11 @@
           "strength": 1.0
         },
         {
+          "to": "synth:21A:1",
+          "kind": "knock",
+          "strength": 0.215
+        },
+        {
           "to": "synth:21B:0",
           "kind": "knock",
           "strength": 0.429
@@ -13326,11 +13397,16 @@
           "to": "synth:22A:0",
           "kind": "knock",
           "strength": 0.608
+        },
+        {
+          "to": "synth:16B:1",
+          "kind": "phone",
+          "strength": 0.925
         }
       ],
       "household": "HH-22C",
       "household_index": 120,
-      "narrative": "Somebody of 32 has lived in 22C for 2 years and heads the household. They share the flat with 1 other adult. They know the building well, and take the south stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for.",
+      "narrative": "Somebody of 32 has lived in 22C for 8 years and heads the household. They share the flat with 1 other adult. They know the building well, and take the south stair by habit. 4 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They will not leave without the pet. They have 3 neighbours they would knock for, 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -13472,16 +13548,11 @@
           "to": "case:C06",
           "kind": "phone",
           "strength": 0.959
-        },
-        {
-          "to": "synth:14D:0",
-          "kind": "phone",
-          "strength": 0.647
         }
       ],
       "household": "HH-22D",
       "household_index": null,
-      "narrative": "Somebody of 67 has lived in 22D for 11 years and heads the household. They live alone. They know the building well, and take the north stair by habit. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 2 people in the building they would phone.",
+      "narrative": "Somebody of 67 has lived in 22D for 11 years and heads the household. They live alone. They know the building well, and take the north stair by habit. 6 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They have 1 person in the building they would phone.",
       "notes": ""
     },
     {
@@ -13804,7 +13875,7 @@
         "age_band": "18_34",
         "sex": "male",
         "household_role": "head",
-        "tenure_years": 1.7
+        "tenure_years": 5.8
       },
       "sim": {
         "agent_type": "adult",
@@ -13836,10 +13907,10 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.746,
+        "floorplan_familiarity": 0.955,
         "habitual_stair": "north",
         "knows_second_stair": true,
-        "prior_false_alarms": 1
+        "prior_false_alarms": 3
       },
       "dispositions": {
         "altruism": 0.539,
@@ -13867,7 +13938,7 @@
       ],
       "household": "HH-23D",
       "household_index": null,
-      "narrative": "Somebody of 28 has lived in 23D for about a year and heads the household. They live alone. They know the building well, and take the north stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 1 neighbour they would knock for.",
+      "narrative": "Somebody of 28 has lived in 23D for 6 years and heads the household. They live alone. They know the building well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are asleep. They will not leave without the pet. They have 1 neighbour they would knock for.",
       "notes": ""
     },
     {
@@ -13931,11 +14002,16 @@
           "to": "G_group_chat_building",
           "kind": "group_chat",
           "strength": 0.185
+        },
+        {
+          "to": "synth:24D:0",
+          "kind": "knock",
+          "strength": 0.595
         }
       ],
       "household": "HH-24A",
       "household_index": null,
-      "narrative": "Somebody of 22 has lived in 24A for less than a year and heads the household. They live alone. They barely know the building's layout, and take the north stair by habit. They will usually check with somebody before acting, and would help if asked. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They have the building group chat.",
+      "narrative": "Somebody of 22 has lived in 24A for less than a year and heads the household. They live alone. They barely know the building's layout, and take the north stair by habit. They will usually check with somebody before acting, and would help if asked. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are asleep. They have 1 neighbour they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -14113,7 +14189,7 @@
       ],
       "household": "HH-24C",
       "household_index": 130,
-      "narrative": "Somebody of 25 has lived in 24C for 7 years and heads the household. They share the flat with 1 other adult. They know the building well, and take the north stair by habit. 5 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 25 has lived in 24C for 7 years and heads the household. They share the flat with 1 child. They know the building well, and take the north stair by habit. 5 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 2 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -14123,14 +14199,14 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 24,
-        "age_band": "18_34",
+        "age_years": 6,
+        "age_band": "0_17",
         "sex": "female",
-        "household_role": "partner",
+        "household_role": "child",
         "tenure_years": 1.6
       },
       "sim": {
-        "agent_type": "adult",
+        "agent_type": "child",
         "gender": "female",
         "mobility": "none",
         "escorts": null,
@@ -14139,7 +14215,7 @@
       "body": {
         "can_use_stairs": true,
         "limiting_condition": false,
-        "base_speed": 1.341,
+        "base_speed": 0.864,
         "patience_s": 43.6,
         "tries_other_stair": false
       },
@@ -14175,29 +14251,14 @@
       "commitments": [],
       "ties": [
         {
-          "to": "G_group_chat_building",
-          "kind": "group_chat",
-          "strength": 0.218
-        },
-        {
           "to": "synth:24C:0",
           "kind": "household",
           "strength": 1.0
-        },
-        {
-          "to": "synth:24D:0",
-          "kind": "knock",
-          "strength": 0.717
-        },
-        {
-          "to": "synth:25C:1",
-          "kind": "knock",
-          "strength": 0.472
         }
       ],
       "household": "HH-24C",
       "household_index": 130,
-      "narrative": "Somebody of 24 has lived in 24C for about a year and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. In a corridor full of unsure neighbours, this is who starts giving directions. At the moment the fire starts they are awake at home. They have 2 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 6 has lived in 24C for about a year and is a child of the household. They share the flat with 1 other adult. They know the building reasonably well, and take the north stair by habit. 3 false alarms here already, so a bell alone does not mean much to them. They are too young to decide anything for themselves and will go wherever the adults in the flat take them. At the moment the fire starts they are awake at home.",
       "notes": ""
     },
     {
@@ -14264,14 +14325,14 @@
           "strength": 0.496
         },
         {
+          "to": "synth:24A:0",
+          "kind": "knock",
+          "strength": 0.595
+        },
+        {
           "to": "synth:24B:0",
           "kind": "knock",
           "strength": 0.747
-        },
-        {
-          "to": "synth:24C:1",
-          "kind": "knock",
-          "strength": 0.717
         }
       ],
       "household": "HH-24D",
@@ -14537,11 +14598,11 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 47,
-        "age_band": "35_49",
+        "age_years": 31,
+        "age_band": "18_34",
         "sex": "male",
         "household_role": "partner",
-        "tenure_years": 12.8
+        "tenure_years": 7.6
       },
       "sim": {
         "agent_type": "adult",
@@ -14609,11 +14670,6 @@
           "strength": 0.335
         },
         {
-          "to": "synth:24C:1",
-          "kind": "knock",
-          "strength": 0.472
-        },
-        {
           "to": "synth:25A:0",
           "kind": "knock",
           "strength": 0.378
@@ -14636,7 +14692,7 @@
       ],
       "household": "HH-25C",
       "household_index": 135,
-      "narrative": "Somebody of 47 has lived in 25C for 13 years and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and take the south stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are awake at home. They have 7 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 31 has lived in 25C for 8 years and is a partner in the household. They share the flat with 1 other adult. They know the building reasonably well, and take the south stair by habit. One false alarm here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and would help if asked. At the moment the fire starts they are awake at home. They have 6 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {
@@ -14842,8 +14898,8 @@
       "case_id": null,
       "identity": {
         "name": null,
-        "age_years": 92,
-        "age_band": "75_plus",
+        "age_years": 73,
+        "age_band": "65_74",
         "sex": "female",
         "household_role": "parent",
         "tenure_years": 19.2
@@ -14926,7 +14982,7 @@
       ],
       "household": "HH-26A",
       "household_index": 138,
-      "narrative": "Somebody of 92 has lived in 26A for 19 years and is an older parent living with the household. They share the flat with 3 other adults. They know the building well, and take the south stair by habit. 4 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for.",
+      "narrative": "Somebody of 73 has lived in 26A for 19 years and is an older parent living with the household. They share the flat with 3 other adults. They know the building well, and take the south stair by habit. 4 false alarms here already, so a bell alone does not mean much to them. They will look for information and talk to people before moving, and look after themselves first. At the moment the fire starts they are asleep. They have 3 neighbours they would knock for.",
       "notes": ""
     },
     {
@@ -15400,7 +15456,7 @@
         "age_band": "18_34",
         "sex": "female",
         "household_role": "head",
-        "tenure_years": 0.2
+        "tenure_years": 1.2
       },
       "sim": {
         "agent_type": "adult",
@@ -15432,15 +15488,16 @@
       },
       "knowledge": {
         "fire_safety_training": false,
-        "floorplan_familiarity": 0.047,
+        "floorplan_familiarity": 0.702,
         "habitual_stair": "south",
-        "knows_second_stair": true
+        "knows_second_stair": true,
+        "prior_false_alarms": 2
       },
       "dispositions": {
         "altruism": 0.2,
         "authority_compliance": 0.625,
         "leadership": 0.432,
-        "mill_tendency": 0.326,
+        "mill_tendency": 0.501,
         "risk_tolerance": 0.667,
         "seeks_confirmation": 0.363
       },
@@ -15472,7 +15529,7 @@
       ],
       "household": "HH-26D",
       "household_index": null,
-      "narrative": "Somebody of 20 has lived in 26D for less than a year and heads the household. They live alone. They barely know the building's layout, and take the south stair by habit. They tend to act rather than confer, and look after themselves first. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for, the building group chat.",
+      "narrative": "Somebody of 20 has lived in 26D for about a year and heads the household. They live alone. They know the building well, and take the south stair by habit. 2 false alarms here already, so a bell alone does not mean much to them. They will usually check with somebody before acting, and look after themselves first. At the moment the fire starts they are asleep. They will not leave without the pet. They have 2 neighbours they would knock for, the building group chat.",
       "notes": ""
     },
     {

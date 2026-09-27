@@ -227,7 +227,6 @@ def apply_rules(
         for rule, drawn_value, path in drawn:
             if rule.mechanism == "set":
                 continue
-            before = value
             if isinstance(value, bool) or isinstance(value, str):
                 if warnings is not None:
                     warnings.append(
@@ -248,7 +247,6 @@ def apply_rules(
                 drawn=drawn_value, result=value, evidence=rule.evidence,
                 sources=list(rule.sources), why=str(rule.pred), draw_path=path,
             ))
-            del before
 
         # bounds and rounding
         if not isinstance(value, (bool, str)):

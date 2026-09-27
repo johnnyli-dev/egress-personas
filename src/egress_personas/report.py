@@ -7,8 +7,6 @@ and repairs. Good news is further down.
 
 from __future__ import annotations
 
-from typing import Any
-
 from . import ties as tie_mod
 from .sample import Population
 
@@ -36,7 +34,6 @@ def markdown(pop: Population) -> str:  # noqa: C901 - a report is a list of sect
         "",
     ]
 
-    zero = [r for r in sorted(pop.matched) if pop.matched[r] == 0]
     unmatched = [w for w in pop.warnings if "matched no persona" in w]
     L += ["## Things to look at first", ""]
     if unmatched:
@@ -44,10 +41,14 @@ def markdown(pop: Population) -> str:  # noqa: C901 - a report is a list of sect
               f"nobody is almost always a broken `applies_to`, not a row that does "
               f"nothing.", ""]
         L += [f"- {w}" for w in unmatched] + [""]
+    by_cases = [c for c in pop.conformance
+                if c["within"] is False and c.get("explained_by_cases")]
     missed = [c for c in pop.conformance
-              if c["within"] is False and c.get("noise") is not True]
+              if c["within"] is False and c.get("noise") is not True
+              and not c.get("explained_by_cases")]
     noisy = [c for c in pop.conformance
-             if c["within"] is False and c.get("noise") is True]
+             if c["within"] is False and c.get("noise") is True
+             and not c.get("explained_by_cases")]
     if missed:
         L += [f"**{len(missed)} target(s) missed by more than sampling noise.** These "
               f"are the ones to act on.", ""]
@@ -65,6 +66,20 @@ def markdown(pop: Population) -> str:  # noqa: C901 - a report is a list of sect
             L.append(f"- {c['dimension']}.{c['category']}: wanted {c['target']} "
                      f"±{c['tolerance']}, got {c['realized']} over "
                      f"{c['measured_over']} people (±{c['stderr']} per standard error)")
+        L.append("")
+    if by_cases:
+        L += [f"{len(by_cases)} target(s) are outside tolerance **because of the "
+              f"hand-authored cases**, and land inside it once those are taken out. "
+              f"One authored persona is "
+              f"{1 / max(len(pop.people), 1) * 100:.1f} percentage points of the "
+              f"building, and rather more of a subgroup — so this is a decision "
+              f"somebody made, not a fault in the sampler.", ""]
+        for c in by_cases:
+            L.append(f"- {c['dimension']}.{c['category']}: wanted {c['target']}, got "
+                     f"{c['realized']} with the cases and "
+                     f"{c['realized_excluding_cases']} without "
+                     f"({c['cases_in_category']} of the {c['cases_in_base']} "
+                     f"case personas in this group)")
         L.append("")
     if pop.gaps:
         L += ["**Gaps left open on purpose.**", ""]
@@ -86,8 +101,8 @@ def markdown(pop: Population) -> str:  # noqa: C901 - a report is a list of sect
               "its tolerance, and no gap was left open.", ""]
 
     L += ["## Targets against what was drawn", "",
-          "| target | want | got | tol | over | s.e. | z | |",
-          "|---|---|---|---|---|---|---|---|"]
+          "| target | want | got | without cases | tol | over | s.e. | z | |",
+          "|---|---|---|---|---|---|---|---|---|"]
     for c in pop.conformance:
         if c["within"] is None:
             mark = ""
@@ -98,14 +113,19 @@ def markdown(pop: Population) -> str:  # noqa: C901 - a report is a list of sect
         else:
             mark = "**OFF**"
         tol = "" if c["tolerance"] is None else f"±{c['tolerance']}"
+        if c["within"] is False and c.get("explained_by_cases"):
+            mark = "cases"
+        excl = c.get("realized_excluding_cases")
         L.append(f"| {c['dimension']}.{c['category']} | {c['target']} | "
-                 f"{c['realized']} | {tol} | {c.get('measured_over', '')} | "
+                 f"{c['realized']} | {excl if excl is not None else ''} | {tol} | "
+                 f"{c.get('measured_over', '')} | "
                  f"{c.get('stderr') or ''} | {c.get('z') if c.get('z') is not None else ''} "
                  f"| {mark} |")
     L += ["",
           "`z` is how many standard errors the drawn share sits from its target, so a "
           "row marked `noise` is one where the building is too small to pin the share "
-          "any tighter. `**OFF**` means the sampler really is off.",
+          "any tighter, and one marked `cases` is one the hand-authored personas moved. "
+          "`**OFF**` means the sampler really is off.",
           ""]
     L += [f"Household sizes were tilted by theta = {pop.theta:.4f} to reach "
           f"{pop.targets.persons_per_flat} people per flat "
@@ -178,8 +198,6 @@ def markdown(pop: Population) -> str:  # noqa: C901 - a report is a list of sect
           "|---|---|---|---|"]
     ev: dict[str, str] = {}
     tgt: dict[str, str] = {}
-    for row in []:
-        pass
     for p in people:
         for path, tr in pop.traces.get(p.key, {}).items():
             for s in tr.steps:

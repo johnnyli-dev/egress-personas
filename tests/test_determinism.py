@@ -8,7 +8,6 @@ the results came from the change they made or from the reshuffling it caused.
 
 from __future__ import annotations
 
-import copy
 import json
 
 from egress_personas.emit import population_json
