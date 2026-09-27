@@ -1,0 +1,963 @@
+<title>Who Lives Here</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap">
+
+<style>
+/* ── tokens ─────────────────────────────────────────────────────────────────
+   A drafting palette: cool paper, ink, one plan-blue accent. Semantic colours
+   (fire, lift, unheard) are separate from the accent and are the only other
+   hues on the page. Every token is defined here, in the bare :root, so the
+   un-stamped "system" theme resolves as a complete set. */
+:root {
+  --paper:      #E9EDF1;
+  --surface:    #FFFFFF;
+  --surface-2:  #F4F7FA;
+  --ink:        #0E161F;
+  --ink-2:      #47555F;
+  --ink-3:      #78868F;
+  --rule:       #C2CCD5;
+  --rule-soft:  #DBE2E8;
+  --blue:       #17587F;
+  --blue-soft:  #D6E5EE;
+  --fire:       #A0331A;
+  --fire-soft:  #F2DCD5;
+  --lift:       #5C4488;
+  --lift-soft:  #E3DBF0;
+  --warn:       #765B0E;
+  --warn-soft:  #F0E7CC;
+  --shadow:     0 1px 2px rgba(14,22,31,.06), 0 8px 24px -16px rgba(14,22,31,.28);
+
+  --sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --serif: "IBM Plex Serif", ui-serif, Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:     #0B1015;
+    --surface:   #131B23;
+    --surface-2: #19222B;
+    --ink:       #DCE4EB;
+    --ink-2:     #94A2AF;
+    --ink-3:     #6C7A87;
+    --rule:      #263139;
+    --rule-soft: #1D262E;
+    --blue:      #6BB2DC;
+    --blue-soft: #102A3A;
+    --fire:      #E3805B;
+    --fire-soft: #331709;
+    --lift:      #AC90DF;
+    --lift-soft: #201831;
+    --warn:      #C8A749;
+    --warn-soft: #2B2410;
+    --shadow:    0 1px 2px rgba(0,0,0,.5), 0 10px 28px -18px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"] {
+  --paper:     #0B1015;
+  --surface:   #131B23;
+  --surface-2: #19222B;
+  --ink:       #DCE4EB;
+  --ink-2:     #94A2AF;
+  --ink-3:     #6C7A87;
+  --rule:      #263139;
+  --rule-soft: #1D262E;
+  --blue:      #6BB2DC;
+  --blue-soft: #102A3A;
+  --fire:      #E3805B;
+  --fire-soft: #331709;
+  --lift:      #AC90DF;
+  --lift-soft: #201831;
+  --warn:      #C8A749;
+  --warn-soft: #2B2410;
+  --shadow:    0 1px 2px rgba(0,0,0,.5), 0 10px 28px -18px rgba(0,0,0,.9);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1420px; margin: 0 auto; padding: 0 18px; padding-block: 22px 44px; }
+
+/* ── masthead ─────────────────────────────────────────────────────────── */
+header { display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: flex-end;
+         justify-content: space-between; padding-bottom: 14px;
+         border-bottom: 1px solid var(--rule); }
+h1 { font-size: 26px; font-weight: 600; letter-spacing: -.015em; margin: 0;
+     text-wrap: balance; }
+.sub { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; max-width: 62ch; }
+.sub b { color: var(--ink); font-weight: 500; }
+.runid { font-family: var(--mono); font-size: 11px; color: var(--ink-3);
+         margin: 6px 0 0; word-break: break-all; }
+
+.counts { display: flex; flex-wrap: wrap; gap: 0; }
+.counts div { padding: 0 16px; border-left: 1px solid var(--rule-soft); }
+.counts div:first-child { border-left: 0; padding-left: 0; }
+.counts b { display: block; font-family: var(--mono); font-size: 19px;
+            font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.counts span { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em;
+               color: var(--ink-3); }
+
+/* ── controls ─────────────────────────────────────────────────────────── */
+.controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center;
+            padding: 16px 0; }
+button { font: inherit; cursor: pointer; }
+#sample { font-family: var(--sans); font-size: 13px; font-weight: 500;
+          padding: 8px 16px; border-radius: 3px; border: 1px solid var(--blue);
+          background: var(--blue); color: var(--surface);
+          display: inline-flex; align-items: center; gap: 8px; }
+:root[data-theme="dark"] #sample, :root:not([data-theme="light"]) #sample { color: var(--paper); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) #sample { color: #fff; } }
+#sample kbd { font-family: var(--mono); font-size: 10px; opacity: .72;
+              border: 1px solid currentColor; border-radius: 2px; padding: 0 4px; }
+#sample:hover { filter: brightness(1.08); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; padding: 5px 10px; border-radius: 3px;
+        border: 1px solid var(--rule); background: var(--surface);
+        color: var(--ink-2); display: inline-flex; gap: 7px; align-items: baseline; }
+.chip:hover { border-color: var(--blue); color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--blue-soft); border-color: var(--blue);
+                             color: var(--ink); font-weight: 500; }
+.chip i { font-family: var(--mono); font-style: normal; font-size: 11px;
+          font-variant-numeric: tabular-nums; color: var(--ink-3); }
+.chip[aria-pressed="true"] i { color: var(--blue); }
+.chip[disabled] { opacity: .4; cursor: default; }
+
+/* ── the three tracks ─────────────────────────────────────────────────── */
+main { display: grid; grid-template-columns: 224px minmax(0, 1fr) 336px; gap: 18px;
+       align-items: start; }
+h2 { font-size: 10.5px; text-transform: uppercase; letter-spacing: .09em;
+     color: var(--ink-3); font-weight: 600; margin: 0 0 8px; }
+h2 em { font-style: normal; font-family: var(--mono); text-transform: none;
+        letter-spacing: 0; color: var(--ink-3); }
+aside > h2:not(:first-child) { margin-top: 22px; }
+
+/* ── the tower ────────────────────────────────────────────────────────── */
+#tower { display: flex; flex-direction: column-reverse; gap: 1px;
+         border: 1px solid var(--rule); border-radius: 3px; padding: 5px;
+         background: var(--surface); }
+.floor { display: grid; grid-template-columns: 24px repeat(4, 1fr); gap: 2px;
+         align-items: stretch; }
+.floor > b { font-family: var(--mono); font-size: 10px; font-weight: 400;
+             color: var(--ink-3); text-align: right; padding-right: 3px;
+             font-variant-numeric: tabular-nums; align-self: center; }
+.cell { height: 15px; border: 1px solid var(--rule-soft); border-radius: 1px;
+        background: var(--surface-2); position: relative; padding: 0;
+        font-family: var(--mono); font-size: 9px; color: var(--ink-3); }
+.cell:hover { border-color: var(--blue); }
+.cell[data-n="0"] { background: transparent; }
+.cell[data-n="1"] { background: color-mix(in srgb, var(--blue) 16%, var(--surface)); }
+.cell[data-n="2"] { background: color-mix(in srgb, var(--blue) 30%, var(--surface)); }
+.cell[data-n="3"] { background: color-mix(in srgb, var(--blue) 46%, var(--surface)); }
+.cell[data-n="4"] { background: color-mix(in srgb, var(--blue) 62%, var(--surface)); }
+.floor.fire > b { color: var(--fire); font-weight: 600; }
+.floor.fire .cell { border-color: var(--fire); }
+.cell.here { outline: 2px solid var(--ink); outline-offset: 1px; z-index: 2; }
+.cell.tie::after { content: ""; position: absolute; inset: 0; margin: auto;
+                   width: 5px; height: 5px; border-radius: 50%;
+                   background: var(--ink); }
+.cell.tie.knock::after  { background: var(--blue); }
+.cell.tie.phone::after  { background: var(--fire); }
+.floorpick { grid-column: 1 / -1; height: 0; }
+
+.legend { margin: 8px 0 0; font-size: 11px; color: var(--ink-3); line-height: 1.55; }
+.legend span { display: inline-flex; align-items: center; gap: 4px; margin-right: 10px; }
+.legend i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+
+/* ── resident list ────────────────────────────────────────────────────── */
+#list { list-style: none; margin: 0; padding: 0; max-height: 340px; overflow-y: auto;
+        border: 1px solid var(--rule); border-radius: 3px; background: var(--surface); }
+#list li + li { border-top: 1px solid var(--rule-soft); }
+#list button { display: grid; grid-template-columns: 34px 1fr auto; gap: 8px;
+               width: 100%; text-align: left; background: none; border: 0;
+               padding: 6px 8px; color: inherit; font-size: 12px; align-items: baseline; }
+#list button:hover { background: var(--surface-2); }
+#list button[aria-current="true"] { background: var(--blue-soft); font-weight: 500; }
+#list .u { font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
+#list .w { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis;
+           white-space: nowrap; }
+#list .t { font-family: var(--mono); font-size: 10px; color: var(--ink-3);
+           font-variant-numeric: tabular-nums; }
+
+/* ── the person ───────────────────────────────────────────────────────── */
+.person { background: var(--surface); border: 1px solid var(--rule); border-radius: 3px;
+          box-shadow: var(--shadow); padding: 22px 24px 24px; min-width: 0; }
+.idline { display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+          margin-bottom: 8px; }
+.pid { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--blue);
+       letter-spacing: .02em; }
+.badge { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em;
+         font-weight: 600; padding: 2px 7px; border-radius: 2px;
+         background: var(--surface-2); color: var(--ink-2);
+         border: 1px solid var(--rule-soft); }
+.badge.case { background: var(--blue-soft); color: var(--blue); border-color: transparent; }
+.badge.fire { background: var(--fire-soft); color: var(--fire); border-color: transparent; }
+.badge.lift { background: var(--lift-soft); color: var(--lift); border-color: transparent; }
+.badge.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+
+.person h3 { font-size: 21px; font-weight: 600; margin: 0; letter-spacing: -.01em;
+             text-wrap: balance; }
+.where { font-family: var(--mono); font-size: 12px; color: var(--ink-2); margin: 6px 0 0;
+         font-variant-numeric: tabular-nums; }
+.narrative { font-family: var(--serif); font-size: 16.5px; line-height: 1.62;
+             margin: 18px 0 0; padding: 0 0 0 16px;
+             border-left: 2px solid var(--blue); color: var(--ink);
+             max-width: 64ch; }
+.aside-note { font-size: 12.5px; color: var(--ink-2); margin: 12px 0 0;
+              padding-left: 18px; font-style: italic; max-width: 64ch; }
+
+.blocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+          gap: 0 26px; margin-top: 22px; padding-top: 18px;
+          border-top: 1px solid var(--rule-soft); }
+.block h4 { font-size: 10.5px; text-transform: uppercase; letter-spacing: .09em;
+            color: var(--ink-3); font-weight: 600; margin: 0 0 8px; }
+.block + .block { border-left: 0; }
+dl { margin: 0 0 18px; display: grid; grid-template-columns: 1fr auto; gap: 3px 10px;
+     align-items: baseline; }
+dt { font-size: 12px; color: var(--ink-2); }
+dd { margin: 0; font-family: var(--mono); font-size: 12px; text-align: right;
+     font-variant-numeric: tabular-nums; }
+dd.no { color: var(--ink-3); }
+.meterrow { grid-column: 1 / -1; height: 3px; background: var(--rule-soft);
+            border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+.meterrow i { display: block; height: 100%; background: var(--blue); }
+
+.commit { margin-top: 2px; padding: 12px 14px; border-radius: 3px;
+          background: var(--warn-soft); font-size: 13px; }
+.commit b { font-weight: 600; }
+
+details.prov { margin-top: 20px; border-top: 1px solid var(--rule-soft);
+               padding-top: 14px; }
+details.prov summary { font-size: 11px; text-transform: uppercase;
+                       letter-spacing: .08em; color: var(--ink-3); font-weight: 600;
+                       cursor: pointer; }
+details.prov summary:hover { color: var(--blue); }
+.provtable { overflow-x: auto; margin-top: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 11.5px; }
+th { text-align: left; font-size: 10px; text-transform: uppercase;
+     letter-spacing: .07em; color: var(--ink-3); font-weight: 600;
+     padding: 0 10px 5px 0; border-bottom: 1px solid var(--rule-soft);
+     white-space: nowrap; }
+td { padding: 4px 10px 4px 0; border-bottom: 1px solid var(--rule-soft);
+     vertical-align: top; }
+td.k, td.v { font-family: var(--mono); white-space: nowrap; }
+td.v { font-variant-numeric: tabular-nums; }
+.ev { font-family: var(--mono); font-size: 9.5px; letter-spacing: .04em;
+      padding: 1px 4px; border-radius: 2px; }
+.ev.SOURCED  { background: var(--blue-soft); color: var(--blue); }
+.ev.ESTIMATE { background: var(--warn-soft); color: var(--warn); }
+.ev.INVENTED { background: var(--fire-soft); color: var(--fire); }
+td a { color: var(--blue); text-decoration: none; border-bottom: 1px solid transparent; }
+td a:hover { border-bottom-color: currentColor; }
+.inherit { color: var(--ink-3); font-style: italic; }
+
+/* ── connections ──────────────────────────────────────────────────────── */
+.links { display: flex; flex-direction: column; gap: 0; }
+.panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 3px;
+         padding: 14px; }
+#ego { display: block; width: 100%; height: auto; }
+.reach { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-2); line-height: 1.55; }
+.reach b { font-family: var(--mono); color: var(--ink); font-weight: 500; }
+
+#ties { list-style: none; margin: 12px 0 0; padding: 0; }
+#ties li + li { border-top: 1px solid var(--rule-soft); }
+#ties button { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px;
+               width: 100%; text-align: left; background: none; border: 0;
+               padding: 7px 2px; color: inherit; }
+#ties button:hover { background: var(--surface-2); }
+#ties .kind { font-size: 10px; text-transform: uppercase; letter-spacing: .07em;
+              color: var(--ink-3); font-weight: 600; }
+#ties .who { font-size: 12.5px; }
+#ties .who em { font-style: normal; font-family: var(--mono); font-size: 11px;
+                color: var(--ink-2); }
+#ties .bar { grid-row: 1 / 3; align-self: center; width: 42px; height: 4px;
+             border-radius: 2px; background: var(--rule-soft); overflow: hidden; }
+#ties .bar i { display: block; height: 100%; }
+#ties .none { padding: 10px 2px; font-size: 12.5px; color: var(--ink-2); }
+
+#trail { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap;
+         gap: 5px; }
+#trail button { font-family: var(--mono); font-size: 11px; padding: 3px 7px;
+                border: 1px solid var(--rule); border-radius: 2px;
+                background: var(--surface); color: var(--ink-2); }
+#trail button:hover { border-color: var(--blue); color: var(--ink); }
+
+footer { margin-top: 30px; padding-top: 14px; border-top: 1px solid var(--rule);
+         font-size: 11.5px; color: var(--ink-3); line-height: 1.6; max-width: 84ch; }
+footer code { font-family: var(--mono); font-size: 11px; }
+
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+@media (max-width: 1080px) {
+  main { grid-template-columns: 200px minmax(0, 1fr); }
+  .links { grid-column: 1 / -1; display: grid;
+           grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 18px;
+           align-items: start; }
+  .links > h2 { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  main { grid-template-columns: minmax(0, 1fr); }
+  .links { grid-template-columns: minmax(0, 1fr); }
+  .rail { order: 3; }
+  .counts div { padding: 0 12px 0 0; border-left: 0; }
+  .person { padding: 18px; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Who lives here</h1>
+      <p class="sub" id="scenario"></p>
+      <p class="runid" id="runid"></p>
+    </div>
+    <div class="counts" id="counts"></div>
+  </header>
+
+  <div class="controls">
+    <button id="sample" type="button">Sample someone <kbd>S</kbd></button>
+    <div class="chips" id="chips" role="group" aria-label="Subsets to sample from"></div>
+  </div>
+
+  <main>
+    <aside class="rail">
+      <h2>The tower</h2>
+      <div id="tower"></div>
+      <p class="legend" id="legend"></p>
+
+      <h2>Residents <em id="poolcount"></em></h2>
+      <ol id="list"></ol>
+    </aside>
+
+    <section class="person" id="card" aria-live="polite"></section>
+
+    <aside class="links">
+      <h2>Connections</h2>
+      <div class="panel">
+        <svg id="ego" viewBox="0 0 320 280" role="img" aria-labelledby="egotitle"></svg>
+        <p class="reach" id="reach"></p>
+        <ul id="ties"></ul>
+      </div>
+      <h2>Where you have been</h2>
+      <ol id="trail"></ol>
+    </aside>
+  </main>
+
+  <footer id="footer"></footer>
+</div>
+
+<script id="payload" type="application/json">__PAYLOAD__</script>
+<script>
+(function () {
+  "use strict";
+
+  const D = JSON.parse(document.getElementById("payload").textContent);
+  const people = D.people;
+  const byKey = new Map(people.map(p => [p.key, p]));
+  const groups = new Map(D.groups.map(g => [g.id, g]));
+  const units = new Map(D.units.map(u => [u.label, u]));
+  const households = new Map(D.households.map(h => [h.id, h]));
+  const fireFloor = D.meta.scenario.fire_floor_label;
+
+  const KIND = {
+    household:  { label: "household",     colour: "var(--ink-2)", short: "flat" },
+    knock:      { label: "would knock",   colour: "var(--blue)",  short: "knock" },
+    phone:      { label: "would phone",   colour: "var(--fire)",  short: "phone" },
+    group_chat: { label: "building chat", colour: "var(--lift)",  short: "chat" }
+  };
+  const KIND_ORDER = ["household", "knock", "phone", "group_chat"];
+
+  let filter = "all";
+  let current = null;
+  const trail = [];
+
+  // ── helpers ──────────────────────────────────────────────────────────────
+  const el = (tag, cls, text) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined && text !== null) n.textContent = text;
+    return n;
+  };
+  const num = v => {
+    if (v === true) return "yes";
+    if (v === false) return "no";
+    if (typeof v === "number") return Number.isInteger(v) ? String(v) : String(v);
+    return String(v);
+  };
+  const title = p => p.identity.name
+    || `${p.identity.age_years}-year-old ${p.identity.sex}`;
+  const label = p => p.identity.name || `${p.sim.agent_type}, ${p.identity.age_years}`;
+  const peopleTies = p => p.ties.filter(t => byKey.has(t.to));
+  const isolated = p => p.ties.length === 0;
+
+  const UNITS_OF = {
+    base_speed: " m/s", patience_s: " s", smoke_limit_m: " m", delay_s: " s",
+    stair_fatigue_rate: "/storey", stair_recovery_rate: "/s",
+    medical_events_per_hour: "/h", tenure_years: " y"
+  };
+  const PRETTY = {
+    base_speed: "walking speed", patience_s: "patience in a queue",
+    smoke_limit_m: "turns back below", tries_other_stair: "tries the other stair",
+    limiting_condition: "walks with difficulty", can_use_stairs: "can use stairs",
+    congestion_sensitivity: "avoids crowds", fed_tolerance: "smoke tolerance",
+    medical_events_per_hour: "cardiac event rate", delay_s: "pre-movement",
+    stair_fatigue_rate: "tires on stairs", stair_recovery_rate: "recovers resting",
+    floorplan_familiarity: "knows the layout", habitual_stair: "habitual stair",
+    knows_second_stair: "knows a second stair", prior_false_alarms: "false alarms here",
+    fire_safety_training: "has had training",
+    mill_tendency: "confers before acting", seeks_confirmation: "seeks a second cue",
+    authority_compliance: "does as told", altruism: "helps others",
+    risk_tolerance: "accepts risk", leadership: "directs others",
+    alarm_audible: "can hear the alarm"
+  };
+  const isUnit01 = k => k in {
+    floorplan_familiarity: 1, mill_tendency: 1, seeks_confirmation: 1,
+    authority_compliance: 1, altruism: 1, risk_tolerance: 1, leadership: 1
+  };
+
+  // ── masthead ─────────────────────────────────────────────────────────────
+  const sc = D.meta.scenario;
+  document.getElementById("scenario").innerHTML =
+    `A sampled population for <b>${sc.id}</b>: ${sc.time_of_day}, `
+    + `${sc.alarm_quality} alarm, fire starting on floor <b>${fireFloor}</b> of `
+    + `${sc.num_floors}. Click anybody to read them, then follow their ties to see `
+    + `who they would reach — and who would never hear from anyone.`;
+  document.getElementById("runid").textContent =
+    `${D.generator} · seed ${D.meta.seed} · run ${D.meta.run_id}`;
+
+  const counts = [
+    [people.length, "residents"],
+    [D.households.length, "households"],
+    [D.subsets.isolated.keys.length, "know nobody"],
+    [D.subsets.lift.keys.length, "cannot use stairs"],
+    [D.subsets.unheard.keys.length, "cannot hear the alarm"],
+    [D.subsets.committed.keys.length, "will not leave without"]
+  ];
+  const countsBox = document.getElementById("counts");
+  counts.forEach(([n, what]) => {
+    const d = el("div");
+    d.append(el("b", null, String(n)), el("span", null, what));
+    countsBox.append(d);
+  });
+
+  // ── filter chips ─────────────────────────────────────────────────────────
+  const chipBox = document.getElementById("chips");
+  Object.entries(D.subsets).forEach(([name, sub]) => {
+    const b = el("button", "chip");
+    b.type = "button";
+    b.title = sub.what;
+    b.setAttribute("aria-pressed", String(name === filter));
+    b.append(document.createTextNode(name), el("i", null, String(sub.keys.length)));
+    if (!sub.keys.length) b.disabled = true;
+    b.addEventListener("click", () => {
+      filter = name;
+      [...chipBox.children].forEach(c =>
+        c.setAttribute("aria-pressed", String(c === b)));
+      renderList();
+      const pool = D.subsets[filter].keys;
+      if (pool.length && !pool.includes(current.key)) select(byKey.get(pool[0]));
+    });
+    chipBox.append(b);
+  });
+
+  // ── the tower ────────────────────────────────────────────────────────────
+  const towerBox = document.getElementById("tower");
+  const cellFor = new Map();
+  const floorsSeen = [...new Set(D.units.map(u => u.floor_label))].sort((a, b) => a - b);
+  const residentsOf = new Map();
+  people.forEach(p => {
+    const k = p.situation.unit;
+    if (!residentsOf.has(k)) residentsOf.set(k, []);
+    residentsOf.get(k).push(p);
+  });
+
+  floorsSeen.forEach(floor => {
+    const row = el("div", "floor" + (floor === fireFloor ? " fire" : ""));
+    row.append(el("b", null, String(floor)));
+    ["A", "B", "C", "D"].forEach(letter => {
+      const lbl = `${floor}${letter}`;
+      const c = el("button", "cell");
+      c.type = "button";
+      const here = residentsOf.get(lbl) || [];
+      c.dataset.n = String(Math.min(here.length, 4));
+      c.dataset.unit = lbl;
+      const names = here.map(p => label(p)).join(", ");
+      c.title = here.length
+        ? `${lbl} — ${here.length} resident${here.length > 1 ? "s" : ""}: ${names}`
+        : `${lbl} — empty`;
+      c.setAttribute("aria-label", c.title);
+      if (here.length) {
+        c.addEventListener("click", () => select(here[0]));
+      } else {
+        c.disabled = true;
+      }
+      cellFor.set(lbl, c);
+      row.append(c);
+    });
+    towerBox.append(row);
+  });
+
+  document.getElementById("legend").innerHTML =
+    `Floors ${floorsSeen[0]}–${floorsSeen[floorsSeen.length - 1]}, four flats each, `
+    + `no floor 13. Darker is fuller; the outlined flat is the one you are reading. `
+    + `<span><i style="background:var(--blue)"></i>a neighbour they would knock for</span>`
+    + `<span><i style="background:var(--fire)"></i>someone they would phone</span>`;
+
+  // ── resident list ────────────────────────────────────────────────────────
+  const listBox = document.getElementById("list");
+  const poolCount = document.getElementById("poolcount");
+
+  function renderList() {
+    const pool = D.subsets[filter].keys.map(k => byKey.get(k));
+    poolCount.textContent = `${pool.length}`;
+    listBox.replaceChildren();
+    pool.forEach(p => {
+      const li = el("li");
+      const b = el("button");
+      b.type = "button";
+      b.append(
+        el("span", "u", p.situation.unit),
+        el("span", "w", label(p)),
+        el("span", "t", `${p.ties.length}`)
+      );
+      b.title = `${p.id} · ${p.ties.length} tie${p.ties.length === 1 ? "" : "s"}`;
+      if (current && p.key === current.key) b.setAttribute("aria-current", "true");
+      b.addEventListener("click", () => select(p));
+      li.append(b);
+      listBox.append(li);
+    });
+  }
+
+  // ── the person ───────────────────────────────────────────────────────────
+  const cardBox = document.getElementById("card");
+
+  function badges(p) {
+    const out = [];
+    if (p.case_id) out.push(["case", `case ${p.case_id}`]);
+    if (p.situation.floor_label === fireFloor) out.push(["fire", "on the fire floor"]);
+    if (p.sim.mobility === "wheelchair") out.push(["lift", "cannot use the stairs"]);
+    if (p.situation.alarm_audible === false) out.push(["warn", "cannot hear the alarm"]);
+    if (!p.situation.present) out.push(["", "not in the building"]);
+    if (isolated(p)) out.push(["warn", "knows nobody"]);
+    if (p.body.limiting_condition) out.push(["", "walks with difficulty"]);
+    return out;
+  }
+
+  function dataList(block, keys) {
+    const dl = el("dl");
+    keys.forEach(k => {
+      const v = block[k];
+      if (v === undefined || v === null) return;
+      dl.append(el("dt", null, PRETTY[k] || k.replace(/_/g, " ")));
+      const dd = el("dd", v === false ? "no" : null,
+                    num(v) + (UNITS_OF[k] || ""));
+      if (v === false) dd.textContent = "no";
+      dl.append(dd);
+      if (isUnit01(k) && typeof v === "number") {
+        const row = el("div", "meterrow");
+        const fill = el("i");
+        fill.style.width = Math.round(Math.min(Math.max(v, 0), 1) * 100) + "%";
+        row.append(fill);
+        dl.append(row);
+      }
+    });
+    return dl;
+  }
+
+  function provTable(p) {
+    const fields = D.prov[p.key] || {};
+    const keys = Object.keys(fields).sort();
+    if (!keys.length) return null;
+    const det = el("details", "prov");
+    det.append(el("summary", null, "Where these numbers come from"));
+    const wrapT = el("div", "provtable");
+    const t = el("table");
+    const head = el("tr");
+    ["field", "value", "from", "how sure", "sources"].forEach(h =>
+      head.append(el("th", null, h)));
+    const thead = el("thead");
+    thead.append(head);
+    t.append(thead);
+    const body = el("tbody");
+    keys.forEach(path => {
+      const f = fields[path];
+      const tr = el("tr");
+      tr.append(el("td", "k", path));
+      if (f.inherited) {
+        const td = el("td");
+        td.colSpan = 4;
+        td.append(el("span", "inherit",
+          "left to the simulation’s own rules, which are sourced"));
+        tr.append(td);
+        body.append(tr);
+        return;
+      }
+      tr.append(el("td", "v", num(f.v)));
+      const from = el("td");
+      from.textContent = f.pinned
+        ? "pinned by the case"
+        : f.chain.map(c => `${c.r} ${c.m}`).join(" then ");
+      if (!f.pinned) {
+        from.title = f.chain
+          .map(c => (D.rules[c.r] ? `${c.r}: ${D.rules[c.r].name}` : c.r))
+          .join("\n");
+      }
+      tr.append(from);
+      const sure = el("td");
+      [...new Set(f.chain.map(c => c.ev))].forEach(ev =>
+        sure.append(el("span", "ev " + ev, ev)));
+      tr.append(sure);
+      const src = el("td");
+      f.src.forEach((id, i) => {
+        const s = D.sources[id];
+        if (i) src.append(document.createTextNode(", "));
+        if (s && s.url) {
+          const a = el("a", null, s.short);
+          a.href = s.url;
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.title = s.cite;
+          src.append(a);
+        } else {
+          const span = el("span", null, s ? s.short : id);
+          if (s) span.title = s.cite;
+          src.append(span);
+        }
+      });
+      if (!f.src.length) src.append(el("span", "inherit", "no source recorded"));
+      tr.append(src);
+      body.append(tr);
+    });
+    t.append(body);
+    wrapT.append(t);
+    det.append(wrapT);
+    return det;
+  }
+
+  function renderCard(p) {
+    cardBox.replaceChildren();
+
+    const idline = el("div", "idline");
+    idline.append(el("span", "pid", p.id));
+    badges(p).forEach(([cls, txt]) =>
+      idline.append(el("span", "badge " + cls, txt)));
+    cardBox.append(idline);
+
+    cardBox.append(el("h3", null, title(p)));
+
+    const hh = households.get(p.household);
+    const mates = hh ? hh.size - 1 : 0;
+    const where = [
+      `${p.situation.unit}`,
+      `floor ${p.situation.floor_label}`,
+      p.identity.household_role,
+      mates ? `${mates} other${mates > 1 ? "s" : ""} in the flat` : "lives alone",
+      `${p.identity.tenure_years ?? "?"} years here`,
+      p.situation.activity.replace(/_/g, " ")
+    ].join("  ·  ");
+    cardBox.append(el("p", "where", where));
+
+    cardBox.append(el("blockquote", "narrative", p.narrative));
+    if (p.notes) cardBox.append(el("p", "aside-note", "Why this case exists: " + p.notes));
+
+    if (p.commitments.length) {
+      const c = el("div", "commit");
+      c.innerHTML = "<b>Will not leave without</b> " + p.commitments.map(x =>
+        `${x.what || x.kind} (+${num(x.delay_s)} s`
+        + (x.abandon_probability != null
+            ? `, gives up with probability ${num(x.abandon_probability)}` : "")
+        + ")").join(", ") + ".";
+      cardBox.append(c);
+    }
+
+    const blocks = el("div", "blocks");
+    const b1 = el("div", "block");
+    b1.append(el("h4", null, "Body"),
+      dataList(p.body, ["base_speed", "patience_s", "limiting_condition",
+        "can_use_stairs", "tries_other_stair", "smoke_limit_m",
+        "congestion_sensitivity", "stair_fatigue_rate", "stair_recovery_rate",
+        "fed_tolerance", "medical_events_per_hour", "delay_s"]));
+    const b2 = el("div", "block");
+    b2.append(el("h4", null, "What they know"),
+      dataList(Object.assign({}, p.knowledge,
+        { alarm_audible: p.situation.alarm_audible }),
+        ["floorplan_familiarity", "habitual_stair", "knows_second_stair",
+         "prior_false_alarms", "fire_safety_training", "alarm_audible"]));
+    const b3 = el("div", "block");
+    b3.append(el("h4", null, "How they decide"),
+      dataList(p.dispositions, ["mill_tendency", "seeks_confirmation",
+        "authority_compliance", "altruism", "risk_tolerance", "leadership"]));
+    blocks.append(b1, b2, b3);
+    cardBox.append(blocks);
+
+    const prov = provTable(p);
+    if (prov) cardBox.append(prov);
+  }
+
+  // ── connections ──────────────────────────────────────────────────────────
+  const ego = document.getElementById("ego");
+  const tiesBox = document.getElementById("ties");
+  const reachBox = document.getElementById("reach");
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const svg = (tag, attrs) => {
+    const n = document.createElementNS(SVGNS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  };
+
+  function renderEgo(p) {
+    ego.replaceChildren();
+    const cx = 160, cy = 138, R = 100;
+    const caption = svg("title", { id: "egotitle" });
+    caption.textContent = `${p.ties.length} connections for ${title(p)}`;
+    ego.append(caption);
+
+    const ordered = KIND_ORDER.flatMap(k =>
+      p.ties.filter(x => x.kind === k).sort((a, b) => b.strength - a.strength));
+
+    if (!ordered.length) {
+      ego.append(svg("circle", { cx, cy, r: 26, fill: "var(--surface-2)",
+        stroke: "var(--rule)", "stroke-dasharray": "3 3" }));
+      const t1 = svg("text", { x: cx, y: cy + 4, "text-anchor": "middle",
+        fill: "var(--ink-2)", "font-family": "var(--mono)", "font-size": "11" });
+      t1.textContent = p.situation.unit;
+      ego.append(t1);
+      const t2 = svg("text", { x: cx, y: cy + 62, "text-anchor": "middle",
+        fill: "var(--ink-2)", "font-family": "var(--sans)", "font-size": "12.5" });
+      t2.textContent = "No connections at all.";
+      const t3 = svg("text", { x: cx, y: cy + 80, "text-anchor": "middle",
+        fill: "var(--ink-3)", "font-family": "var(--sans)", "font-size": "11.5" });
+      t3.textContent = "Nobody would knock, nobody would call.";
+      ego.append(t2, t3);
+      return;
+    }
+
+    const step = (Math.PI * 2) / ordered.length;
+    const start = -Math.PI / 2;
+    ordered.forEach((tie, i) => {
+      const a = start + step * i;
+      const x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R;
+      const colour = KIND[tie.kind].colour;
+      ego.append(svg("line", { x1: cx, y1: cy, x2: x, y2: y, stroke: colour,
+        "stroke-width": (0.8 + tie.strength * 2.6).toFixed(2),
+        "stroke-opacity": (0.3 + tie.strength * 0.55).toFixed(2),
+        "stroke-linecap": "round" }));
+
+      const other = byKey.get(tie.to);
+      const g = svg("g", { class: "node", tabindex: "0", role: "button",
+        style: "cursor:" + (other ? "pointer" : "default") });
+      g.append(svg("circle", { cx: x, cy: y, r: 15, fill: "var(--surface)",
+        stroke: colour, "stroke-width": "1.5" }));
+      const txt = svg("text", { x, y: y + 3.5, "text-anchor": "middle",
+        fill: "var(--ink)", "font-family": "var(--mono)", "font-size": "9.5" });
+      txt.textContent = other ? other.situation.unit
+        : String(groups.get(tie.to)?.members.length ?? "") ;
+      g.append(txt);
+      const tt = svg("title");
+      tt.textContent = other
+        ? `${KIND[tie.kind].label} · ${other.id} ${other.situation.unit} · `
+          + `${label(other)} · strength ${tie.strength}`
+        : `${KIND[tie.kind].label} · ${groups.get(tie.to)?.members.length} members`;
+      g.append(tt);
+      if (other) {
+        g.addEventListener("click", () => select(other));
+        g.addEventListener("keydown", e => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(other); }
+        });
+      }
+      ego.append(g);
+    });
+
+    // The person, drawn last so it sits over the spokes.
+    ego.append(svg("circle", { cx, cy, r: 27, fill: "var(--blue-soft)",
+      stroke: "var(--blue)", "stroke-width": "1.5" }));
+    const me = svg("text", { x: cx, y: cy + 4, "text-anchor": "middle",
+      fill: "var(--ink)", "font-family": "var(--mono)", "font-size": "11.5",
+      "font-weight": "500" });
+    me.textContent = p.situation.unit;
+    ego.append(me);
+
+    // A key, inside the viewBox so nothing clips.
+    const used = KIND_ORDER.filter(k => ordered.some(t => t.kind === k));
+    const keyY = 262;
+    let kx = 8;
+    used.forEach(k => {
+      ego.append(svg("line", { x1: kx, y1: keyY, x2: kx + 14, y2: keyY,
+        stroke: KIND[k].colour, "stroke-width": "2.4", "stroke-linecap": "round" }));
+      const lt = svg("text", { x: kx + 19, y: keyY + 3.5, fill: "var(--ink-2)",
+        "font-family": "var(--sans)", "font-size": "10.5" });
+      lt.textContent = KIND[k].short;
+      ego.append(lt);
+      kx += 24 + KIND[k].short.length * 6.2;
+    });
+  }
+
+  function renderReach(p) {
+    const direct = new Set(peopleTies(p).map(t => t.to));
+    const two = new Set(direct);
+    direct.forEach(k => peopleTies(byKey.get(k)).forEach(t => {
+      if (t.to !== p.key) two.add(t.to);
+    }));
+    const chat = p.ties.find(t => t.kind === "group_chat");
+    const chatSize = chat ? (groups.get(chat.to)?.members.length ?? 0) - 1 : 0;
+
+    if (!direct.size && !chatSize) {
+      reachBox.innerHTML = "Warned by nobody, and able to warn nobody. "
+        + "If this resident is asleep and the alarm is all there is, the alarm is all "
+        + "there is.";
+      return;
+    }
+    const bits = [`<b>${direct.size}</b> ${direct.size === 1 ? "person" : "people"} `
+      + `directly`];
+    if (two.size > direct.size) {
+      bits.push(`<b>${two.size}</b> within two steps`);
+    }
+    let s = `They could pass a warning to ${bits.join(", and ")}.`;
+    if (chatSize > 0) {
+      s += ` A message in the building chat would reach <b>${chatSize}</b> more, `
+        + `if anybody reads it at ${sc.time_of_day === "night" ? "3 a.m." : "that hour"}.`;
+    }
+    reachBox.innerHTML = s;
+  }
+
+  function renderTies(p) {
+    tiesBox.replaceChildren();
+    if (!p.ties.length) {
+      tiesBox.append(el("li", "none",
+        "No household, no neighbour they would knock for, nobody to phone, and not in "
+        + "the building chat."));
+      return;
+    }
+    KIND_ORDER.forEach(kind => {
+      p.ties.filter(t => t.kind === kind)
+        .sort((a, b) => b.strength - a.strength)
+        .forEach(tie => {
+          const other = byKey.get(tie.to);
+          const li = el("li");
+          const b = el("button");
+          b.type = "button";
+          b.append(el("span", "kind", KIND[kind].label));
+          const who = el("span", "who");
+          if (other) {
+            who.append(document.createTextNode(label(other) + " "));
+            who.append(el("em", null, `${other.situation.unit} · ${other.id}`));
+          } else {
+            const g = groups.get(tie.to);
+            who.append(document.createTextNode(
+              `${g ? g.members.length : "?"} residents share it`));
+          }
+          b.append(who);
+          const bar = el("span", "bar");
+          const fill = el("i");
+          fill.style.width = Math.round(tie.strength * 100) + "%";
+          fill.style.background = KIND[kind].colour;
+          bar.append(fill);
+          bar.title = `strength ${tie.strength}`;
+          b.append(bar);
+          if (other) {
+            b.addEventListener("click", () => select(other));
+          } else {
+            b.disabled = true;
+            b.style.cursor = "default";
+          }
+          li.append(b);
+          tiesBox.append(li);
+        });
+    });
+  }
+
+  // ── tower marks for the selected person ──────────────────────────────────
+  function markTower(p) {
+    cellFor.forEach(c => { c.classList.remove("here", "tie", "knock", "phone"); });
+    const mine = cellFor.get(p.situation.unit);
+    if (mine) mine.classList.add("here");
+    p.ties.forEach(t => {
+      const other = byKey.get(t.to);
+      if (!other || t.kind === "household") return;
+      const c = cellFor.get(other.situation.unit);
+      if (c && !c.classList.contains("here")) {
+        c.classList.add("tie", t.kind === "phone" ? "phone" : "knock");
+      }
+    });
+  }
+
+  // ── trail ────────────────────────────────────────────────────────────────
+  const trailBox = document.getElementById("trail");
+  function renderTrail() {
+    trailBox.replaceChildren();
+    trail.slice(-9).forEach(key => {
+      const p = byKey.get(key);
+      const li = el("li");
+      const b = el("button");
+      b.type = "button";
+      b.textContent = p.situation.unit;
+      b.title = `${p.id} · ${label(p)}`;
+      b.addEventListener("click", () => select(p));
+      li.append(b);
+      trailBox.append(li);
+    });
+    if (!trail.length) trailBox.append(el("li", "none"));
+  }
+
+  // ── select ───────────────────────────────────────────────────────────────
+  function select(p) {
+    if (!p) return;
+    current = p;
+    if (trail[trail.length - 1] !== p.key) trail.push(p.key);
+    renderCard(p);
+    renderEgo(p);
+    renderReach(p);
+    renderTies(p);
+    markTower(p);
+    renderTrail();
+    [...listBox.querySelectorAll("button")].forEach(b =>
+      b.removeAttribute("aria-current"));
+    const row = [...listBox.querySelectorAll("button")]
+      .find(b => b.querySelector(".u").textContent === p.situation.unit
+                 && b.querySelector(".w").textContent === label(p));
+    if (row) row.setAttribute("aria-current", "true");
+  }
+
+  function sampleOne() {
+    const pool = D.subsets[filter].keys;
+    if (!pool.length) return;
+    let key = pool[Math.floor(Math.random() * pool.length)];
+    if (pool.length > 1 && current && key === current.key) {
+      key = pool[(pool.indexOf(key) + 1) % pool.length];
+    }
+    select(byKey.get(key));
+  }
+
+  document.getElementById("sample").addEventListener("click", sampleOne);
+  document.addEventListener("keydown", e => {
+    if (e.target.matches("input, textarea, select")) return;
+    if (e.key === "s" || e.key === "S") { e.preventDefault(); sampleOne(); }
+  });
+
+  document.getElementById("footer").innerHTML =
+    `Household sizes were tilted by theta = ${D.theta} so the flats average `
+    + `${D.meta.counts.personas / D.meta.counts.units} people — census household sizes `
+    + `and the per-flat figure for large buildings do not agree, and this is where that `
+    + `is resolved. Every number above says how sure we are of it: `
+    + `<span class="ev SOURCED">SOURCED</span> means a citation was read, `
+    + `<span class="ev ESTIMATE">ESTIMATE</span> reasoned from something adjacent, `
+    + `<span class="ev INVENTED">INVENTED</span> that the model needs a number and `
+    + `nobody has measured one. Fields left to the simulation’s own rules are marked as `
+    + `inherited rather than overridden here. Regenerate with `
+    + `<code>personas explore --scenario ${sc.id} --seed ${D.meta.seed}</code>.`;
+
+  // Open on a hand-authored case, so the page starts in a real working state.
+  renderList();
+  const opener = people.find(p => p.case_id === "C01")
+    || people.find(p => p.case_id) || people[0];
+  select(opener);
+})();
+</script>

@@ -129,6 +129,43 @@ def cmd_compare(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_show(args: argparse.Namespace) -> int:
+    from .sample import sample
+    from .show import pick, render, summary
+    tables = _checked(args.data)
+    pop = sample(tables, args.scenario, args.seed)
+    if args.list:
+        print(summary(pop))
+        return 0
+    try:
+        people = pick(pop, which=args.filter, persona_id=args.id, floor=args.floor,
+                      unit=args.unit, count=args.count, seed=args.pick_seed)
+    except KeyError as e:
+        print(e.args[0], file=sys.stderr)
+        return 1
+    if not people:
+        print("nothing matched. `personas show --list` shows what there is.",
+              file=sys.stderr)
+        return 1
+    for i, person in enumerate(people):
+        if i:
+            print()
+        print(render(pop, person, provenance=not args.no_provenance))
+    return 0
+
+
+def cmd_explore(args: argparse.Namespace) -> int:
+    from .explore import write_explorer
+    from .sample import sample
+    tables = _checked(args.data)
+    pop = sample(tables, args.scenario, args.seed)
+    path = write_explorer(pop, args.out_file, tables=tables,
+                          generated_at=args.generated_at)
+    print(f"wrote {path}")
+    print(f"{len(pop.people)} residents embedded. Open it in a browser.")
+    return 0
+
+
 def cmd_schema(args: argparse.Namespace) -> int:
     from .schema import build_schema
     text = json.dumps(build_schema(), indent=2) + "\n"
@@ -207,6 +244,32 @@ def main(argv: list[str] | None = None) -> int:
                    default=Path("reference/legacy_roster_2026-09.csv"))
     p.add_argument("--out-file")
     p.set_defaults(fn=cmd_compare)
+
+    p = sub.add_parser("show", help="sample a persona and read them")
+    common(p)
+    scen(p)
+    p.add_argument("--filter", default="all",
+                   help="a subset to sample from; --list shows them all")
+    p.add_argument("--id", help="a persona id (P0041), key (case:C01) or case id (C01)")
+    p.add_argument("--floor", type=int, help="only this floor, as the building names it")
+    p.add_argument("--unit", help="only this flat, e.g. 14A")
+    p.add_argument("-n", "--count", type=int, default=1, help="how many to show")
+    p.add_argument("--pick-seed", type=int,
+                   help="which sample to draw; the same value always draws the same people")
+    p.add_argument("--no-provenance", action="store_true",
+                   help="leave out where each number came from")
+    p.add_argument("--list", action="store_true",
+                   help="count each subset instead of showing anybody")
+    p.set_defaults(fn=cmd_show)
+
+    p = sub.add_parser("explore",
+                       help="write a self-contained page for browsing the population")
+    common(p)
+    scen(p)
+    p.add_argument("--out-file", type=Path, default=None,
+                   help="default: out/<scenario>-<seed>.explorer.html")
+    p.add_argument("--generated-at", help="fix the timestamp, for reproducible output")
+    p.set_defaults(fn=cmd_explore)
 
     p = sub.add_parser("schema", help="print the population JSON Schema")
     p.add_argument("--out-file")

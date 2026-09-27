@@ -13,9 +13,38 @@ project previously said what a persona **was**. This does.
 uv sync
 uv run personas validate                              # check the snapshot in data/
 uv run personas build --scenario night_fire12 --seed 1234
+uv run personas show --filter isolated                # sample somebody and read them
+uv run personas explore                               # a page for browsing the population
 uv run personas compare                               # against the team's first roster
 uv run pytest
 ```
+
+## Looking at the people
+
+The population JSON is a good contract and a poor thing to read, so there are two ways
+to look at who the sampler actually produced.
+
+`personas show` samples somebody and prints them: the card, the blocks the simulation
+will act on, who they would reach for, and which paper each number came from.
+`--list` counts the subsets worth sampling from — `isolated`, `lift`, `unheard`,
+`committed`, `cases` — and `--filter` draws from one. Sampling is seeded, so
+`--pick-seed` draws the same people again.
+
+```
+P0100  Long-tenured widow above the fire  ·  case C01
+18C · floor 18 (simulation floor 17) · asleep
+  …
+  connections   4
+    would knock   P0087 17A   adult                     ████     0.50
+    would phone   P0035 8D    adult                     █████    0.67
+    building chat G_group_chat_building  (55 members)    ██       0.28
+```
+
+`personas explore` writes a self-contained page — the tower floor by floor, a filtered
+resident list, the selected person's card, and their ties drawn as a graph you can click
+through. It embeds the population, a provenance index and the source list, so it opens
+from disk and can be sent to somebody who does not have the repository. Following the
+ties is the point: who could pass a warning to whom, and who would hear from nobody.
 
 Four files land in `out/`:
 
@@ -153,6 +182,9 @@ src/egress_personas/
   compare.py     against the archived roster
   sheet.py       pulling from Google Sheets
   seed.py        a starting set of tabs
+  show.py        sampling somebody and reading them in the terminal
+  explore.py     the payload behind the page
+  explorer.html  the page: tower, list, card, tie graph
 ```
 
 Dependencies: `jsonschema` only. Sheets arrive as CSV over `urllib`; the generator and

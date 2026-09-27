@@ -17,6 +17,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/egress_personas"]
+artifacts = ["src/egress_personas/explorer.html"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
