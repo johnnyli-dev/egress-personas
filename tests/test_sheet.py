@@ -40,7 +40,7 @@ def test_pull_asks_for_every_tab_by_its_title(tmp_path, stub_sheet):
 
 
 def test_pull_records_the_sheet_and_when(tmp_path, stub_sheet):
-    meta = sheet_mod.pull("SHEET123", tmp_path / "data")
+    meta, _changes = sheet_mod.pull("SHEET123", tmp_path / "data")
     assert meta["sheet_id"] == "SHEET123"
     assert meta["pulled_at"].endswith("+00:00")
     assert set(meta["tabs"]) == set(TABS)
@@ -132,3 +132,96 @@ def test_the_export_url_is_the_csv_endpoint():
     assert url.startswith("https://docs.google.com/spreadsheets/d/ID/")
     assert "tqx=out:csv" in url
     assert "sheet=Parameters" in url
+
+
+# ── knowing whether you are behind ──────────────────────────────────────────
+
+def test_a_check_against_an_unchanged_sheet_writes_nothing_and_says_so(
+        tmp_path, stub_sheet, data_dir):
+    dest = tmp_path / "data"
+    sheet_mod.pull("SHEET123", dest)
+    before = {p.name: p.read_bytes() for p in dest.iterdir()}
+    _meta, changes = sheet_mod.pull("SHEET123", dest, dry_run=True)
+    assert not any(changes)
+    assert {p.name: p.read_bytes() for p in dest.iterdir()} == before
+
+
+def test_a_check_reports_what_moved_without_touching_the_snapshot(
+        tmp_path, monkeypatch, stub_sheet, data_dir):
+    import csv
+    import io
+
+    dest = tmp_path / "data"
+    sheet_mod.pull("SHEET123", dest)
+    before = (dest / "population.csv").read_bytes()
+
+    def edited(sheet_id, name, token=None, timeout=30.0):
+        text = (data_dir / f"{name}.csv").read_text(encoding="utf-8-sig")
+        if name != "population":
+            return text
+        rows = list(csv.reader(io.StringIO(text)))
+        head = rows[0]
+        value, tol = head.index("value"), head.index("tolerance")
+        for r in rows[1:]:
+            if r[0] == "T060":          # a cell somebody edited
+                r[value] = "0.31"
+            if r[0] == "T001":          # another, in a different column
+                r[tol] = "0.20"
+        rows = [r for r in rows if r[0] != "T031"]          # a row somebody deleted
+        rows.append(["T099", "pet", "cats_only", "0.05", "share"]
+                    + [""] * (len(head) - 5))               # and one they added
+        buf = io.StringIO()
+        csv.writer(buf, lineterminator="\n").writerows(rows)
+        return buf.getvalue()
+
+    monkeypatch.setattr(sheet_mod, "fetch_tab", edited)
+    _meta, changes = sheet_mod.pull("SHEET123", dest, dry_run=True)
+
+    assert (dest / "population.csv").read_bytes() == before, "a check must not write"
+
+    moved = [c for c in changes if c]
+    assert [c.tab for c in moved] == ["population"]
+    c = moved[0]
+    assert c.added == ["T099"]
+    assert c.removed == ["T031"]
+    assert dict(c.changed) == {"T060": ["value"], "T001": ["tolerance"]}
+    assert "1 added, 1 removed, 2 changed" == c.summary()
+    detail = "\n".join(c.detail())
+    assert "+ T099" in detail and "- T031" in detail and "~ T060  (value)" in detail
+
+
+def test_reformatting_alone_is_not_a_change(tmp_path, monkeypatch, stub_sheet,
+                                            data_dir):
+    """Google quotes every field and spells numbers its own way. Reporting that as a
+    change would make the first pull look like somebody rewrote the whole sheet."""
+    import csv
+    import io
+
+    dest = tmp_path / "data"
+    sheet_mod.pull("SHEET123", dest)
+
+    def requoted(sheet_id, name, token=None, timeout=30.0):
+        text = (data_dir / f"{name}.csv").read_text(encoding="utf-8-sig")
+        rows = list(csv.reader(io.StringIO(text)))
+        buf = io.StringIO()
+        csv.writer(buf, lineterminator="\r\n",
+                   quoting=csv.QUOTE_ALL).writerows(rows)
+        return buf.getvalue()
+
+    monkeypatch.setattr(sheet_mod, "fetch_tab", requoted)
+    _meta, changes = sheet_mod.pull("SHEET123", dest, dry_run=True)
+    assert not any(changes), [c.tab for c in changes if c]
+
+
+def test_a_tab_that_is_new_to_the_snapshot_reads_as_all_added(tmp_path, stub_sheet):
+    dest = tmp_path / "data"
+    _meta, changes = sheet_mod.pull("SHEET123", dest, dry_run=True)
+    assert all(c.added and not c.removed and not c.changed for c in changes)
+
+
+def test_the_population_does_not_record_when_it_was_fetched(population):
+    """Otherwise a pull that changed nothing would still change every output file."""
+    from egress_personas.emit import population_json
+    meta = population_json(population, generated_at="2026-01-01T00:00:00+00:00")["meta"]
+    assert "content_hash" in meta["snapshot"]
+    assert "pulled_at" not in meta["snapshot"]

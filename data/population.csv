@@ -1,22 +1,22 @@
-id,dimension,category,value,unit,tolerance,basis,source_ids,notes
-T001,occupancy,persons_per_flat,1.66,persons,0.15,estimate,acs_b11016,"Flats in large San Francisco buildings hold fewer people than the city average of 2.14. This is the primary occupancy target because it is plan-independent: a per-floor figure only means something once you fix how many flats a floor has."
-T010,household_size,1,40.65,share,,acs,acs_b11016,San Francisco households of one person.
-T011,household_size,2,32.67,share,,acs,acs_b11016,Two people.
-T012,household_size,3,12.12,share,,acs,acs_b11016,Three people.
-T013,household_size,4plus,14.57,share,,acs,acs_b11016,"Four or more, folded to exactly four."
-T020,age_band,0_17,0.12,share,0.04,estimate,,"Reasoned to fit a tower of mostly small flats. Needs a real San Francisco figure."
-T021,age_band,18_34,0.27,share,0.04,acs,,Ages 18 to 34 at 27 percent.
-T022,age_band,35_49,0.24,share,0.04,estimate,,Needs a real figure.
-T023,age_band,50_64,0.19,share,0.04,estimate,,Needs a real figure.
-T024,age_band,65_74,0.11,share,0.03,estimate,,Needs a real figure.
-T025,age_band,75_plus,0.07,share,0.03,estimate,,"Needs a real figure. This band and the one above it drive the stair-speed tail, so they are worth getting right early."
-T030,sex,female,0.50,share,0.04,estimate,,
-T031,sex,male,0.50,share,0.04,estimate,,
-T040,mobility,wheelchair,0.013,share,0.008,sipp,sipp_wheelchair,"About 1.3 percent use a wheelchair. These are the occupants who cannot use the stairs at all, so the count matters more than the share."
-T041,mobility,ambulatory_difficulty@18_64,0.038,share,0.015,acs,acs_b18105,Ambulatory difficulty among adults aged 35 to 64.
-T042,mobility,ambulatory_difficulty@65_plus,0.182,share,0.04,acs,acs_b18105,"Ambulatory difficulty among those 65 and over. This, not the wheelchair share, is what the team's first workbook's 'mobility impaired' category was actually describing."
-T050,absence,share,0.06,share,0.03,estimate,,"Residents not in the building. Overridden per scenario: a weekday afternoon empties a tower that a 3 a.m. fire does not."
-T060,pet,share,0.25,share,0.10,estimate,,"Share of flats keeping a pet. The team's first workbook had 11 of 92 flats, about 12 percent; US household figures are far higher. Neither is a San Francisco apartment figure."
-T070,tenure,lt_1,0.18,share,0.06,estimate,,"Residents in their first year. Drives how much of the building they know."
-T071,tenure,1_5,0.37,share,0.08,estimate,,
-T072,tenure,5_plus,0.45,share,0.08,estimate,,"Needs a real figure: San Francisco rent control makes long tenures commoner here than nationally, which would raise familiarity across the board."
+"id","dimension","category","value","unit","tolerance","basis","source_ids","notes"
+"T001","occupancy","persons_per_flat","1.66","persons","0.15","estimate","acs_b11016","Flats in large San Francisco buildings hold fewer people than the city average of 2.14. This is the primary occupancy target because it is plan-independent: a per-floor figure only means something once you fix how many flats a floor has."
+"T010","household_size","1","40.65","share","","acs","acs_b11016","San Francisco households of one person."
+"T011","household_size","2","32.67","share","","acs","acs_b11016","Two people."
+"T012","household_size","3","12.12","share","","acs","acs_b11016","Three people."
+"T013","household_size","4plus","14.57","share","","acs","acs_b11016","Four or more, folded to exactly four."
+"T020","age_band","0_17","0.12","share","0.04","estimate","","Reasoned to fit a tower of mostly small flats. Needs a real San Francisco figure."
+"T021","age_band","18_34","0.27","share","0.04","acs","","Ages 18 to 34 at 27 percent."
+"T022","age_band","35_49","0.24","share","0.04","estimate","","Needs a real figure."
+"T023","age_band","50_64","0.19","share","0.04","estimate","","Needs a real figure."
+"T024","age_band","65_74","0.11","share","0.03","estimate","","Needs a real figure."
+"T025","age_band","75_plus","0.07","share","0.03","estimate","","Needs a real figure. This band and the one above it drive the stair-speed tail, so they are worth getting right early."
+"T030","sex","female","0.50","share","0.04","estimate","",""
+"T031","sex","male","0.50","share","0.04","estimate","",""
+"T040","mobility","wheelchair","0.013","share","0.008","sipp","sipp_wheelchair","About 1.3 percent use a wheelchair. These are the occupants who cannot use the stairs at all, so the count matters more than the share."
+"T041","mobility","ambulatory_difficulty@18_64","0.038","share","0.015","acs","acs_b18105","Ambulatory difficulty among adults aged 35 to 64."
+"T042","mobility","ambulatory_difficulty@65_plus","0.182","share","0.04","acs","acs_b18105","Ambulatory difficulty among those 65 and over. This, not the wheelchair share, is what the team's first workbook's 'mobility impaired' category was actually describing."
+"T050","absence","share","0.06","share","0.03","estimate","","Residents not in the building. Overridden per scenario: a weekday afternoon empties a tower that a 3 a.m. fire does not."
+"T060","pet","share","0.25","share","0.10","estimate","","Share of flats keeping a pet. The team's first workbook had 11 of 92 flats, about 12 percent; US household figures are far higher. Neither is a San Francisco apartment figure."
+"T070","tenure","lt_1","0.18","share","0.06","estimate","","Residents in their first year. Drives how much of the building they know."
+"T071","tenure","1_5","0.37","share","0.08","estimate","",""
+"T072","tenure","5_plus","0.45","share","0.08","estimate","","Needs a real figure: San Francisco rent control makes long tenures commoner here than nationally, which would raise familiarity across the board."

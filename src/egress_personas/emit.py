@@ -55,10 +55,12 @@ def population_json(pop: Population, *, generated_at: str | None = None) -> dict
             "generator": f"egress-personas {VERSION}",
             "generated_at": generated_at or _now(),
             "run_id": pop.run_id,
+            # Deliberately no `pulled_at`: when the data is unchanged the output must
+            # be too, and a fetch timestamp would churn every file on every pull.
+            # data/snapshot.json keeps it.
             "snapshot": {
                 "content_hash": pop.snapshot.get("content_hash"),
                 "sheet_id": pop.snapshot.get("sheet_id"),
-                "pulled_at": pop.snapshot.get("pulled_at"),
             },
             "scenario": {
                 "id": pop.scenario.get("scenario_id"),

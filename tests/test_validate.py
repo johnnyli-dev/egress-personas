@@ -7,6 +7,9 @@ act on is barely better than silence.
 
 from __future__ import annotations
 
+import csv
+import io
+
 import pytest
 
 from egress_personas.validate import problems
@@ -113,17 +116,25 @@ def test_a_shifted_row_is_refused_rather_than_misread(mutate):
     This is the failure that shifted seven Cases rows one column left during
     development, so it is the one worth a test of its own.
     """
-    def eat_one_comma(text: str) -> str:
-        lines = text.splitlines()
-        for i, line in enumerate(lines[1:], start=1):
-            if line.startswith("T030,") and line.endswith(",,"):
-                lines[i] = line[:-1]
+    def drop_a_field(text: str) -> str:
+        """Give one row a field fewer, the way a missing comma would.
+
+        Done through the csv module rather than by editing the text, because the
+        snapshot's quoting depends on where it came from: Google quotes every field,
+        the seed writer quotes only what it must.
+        """
+        rows = list(csv.reader(io.StringIO(text)))
+        for row in rows[1:]:
+            if row and row[0] == "T030":
+                del row[-1]
                 break
         else:  # pragma: no cover - guards the fixture, not the code under test
             raise AssertionError("no row to narrow")
-        return "\n".join(lines) + "\n"
+        buf = io.StringIO()
+        csv.writer(buf, lineterminator="\n").writerows(rows)
+        return buf.getvalue()
 
-    t = mutate("population", eat_one_comma)
+    t = mutate("population", drop_a_field)
     m = messages(t)
     assert "field(s) but the header declares" in m
     assert "shifted left" in m

@@ -20,9 +20,10 @@ import re
 import urllib.error
 import urllib.parse
 import urllib.request
+from dataclasses import dataclass, field
 from pathlib import Path
 
-from .tables import TABS, read_csv_text
+from .tables import TABS, Table, _norm, read_csv_text, text
 
 GVIZ = ("https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq"
         "?tqx=out:csv&headers=1&sheet={tab}")
@@ -95,11 +96,75 @@ def fetch_tab(sheet_id: str, name: str, *, token: str | None = None,
     return body
 
 
+@dataclass
+class TabChange:
+    """What moved in one tab between the snapshot on disk and the Sheet."""
+
+    tab: str
+    added: list[str] = field(default_factory=list)
+    removed: list[str] = field(default_factory=list)
+    changed: list[tuple[str, list[str]]] = field(default_factory=list)
+
+    def __bool__(self) -> bool:
+        return bool(self.added or self.removed or self.changed)
+
+    def summary(self) -> str:
+        bits = []
+        if self.added:
+            bits.append(f"{len(self.added)} added")
+        if self.removed:
+            bits.append(f"{len(self.removed)} removed")
+        if self.changed:
+            bits.append(f"{len(self.changed)} changed")
+        return ", ".join(bits) if bits else "unchanged"
+
+    def detail(self, limit: int = 6) -> list[str]:
+        out = [f"+ {k}" for k in self.added[:limit]]
+        out += [f"- {k}" for k in self.removed[:limit]]
+        out += [f"~ {k}  ({', '.join(cols)})" for k, cols in self.changed[:limit]]
+        more = (len(self.added) + len(self.removed) + len(self.changed)) - len(out)
+        if more > 0:
+            out.append(f"… and {more} more")
+        return out
+
+
+def _keyed(tab: Table) -> dict[str, dict[str, str]]:
+    key = TABS[tab.name].key
+    out: dict[str, dict[str, str]] = {}
+    for i, row in enumerate(tab.rows):
+        k = (text(row.get(key)) if key else None) or f"row {tab.row_numbers[i]}"
+        out[k] = row
+    return out
+
+
+def compare(old: Table | None, new: Table) -> TabChange:
+    """Row-level differences, keyed by each tab's own key column."""
+    change = TabChange(tab=new.name)
+    if old is None:
+        change.added = list(_keyed(new))
+        return change
+    a, b = _keyed(old), _keyed(new)
+    change.added = [k for k in b if k not in a]
+    change.removed = [k for k in a if k not in b]
+    for k in b:
+        if k not in a:
+            continue
+        cols = [c for c in set(a[k]) | set(b[k])
+                if _norm(a[k].get(c)) != _norm(b[k].get(c))]
+        if cols:
+            change.changed.append((k, sorted(cols)))
+    return change
+
+
 def pull(sheet_id: str, dest: Path, *, token: str | None = None,
-         only: list[str] | None = None) -> dict[str, object]:
-    """Fetch every tab, validate its shape, and write the snapshot."""
+         only: list[str] | None = None,
+         dry_run: bool = False) -> tuple[dict[str, object], list[TabChange]]:
+    """Fetch every tab, check its shape, and write the snapshot.
+
+    With `dry_run`, nothing is written: the differences come back so you can be told
+    whether the snapshot on disk is behind the Sheet without changing it.
+    """
     dest = Path(dest)
-    dest.mkdir(parents=True, exist_ok=True)
     names = only or list(TABS)
     bodies: dict[str, str] = {}
     for name in names:
@@ -107,6 +172,21 @@ def pull(sheet_id: str, dest: Path, *, token: str | None = None,
         read_csv_text(name, body)  # fail before overwriting a good snapshot
         bodies[name] = body
 
+    changes: list[TabChange] = []
+    for name, body in bodies.items():
+        path = dest / f"{name}.csv"
+        before = None
+        if path.exists():
+            try:
+                before = read_csv_text(name, path.read_text(encoding="utf-8-sig"))
+            except ValueError:
+                before = None  # the snapshot on disk is itself broken; treat as new
+        changes.append(compare(before, read_csv_text(name, body)))
+
+    if dry_run:
+        return {"sheet_id": sheet_id, "tabs": {}}, changes
+
+    dest.mkdir(parents=True, exist_ok=True)
     meta_path = dest / "snapshot.json"
     meta: dict[str, object] = {}
     if meta_path.exists():
@@ -125,4 +205,4 @@ def pull(sheet_id: str, dest: Path, *, token: str | None = None,
         "tabs": tabs,
     })
     meta_path.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
-    return meta
+    return meta, changes

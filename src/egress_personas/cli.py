@@ -78,18 +78,40 @@ def cmd_pull(args: argparse.Namespace) -> int:
         print(e, file=sys.stderr)
         return 1
     try:
-        meta = pull(sheet_id, args.data, token=token, only=args.tab or None)
+        meta, changes = pull(sheet_id, args.data, token=token,
+                             only=args.tab or None, dry_run=args.check)
     except (RuntimeError, ValueError) as e:
         print(e, file=sys.stderr)
         return 1
+
+    moved = [c for c in changes if c]
+    if args.check:
+        if not moved:
+            print(f"data/ is up to date with {sheet_id}.")
+            return 0
+        print(f"data/ is behind the Sheet — {len(moved)} tab(s) differ:\n")
+        for c in moved:
+            print(f"  {c.tab.capitalize():<12} {c.summary()}")
+            for line in c.detail():
+                print(f"      {line}")
+        print("\nRun `personas pull` to bring it up to date. Nothing was written.")
+        return 1
+
     print(f"pulled {len(meta['tabs'])} tab(s) from {sheet_id} at {meta['pulled_at']}")
+    if moved:
+        for c in moved:
+            print(f"  {c.tab.capitalize():<12} {c.summary()}")
+            for line in c.detail():
+                print(f"      {line}")
+    else:
+        print("  nothing changed.")
     probs = problems(_load(args.data))
     if probs:
         print(f"\n{len(probs)} problem(s) in the new snapshot:", file=sys.stderr)
         for p in probs:
             print(f"  {p}", file=sys.stderr)
         return 1
-    print("no problems.")
+    print("\nno problems." + ("  Commit the diff." if moved else ""))
     return 0
 
 
@@ -113,6 +135,13 @@ def cmd_build(args: argparse.Namespace) -> int:
     from .emit import write_all
     from .report import markdown
     from .sample import sample
+    if args.pull:
+        rc = cmd_pull(argparse.Namespace(
+            data=args.data, sheet_url=args.pull, sheet_id=None,
+            tab=None, token_file=args.token_file, check=False))
+        if rc:
+            return rc
+        print()
     tables = _checked(args.data)
     pop = sample(tables, args.scenario, args.seed)
     paths = write_all(pop, args.out,
@@ -256,6 +285,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--sheet-id", help="the id alone, if you have it")
     p.add_argument("--tab", action="append", help="only this tab (repeatable)")
     p.add_argument("--token-file", help="file holding an OAuth access token")
+    p.add_argument("--check", action="store_true",
+                   help="say whether data/ is behind the Sheet and write nothing; "
+                        "exits non-zero when it is")
     p.set_defaults(fn=cmd_pull)
 
     p = sub.add_parser("validate", help="check the snapshot and say where it is wrong")
@@ -267,6 +299,9 @@ def main(argv: list[str] | None = None) -> int:
     scen(p)
     p.add_argument("--out", type=Path, default=OUT)
     p.add_argument("--generated-at", help="fix the timestamp, for reproducible output")
+    p.add_argument("--pull", metavar="SHEET_URL",
+                   help="refresh data/ from this Sheet first, then build from it")
+    p.add_argument("--token-file", help="with --pull, an OAuth access token file")
     p.set_defaults(fn=cmd_build)
 
     p = sub.add_parser("report", help="print the report for a sampled population")

@@ -1,0 +1,38 @@
+{
+  "sheet_id": "1LRCpgreZ7_9WL4iyoEtLnuTjNqOGzTde",
+  "pulled_at": "2026-09-28T18:38:07+00:00",
+  "tabs": {
+    "parameters": {
+      "sha256": "acdc2803cf9c95858370811742145e53764d0b291b59558a94ce0562e04075d8",
+      "bytes": 13273
+    },
+    "sources": {
+      "sha256": "ed8da6207bdfa37fd02cc32ade8c0fe65502c5202ba5c8f2825ae89618384ff2",
+      "bytes": 6816
+    },
+    "population": {
+      "sha256": "789dc0eafc89b10f85b8a622e8948da4abdda49f1283560bc8fbdb513d3d8720",
+      "bytes": 3030
+    },
+    "social": {
+      "sha256": "c5e779372bd79c6ca30479dc9df0328e7bda5778864385cbb065c3bb228d2e86",
+      "bytes": 2295
+    },
+    "cases": {
+      "sha256": "af7d99cb1042ac4252482e462243c23dad6365ebd07c1ebb95bdd6e6276cede6",
+      "bytes": 3061
+    },
+    "building": {
+      "sha256": "ca80e35711a2604854417d1659a55a6fd9dc68d6e3afc7b407b85b9f31d39b9c",
+      "bytes": 7514
+    },
+    "scenarios": {
+      "sha256": "e9d8a646e11c07e3f699307d88c225b0ae401cfa9a7c63c4ea222db8c7a81efe",
+      "bytes": 961
+    },
+    "enums": {
+      "sha256": "9a30023cb325ce09cd46ca9859e1ad99bd047816e8a9ad3cc85176144e4a3456",
+      "bytes": 6321
+    }
+  }
+}
