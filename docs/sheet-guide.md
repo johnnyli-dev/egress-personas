@@ -1,4 +1,68 @@
-# Editing the Sheet
+# The Sheet
+
+## Connecting one, from nothing
+
+```bash
+uv sync --extra sheet                 # openpyxl, only needed for this step
+uv run personas init-sheet            # -> Egress_Persona_Model.xlsx
+```
+
+That writes one workbook holding the eight tabs, correctly named, with the header row
+frozen, a filter on every tab and a dropdown on every column that has a controlled
+vocabulary. Then:
+
+1. **Upload it** to Google Drive, and open it with Google Sheets (Drive converts it and
+   keeps the tab names and the dropdowns). Do not paste the CSVs in by hand — creating
+   eight tabs and pasting into each is where a column lands one over, and a row that has
+   shifted parses cleanly and means something else entirely.
+2. **Share it**: Share → General access → *Anyone with the link* → **Viewer**. The
+   export endpoint reads it as an anonymous viewer, so a sheet restricted to your
+   account returns a sign-in page instead of data, and `pull` says so.
+3. **Pull it back**:
+
+```bash
+uv run personas pull --sheet-url "https://docs.google.com/spreadsheets/d/1AbC…/edit"
+```
+
+Paste the URL straight from the address bar; the id is picked out of it. `pull` writes
+`data/*.csv` and `data/snapshot.json`, and checks the new snapshot before it replaces
+the old one — a tab with a missing or undeclared column is refused and nothing is
+overwritten.
+
+After that, editing is: change the Sheet, `personas pull`, `personas validate`, commit
+the CSV diff. The diff is the review: it shows exactly which cells moved.
+
+### If it has to stay private
+
+The export endpoint has no way to log in, so a sheet that cannot be link-shared needs a
+token:
+
+```bash
+gcloud auth print-access-token > .secrets/token   # .secrets/ is gitignored
+uv run personas pull --sheet-url "…" --token-file .secrets/token
+```
+
+The account behind the token needs read access to the sheet. Never commit the token.
+
+### Why `build` never touches the network
+
+A live sheet and a reproducible generator are only compatible if the generator reads a
+pinned copy. `pull` snapshots; `build` reads the snapshot. So a run always names the
+revision it came from, and pulling is a reviewable commit rather than an invisible
+change under a result. `personas init-sheet` and `personas pull` round-trip to the same
+content hash, so uploading and pulling back does not by itself change a run id — there
+is a test for that.
+
+Two things to know about the round trip. The export endpoint hands back what Sheets
+*displays*, so a cell formatted as a percentage arrives as `35%` (read as 0.35) and a
+date may come back in a different spelling than it went in — which shifts the content
+hash once, on the first pull, and then stays put. And extra tabs are ignored: the
+`Lists` and `READ ME` tabs the workbook ships are for the people editing it, not for
+the generator.
+
+---
+
+## Editing the Sheet
 
 Eight tabs. Row 1 is the header. Blank always means *not stated* — never zero, never
 false — which is what lets a `Cases` row pin two fields and leave the rest to be

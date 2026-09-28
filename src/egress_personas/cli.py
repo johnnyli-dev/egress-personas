@@ -45,14 +45,44 @@ def cmd_init_data(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_init_sheet(args: argparse.Namespace) -> int:
+    from .xlsx import describe, write_workbook
+    try:
+        path = write_workbook(args.data, args.out_file)
+    except (RuntimeError, FileNotFoundError) as e:
+        print(e, file=sys.stderr)
+        return 1
+    d = describe(args.data)
+    print(f"wrote {path}")
+    for tab, (rows, cols) in d["tabs"].items():
+        print(f"  {tab:<12} {rows:>4} rows x {cols:>2} columns")
+    print(f"  {'Lists':<12} {d.get('vocabs', 0):>4} vocabularies behind "
+          f"{d.get('dropdowns', 0)} dropdowns")
+    print("\nNext:")
+    print("  1. Upload it to Google Drive and open it with Google Sheets")
+    print("     (Drive keeps the tab names and the dropdowns).")
+    print("  2. Share -> General access -> Anyone with the link -> Viewer.")
+    print("  3. personas pull --sheet-url <the sheet's URL>")
+    return 0
+
+
 def cmd_pull(args: argparse.Namespace) -> int:
-    from .sheet import pull
+    from .sheet import pull, sheet_id_from
     from .validate import problems
     token = None
     if args.token_file:
         token = Path(args.token_file).read_text().strip()
-    meta = pull(args.sheet_id, args.data, token=token, only=args.tab or None)
-    print(f"pulled {len(meta['tabs'])} tab(s) from {args.sheet_id} at {meta['pulled_at']}")
+    try:
+        sheet_id = sheet_id_from(args.sheet_url or args.sheet_id or "")
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        return 1
+    try:
+        meta = pull(sheet_id, args.data, token=token, only=args.tab or None)
+    except (RuntimeError, ValueError) as e:
+        print(e, file=sys.stderr)
+        return 1
+    print(f"pulled {len(meta['tabs'])} tab(s) from {sheet_id} at {meta['pulled_at']}")
     probs = problems(_load(args.data))
     if probs:
         print(f"\n{len(probs)} problem(s) in the new snapshot:", file=sys.stderr)
@@ -213,9 +243,17 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--force", action="store_true")
     p.set_defaults(fn=cmd_init_data)
 
+    p = sub.add_parser("init-sheet",
+                       help="write one workbook to upload to Google Sheets")
+    common(p)
+    p.add_argument("--out-file", type=Path,
+                   default=Path("Egress_Persona_Model.xlsx"))
+    p.set_defaults(fn=cmd_init_sheet)
+
     p = sub.add_parser("pull", help="snapshot the Google Sheet into data/")
     common(p)
-    p.add_argument("--sheet-id", required=True)
+    p.add_argument("--sheet-url", help="the sheet's URL, straight from the address bar")
+    p.add_argument("--sheet-id", help="the id alone, if you have it")
     p.add_argument("--tab", action="append", help="only this tab (repeatable)")
     p.add_argument("--token-file", help="file holding an OAuth access token")
     p.set_defaults(fn=cmd_pull)

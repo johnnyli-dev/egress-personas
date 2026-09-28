@@ -6,7 +6,9 @@ requires-python = ">=3.12"
 dependencies = ["jsonschema>=4.22"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "nbstripout>=0.7"]
+# Only `personas init-sheet` needs this; the generator stays dependency-light.
+sheet = ["openpyxl>=3.1"]
+dev = ["pytest>=8.0", "nbstripout>=0.7", "openpyxl>=3.1"]
 
 [project.scripts]
 personas = "egress_personas.cli:main"

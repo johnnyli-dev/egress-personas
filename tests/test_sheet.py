@@ -103,6 +103,28 @@ def test_a_web_page_instead_of_csv_is_explained(monkeypatch):
     with pytest.raises(RuntimeError) as e:
         sheet_mod.fetch_tab("ID", "sources")
     assert "not shared for reading by link" in str(e.value)
+    assert "Anyone with the link" in str(e.value)
+
+
+def test_a_missing_sheet_and_an_unreachable_network_both_explain_themselves(monkeypatch):
+    import urllib.error
+
+    def gone(*a, **k):
+        raise urllib.error.HTTPError("u", 404, "Not Found", None, None)
+
+    monkeypatch.setattr(sheet_mod.urllib.request, "urlopen", gone)
+    with pytest.raises(RuntimeError) as e:
+        sheet_mod.fetch_tab("ID", "sources")
+    assert "No sheet with that id" in str(e.value)
+
+    def offline(*a, **k):
+        raise urllib.error.URLError("nodename nor servname provided")
+
+    monkeypatch.setattr(sheet_mod.urllib.request, "urlopen", offline)
+    with pytest.raises(RuntimeError) as e2:
+        sheet_mod.fetch_tab("ID", "sources")
+    assert "could not reach Google" in str(e2.value)
+    assert "does not need the network" in str(e2.value)
 
 
 def test_the_export_url_is_the_csv_endpoint():

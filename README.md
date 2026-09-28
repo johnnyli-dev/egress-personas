@@ -93,14 +93,27 @@ Eight tabs, deliberately small, because every row is hand-maintained.
 | `Scenarios` | a set of conditions: day or night, alarm quality, where the fire starts |
 | `Enums` | every controlled vocabulary, and so every dropdown *and* the validator's vocabulary |
 
-`data/` holds the committed CSV snapshot. `personas pull --sheet-id <id>` refreshes it;
+`data/` holds the committed CSV snapshot. `personas pull` refreshes it from the Sheet;
 **`personas build` reads the snapshot and never the network.** That is what makes a live,
 collaboratively edited sheet compatible with a reproducible generator: the sheet can
 change under you, but a run names the exact revision it came from, and pulling is a
 commit whose diff shows what moved.
 
-To start a sheet from scratch: `personas init-data --force` writes a working set of tabs
-into `data/`; upload them to a Google Sheet and the team owns them from then on.
+### Connecting a Google Sheet
+
+```bash
+uv sync --extra sheet
+uv run personas init-sheet     # one workbook: eight named tabs, frozen headers, dropdowns
+# upload it to Drive, open it as a Sheet, then
+#   Share -> General access -> Anyone with the link -> Viewer
+uv run personas pull --sheet-url "https://docs.google.com/spreadsheets/d/1AbC…/edit"
+```
+
+Upload the workbook rather than pasting eight CSVs into eight tabs: that paste is where
+a column lands one over, and a shifted row parses cleanly and means something else.
+`init-sheet` and `pull` round-trip to the same content hash, so going through Google
+does not by itself change a run id. Full walkthrough, including the private-sheet and
+token case: [`docs/sheet-guide.md`](docs/sheet-guide.md).
 
 ### Adding a parameter
 
