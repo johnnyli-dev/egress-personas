@@ -203,6 +203,39 @@ src/egress_personas/
 Dependencies: `jsonschema` only. Sheets arrive as CSV over `urllib`; the generator and
 its distributions are pure Python, so there is no pandas, numpy or openpyxl to install.
 
+## Comparing buildings
+
+A **cohort** is a building worth asking a question about, written as a set of demographic
+targets that override the base ones. The `cohort` column on the `Population` tab says
+which rows belong to one; the `Cohorts` tab gives each an id, a name, and the question it
+asks.
+
+```bash
+uv run personas cohorts --list
+uv run personas distributions --cohort elderly_block   # age, sex, mobility, speed, ties
+uv run personas cohorts --seeds 5                      # the base against all five
+uv run personas build --cohort families
+```
+
+Five ship with the sheet: mostly elderly, students and new tenants, families with
+children, an accessible building, and a half-empty tower. What falls out is the useful
+part — the elderly cohort never names a mobility share and gets one anyway, because
+mobility is conditioned on age; the families cohort cuts the number of residents nobody
+would warn almost to zero, because bigger households mean everybody has somebody.
+
+**These are inputs to RSET, not RSET.** Nothing here simulates an evacuation. The
+comparison reports what changes in the population *before* the simulation runs, ranked by
+the change against the base building's own seed-to-seed spread, because a difference
+smaller than the spread is not a difference.
+
+## What there is to learn from this
+
+[`docs/learning-objectives.md`](docs/learning-objectives.md) — what the project teaches,
+what it does not, and where an actual contribution is available. The short version: of 31
+parameter rows, 8 are SOURCED, 14 ESTIMATE and 9 INVENTED, and the sensitivity analysis
+that would tell you which of those guesses matter has not been run yet. That is the
+semester's main deliverable, and everything else is in service of it.
+
 ## Where this is going
 
 The population JSON is shaped for the simulation's own reserved roadmap item 3.2,
