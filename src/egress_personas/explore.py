@@ -87,8 +87,26 @@ def payload(pop: Population, tables: Tables | None = None,
                     "finding": text(row.get("finding")) or "",
                 }
 
+    # Every building's makeup, so the page can compare them without a second file.
+    # Only the composition travels, not each cohort's personas: the distributions are a
+    # few kilobytes each, where six full populations would be megabytes.
+    from .distributions import makeup
+    from .households import cohort_ids
+    from .sample import sample as _sample
+
+    makeups: list[dict[str, Any]] = [_slim(makeup(pop))]
+    if tables is not None:
+        for cid in cohort_ids(tables):
+            try:
+                other = _sample(tables, str(pop.scenario.get("scenario_id")),
+                                pop.seed, cohort=cid)
+            except (KeyError, ValueError):
+                continue
+            makeups.append(_slim(makeup(other)))
+
     return {
         "meta": js["meta"],
+        "makeups": makeups,
         "units": js["units"],
         "households": js["households"],
         "groups": js["groups"],
@@ -99,6 +117,23 @@ def payload(pop: Population, tables: Tables | None = None,
         "subsets": subsets,
         "theta": round(pop.theta, 4),
         "generator": f"egress-personas {VERSION}",
+    }
+
+
+def _slim(m: dict[str, Any]) -> dict[str, Any]:
+    """A makeup trimmed to what a chart needs: the conformance prose is not drawn."""
+    return {
+        "cohort": m["cohort"],
+        "cohort_name": m["cohort_name"],
+        "question": m["question"],
+        "residents": m["residents"],
+        "households": m["households"],
+        "distributions": m["distributions"],
+        "crosstabs": m["crosstabs"],
+        "egress_drivers": [
+            {k: d[k] for k in ("key", "phase", "what", "value", "raw", "unit", "why")}
+            for d in m["egress_drivers"]
+        ],
     }
 
 

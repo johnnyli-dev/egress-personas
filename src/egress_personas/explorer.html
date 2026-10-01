@@ -28,6 +28,19 @@
   --warn-soft:  #F0E7CC;
   --shadow:     0 1px 2px rgba(14,22,31,.06), 0 8px 24px -16px rgba(14,22,31,.28);
 
+  /* Chart palette, validated with the data-viz validator against both surfaces:
+     the categorical pair reads ΔE 22.9 normal / 17.8 protan on white and
+     31.8 / 26.8 on the dark surface. The mobility ramp is sequential - one hue,
+     monotone in lightness - because mobility is ordered by severity rather than
+     being a set of unrelated categories. */
+  --series-1:   #1B6E9B;
+  --series-2:   #A85F1E;
+  --ramp-1:     #D4E4EE;
+  --ramp-2:     #94BDD5;
+  --ramp-3:     #4E8CB1;
+  --ramp-4:     #17587F;
+  --grid:       #E4EAEF;
+
   --sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --serif: "IBM Plex Serif", ui-serif, Georgia, "Times New Roman", serif;
@@ -51,6 +64,13 @@
     --warn:      #C8A749;
     --warn-soft: #2B2410;
     --shadow:    0 1px 2px rgba(0,0,0,.5), 0 10px 28px -18px rgba(0,0,0,.9);
+    --series-1: #3C92C9;
+    --series-2: #C97F33;
+    --ramp-1:   #22384A;
+    --ramp-2:   #35617E;
+    --ramp-3:   #4E8DB4;
+    --ramp-4:   #74B8E0;
+    --grid:     #1E2831;
   }
 }
 :root[data-theme="dark"] {
@@ -71,6 +91,13 @@
   --warn:      #C8A749;
   --warn-soft: #2B2410;
   --shadow:    0 1px 2px rgba(0,0,0,.5), 0 10px 28px -18px rgba(0,0,0,.9);
+  --series-1: #3C92C9;
+  --series-2: #C97F33;
+  --ramp-1:   #22384A;
+  --ramp-2:   #35617E;
+  --ramp-3:   #4E8DB4;
+  --ramp-4:   #74B8E0;
+  --grid:     #1E2831;
 }
 
 * { box-sizing: border-box; }
@@ -84,6 +111,46 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 .wrap { max-width: 1420px; margin: 0 auto; padding: 0 18px; padding-block: 22px 44px; }
+
+
+.makeup { margin-top: 30px; }
+.makeup > header { display: flex; flex-wrap: wrap; gap: 12px 24px;
+                   align-items: flex-end; justify-content: space-between;
+                   border-bottom: 1px solid var(--rule); padding-bottom: 12px; }
+.makeup h2 { margin: 0; }
+.makeup .q { font-family: var(--serif); font-size: 15.5px; color: var(--ink);
+             margin: 6px 0 0; max-width: 64ch; font-style: italic; }
+.buildings { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 16px; margin-top: 18px; align-items: start; }
+.panel.chart { padding: 16px 16px 12px; }
+.chart h3 { font-size: 13px; font-weight: 600; margin: 0; letter-spacing: -.005em; }
+.chart .note { font-size: 11.5px; color: var(--ink-3); margin: 3px 0 0; }
+.chart svg { display: block; width: 100%; height: auto; margin-top: 10px;
+             overflow: visible; }
+.chart figcaption { font-size: 11.5px; color: var(--ink-2); margin-top: 8px; }
+.key { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 9px;
+       font-size: 11.5px; color: var(--ink-2); }
+.key span { display: inline-flex; align-items: center; gap: 5px; }
+.key i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+.drivers { margin-top: 16px; }
+.drivers table { font-size: 12px; }
+.drivers td.n { font-family: var(--mono); text-align: right; white-space: nowrap;
+                font-variant-numeric: tabular-nums; }
+.drivers tr.head td { font-size: 10px; text-transform: uppercase;
+                      letter-spacing: .08em; color: var(--ink-3); font-weight: 600;
+                      padding-top: 10px; border-bottom: 0; }
+.drivers td.best { font-weight: 600; }
+.drivers .why { color: var(--ink-3); font-size: 11px; }
+
+#tip { position: fixed; z-index: 40; pointer-events: none; opacity: 0;
+       transition: opacity .09s; background: var(--ink); color: var(--paper);
+       font-size: 11.5px; line-height: 1.45; padding: 6px 9px; border-radius: 3px;
+       max-width: 240px; box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+#tip b { font-family: var(--mono); font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { #tip { transition: none; } }
 
 /* ── masthead ─────────────────────────────────────────────────────────── */
 header { display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: flex-end;
@@ -351,8 +418,24 @@ footer code { font-family: var(--mono); font-size: 11px; }
     </aside>
   </main>
 
+
+  <section class="makeup" id="makeup">
+    <header>
+      <div>
+        <h2>What this building is made of</h2>
+        <p class="q" id="question"></p>
+      </div>
+      <div class="buildings" id="buildings" role="group"
+           aria-label="Which building to show"></div>
+    </header>
+    <div class="panels" id="panels"></div>
+    <div class="drivers panel" id="drivers"></div>
+  </section>
+
   <footer id="footer"></footer>
 </div>
+
+<div id="tip" role="status" aria-live="polite"></div>
 
 <script id="payload" type="application/json">__PAYLOAD__</script>
 <script>
@@ -953,6 +1036,338 @@ footer code { font-family: var(--mono); font-size: 11px; }
     + `nobody has measured one. Fields left to the simulation’s own rules are marked as `
     + `inherited rather than overridden here. Regenerate with `
     + `<code>personas explore --scenario ${sc.id} --seed ${D.meta.seed}</code>.`;
+
+
+  // ── charts ───────────────────────────────────────────────────────────────
+  // Form follows the data's job: ordered buckets get bars, the sexes get a
+  // pyramid (one chart, one axis, two series), and mobility gets a sequential
+  // ramp because its categories are ordered by severity. Every chart has a
+  // hover layer; counts are labelled directly where they fit, so identity and
+  // magnitude are never carried by colour alone.
+
+  const tip = document.getElementById("tip");
+  function showTip(e, html) {
+    tip.innerHTML = html;
+    tip.style.opacity = "1";
+    const pad = 12;
+    const r = tip.getBoundingClientRect();
+    let x = e.clientX + pad, y = e.clientY + pad;
+    if (x + r.width > innerWidth - 8) x = e.clientX - r.width - pad;
+    if (y + r.height > innerHeight - 8) y = e.clientY - r.height - pad;
+    tip.style.left = x + "px";
+    tip.style.top = y + "px";
+  }
+  const hideTip = () => { tip.style.opacity = "0"; };
+
+  function hoverable(node, html) {
+    node.addEventListener("pointerenter", e => showTip(e, html));
+    node.addEventListener("pointermove", e => showTip(e, html));
+    node.addEventListener("pointerleave", hideTip);
+    node.setAttribute("tabindex", "0");
+    node.addEventListener("focus", () => {
+      const b = node.getBoundingClientRect();
+      showTip({ clientX: b.left + b.width / 2, clientY: b.top }, html);
+    });
+    node.addEventListener("blur", hideTip);
+    return node;
+  }
+
+  function figure(title, note, caption) {
+    const f = el("figure", "panel chart");
+    f.style.margin = "0";
+    f.append(el("h3", null, title));
+    if (note) f.append(el("p", "note", note));
+    const s = svg("svg", { role: "img",
+                           "aria-label": note ? `${title} — ${note}` : title });
+    f.append(s);
+    if (caption) f.append(el("figcaption", null, caption));
+    return { figure: f, svg: s };
+  }
+
+  const PRETTY_BAND = {
+    "0_17": "under 18", "18_34": "18–34", "35_49": "35–49", "50_64": "50–64",
+    "65_74": "65–74", "75_plus": "75+", lt_1: "under a year", "1_5": "1–5 years",
+    "5_plus": "5 years or more"
+  };
+  const PRETTY_MOB = {
+    none: "no difficulty", ambulatory_difficulty: "walks with difficulty",
+    walker_cane: "walker or cane", wheelchair: "wheelchair"
+  };
+  const RAMP = ["var(--ramp-1)", "var(--ramp-2)", "var(--ramp-3)", "var(--ramp-4)"];
+
+  /** Horizontal bars for ordered buckets. One series, so no legend: the title names it. */
+  function barChart(dist, opts) {
+    const keys = Object.keys(dist.counts);
+    const vals = keys.map(k => dist.counts[k]);
+    const total = vals.reduce((a, b) => a + b, 0) || 1;
+    const worst = Math.max(...vals, 1);
+    const rowH = 19, gap = 2, labelW = opts.labelW || 78, valueW = 42;
+    const W = 320, plotW = W - labelW - valueW;
+    const H = keys.length * rowH;
+    const { figure: fig, svg: s } = figure(opts.title, opts.note, opts.caption);
+    s.setAttribute("viewBox", `0 0 ${W} ${H + 2}`);
+
+    keys.forEach((k, i) => {
+      const y = i * rowH;
+      const v = dist.counts[k];
+      const w = Math.max(v > 0 ? 2 : 0, (v / worst) * plotW);
+      const label = svg("text", {
+        x: labelW - 8, y: y + rowH / 2 + 3.5, "text-anchor": "end",
+        fill: "var(--ink-2)", "font-family": "var(--sans)", "font-size": "11"
+      });
+      label.textContent = opts.label ? opts.label(k) : k;
+      s.append(label);
+      if (w > 0) {
+        const bar = svg("rect", {
+          x: labelW, y: y + gap, width: w, height: rowH - gap * 2,
+          rx: 3, fill: opts.fill || "var(--series-1)"
+        });
+        s.append(hoverable(bar,
+          `<b>${v}</b> ${dist.unit} · ${(v / total * 100).toFixed(1)}%<br>` +
+          `${opts.label ? opts.label(k) : k}`));
+      }
+      const n = svg("text", {
+        x: labelW + w + 6, y: y + rowH / 2 + 3.5, fill: "var(--ink-3)",
+        "font-family": "var(--mono)", "font-size": "10"
+      });
+      n.textContent = v || "";
+      s.append(n);
+    });
+    return fig;
+  }
+
+  /** A pyramid: the two sexes against one shared age axis, mirrored about it. */
+  function pyramid(ct, opts) {
+    const bands = ct.rows.slice().reverse();
+    const cols = ct.cols.filter(c => c === "female" || c === "male");
+    const worst = Math.max(1, ...bands.flatMap(b => cols.map(c => ct.cells[b][c] || 0)));
+    const rowH = 21, gap = 2, mid = 52, W = 320;
+    const half = (W - mid) / 2 - 22;   // room for the outermost value label
+    const H = bands.length * rowH;
+    const { figure: fig, svg: s } = figure(opts.title, opts.note, opts.caption);
+    s.setAttribute("viewBox", `0 0 ${W} ${H + 16}`);
+
+    // One recessive axis down the middle; no grid, because the labels carry the scale.
+    s.append(svg("line", { x1: W / 2, y1: 0, x2: W / 2, y2: H,
+      stroke: "var(--grid)", "stroke-width": "1" }));
+
+    bands.forEach((band, i) => {
+      const y = i * rowH;
+      const t = svg("text", { x: W / 2, y: y + rowH / 2 + 3.5,
+        "text-anchor": "middle", fill: "var(--ink-2)",
+        "font-family": "var(--sans)", "font-size": "10.5" });
+      t.textContent = PRETTY_BAND[band] || band;
+      s.append(t);
+      cols.forEach(sex => {
+        const v = ct.cells[band][sex] || 0;
+        if (!v) return;
+        const w = Math.max(2, (v / worst) * half);
+        const left = sex === "female";
+        const x = left ? W / 2 - mid / 2 - w : W / 2 + mid / 2;
+        const bar = svg("rect", {
+          x, y: y + gap, width: w, height: rowH - gap * 2,
+          rx: 3, fill: left ? "var(--series-1)" : "var(--series-2)"
+        });
+        s.append(hoverable(bar,
+          `<b>${v}</b> ${sex}, ${PRETTY_BAND[band] || band}`));
+        const n = svg("text", {
+          x: left ? x - 5 : x + w + 5, y: y + rowH / 2 + 3.5,
+          "text-anchor": left ? "end" : "start", fill: "var(--ink-3)",
+          "font-family": "var(--mono)", "font-size": "10" });
+        n.textContent = v;
+        s.append(n);
+      });
+    });
+    const key = el("div", "key");
+    [["female", "var(--series-1)"], ["male", "var(--series-2)"]].forEach(([n, c]) => {
+      const sp = el("span");
+      const i = el("i");
+      i.style.background = c;
+      sp.append(i, document.createTextNode(n));
+      key.append(sp);
+    });
+    fig.append(key);
+    return fig;
+  }
+
+  /** Stacked bars on a sequential ramp: mobility is ordered by severity. */
+  function stackedMobility(ct, opts) {
+    const bands = ct.rows;
+    const cols = ["none", "ambulatory_difficulty", "walker_cane", "wheelchair"]
+      .filter(c => ct.cols.includes(c));
+    const rowH = 21, gap = 2, labelW = 72, W = 320;
+    const plotW = W - labelW - 30;
+    const worst = Math.max(1, ...bands.map(b => ct.row_totals[b] || 0));
+    const H = bands.length * rowH;
+    const { figure: fig, svg: s } = figure(opts.title, opts.note, opts.caption);
+    s.setAttribute("viewBox", `0 0 ${W} ${H + 2}`);
+
+    bands.forEach((band, i) => {
+      const y = i * rowH;
+      const t = svg("text", { x: labelW - 8, y: y + rowH / 2 + 3.5,
+        "text-anchor": "end", fill: "var(--ink-2)",
+        "font-family": "var(--sans)", "font-size": "11" });
+      t.textContent = PRETTY_BAND[band] || band;
+      s.append(t);
+      let x = labelW;
+      cols.forEach((c, ci) => {
+        const v = ct.cells[band][c] || 0;
+        if (!v) return;
+        const w = (v / worst) * plotW;
+        const bar = svg("rect", {
+          x, y: y + gap, width: Math.max(w - 2, 0.8), height: rowH - gap * 2,
+          rx: ci === cols.length - 1 || w > 6 ? 2 : 0,
+          fill: RAMP[ci]
+        });
+        s.append(hoverable(bar,
+          `<b>${v}</b> of ${ct.row_totals[band]} aged ` +
+          `${PRETTY_BAND[band] || band}<br>${PRETTY_MOB[c]}`));
+        x += w;   // the 2px shaved off each fill is the surface gap between segments
+      });
+      const n = svg("text", { x: x + 5, y: y + rowH / 2 + 3.5,
+        fill: "var(--ink-3)", "font-family": "var(--mono)", "font-size": "10" });
+      n.textContent = ct.row_totals[band] || "";
+      s.append(n);
+    });
+    const key = el("div", "key");
+    cols.forEach((c, ci) => {
+      const sp = el("span");
+      const i = el("i");
+      i.style.background = RAMP[ci];
+      sp.append(i, document.createTextNode(PRETTY_MOB[c]));
+      key.append(sp);
+    });
+    fig.append(key);
+    return fig;
+  }
+
+  // ── the makeup section ───────────────────────────────────────────────────
+  const makeups = D.makeups || [];
+  let shown = makeups[0];
+  const panels = document.getElementById("panels");
+  const buildingsBox = document.getElementById("buildings");
+  const questionBox = document.getElementById("question");
+  const driversBox = document.getElementById("drivers");
+
+  function renderMakeup(m) {
+    shown = m;
+    const d = m.distributions;
+    questionBox.textContent = m.question
+      || (m.cohort ? "" : "The building as the census and the literature describe it.");
+    questionBox.hidden = !questionBox.textContent;
+
+    panels.replaceChildren();
+    panels.append(pyramid(m.crosstabs.age_by_sex, {
+      title: "Age and sex",
+      note: `${m.residents} residents, ${m.households} households`,
+      caption: "The shape of the building. A tower of couples and a tower of "
+             + "families fail for different reasons."
+    }));
+    panels.append(stackedMobility(m.crosstabs.age_by_mobility, {
+      title: "Mobility, by age",
+      note: "Darker is more limiting",
+      caption: "Mobility is drawn conditioned on age, so moving the ages moves this "
+             + "without anybody setting it."
+    }));
+    panels.append(barChart(d.base_speed, {
+      title: "Walking speed",
+      note: d.base_speed.mean == null ? "" :
+        `mean ${d.base_speed.mean.toFixed(2)} m/s · slowest twentieth `
+        + `${(d.base_speed.p5 ?? d.base_speed.mean).toFixed(2)} m/s`,
+      caption: "A household moves at its slowest member's pace, so the left tail "
+             + "decides more than the mean does.",
+      labelW: 62
+    }));
+    panels.append(barChart(d.ties, {
+      title: "Connections each",
+      note: "Household, would-knock, would-phone, building chat",
+      caption: "The top bar is the residents with no tie at all — nobody would "
+             + "knock, nobody would call. For them the alarm is the only cue there is.",
+      labelW: 52
+    }));
+    panels.append(barChart(d.tenure, {
+      title: "Years in the building",
+      note: d.tenure.median == null ? ""
+        : `median ${d.tenure.median.toFixed(1)} years`,
+      caption: "Tenure drives how much of the building somebody knows, and how "
+             + "readily they form a tie with a neighbour.",
+      labelW: 62
+    }));
+    panels.append(barChart(d.household_size, {
+      title: "Household size",
+      note: `${m.households} flats occupied`,
+      caption: "Somebody living alone has nobody to wake them, and nobody to wait for.",
+      labelW: 52
+    }));
+
+    renderDrivers();
+  }
+
+  function renderDrivers() {
+    driversBox.replaceChildren();
+    driversBox.append(el("h2", null,
+      "What each building does to an evacuation"));
+    const p = el("p", "note",
+      "Inputs to RSET, not RSET: nothing here simulates an evacuation. These are the "
+      + "quantities the simulation reads, split by which half of the journey they "
+      + "land on. The column you are reading is in bold.");
+    p.style.cssText = "font-size:11.5px;color:var(--ink-3);margin:4px 0 12px;max-width:72ch";
+    driversBox.append(p);
+
+    const wrapT = el("div", "provtable");
+    const t = el("table");
+    const thead = el("thead");
+    const hr = el("tr");
+    hr.append(el("th", null, "driver"), el("th", null, "unit"));
+    makeups.forEach(m => hr.append(el("th", null, m.cohort_name)));
+    thead.append(hr);
+    t.append(thead);
+
+    const body = el("tbody");
+    let phase = null;
+    (shown.egress_drivers || []).forEach((row, idx) => {
+      if (row.phase !== phase) {
+        phase = row.phase;
+        const tr = el("tr", "head");
+        const td = el("td", null, { "TTS": "Before anybody moves",
+          "TTE": "Getting out" }[phase] || "The building");
+        td.colSpan = makeups.length + 2;
+        tr.append(td);
+        body.append(tr);
+      }
+      const tr = el("tr");
+      const name = el("td", null, row.what);
+      name.title = row.why;
+      tr.append(name, el("td", "why", row.unit));
+      makeups.forEach(m => {
+        const cell = (m.egress_drivers || [])[idx];
+        const td = el("td", "n" + (m === shown ? " best" : ""),
+          cell ? String(cell.value) : "—");
+        if (cell) td.title = `${m.cohort_name}: ${cell.value} ${cell.unit}`;
+        tr.append(td);
+      });
+      body.append(tr);
+    });
+    t.append(body);
+    wrapT.append(t);
+    driversBox.append(wrapT);
+  }
+
+  makeups.forEach(m => {
+    const b = el("button", "chip");
+    b.type = "button";
+    b.title = m.question || "the base building";
+    b.append(document.createTextNode(m.cohort_name),
+             el("i", null, String(m.residents)));
+    b.setAttribute("aria-pressed", String(m === shown));
+    b.addEventListener("click", () => {
+      [...buildingsBox.children].forEach(c =>
+        c.setAttribute("aria-pressed", String(c === b)));
+      renderMakeup(m);
+    });
+    buildingsBox.append(b);
+  });
+  if (makeups.length) renderMakeup(makeups[0]);
 
   // Open on a hand-authored case, so the page starts in a real working state.
   renderList();
