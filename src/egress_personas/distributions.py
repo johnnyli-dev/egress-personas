@@ -216,12 +216,26 @@ def egress_drivers(pop: Population) -> list[dict[str, Any]]:
 
     def row(phase: str, what: str, value: Any, unit: str, why: str,
             raw: float | None = None, key: str = "") -> dict[str, Any]:
-        """One driver. `raw` is the number to average across seeds; `value` is how it
-        reads to a person, and the two must not be confused."""
+        """One driver, in three forms, which must not be confused.
+
+        `value` is how it reads to a person. `raw` is the number to average across
+        seeds. `norm` is the only one safe to compare *between buildings*: a count
+        divided by the people it was counted among.
+
+        That last distinction is not pedantry. Occupancy across the cohorts runs from
+        0.85 to 3.1 people per flat, so a count rising from 32 to 75 can be mostly the
+        building being fuller. Comparing counts across buildings of different size
+        attributes to behaviour what is really headcount.
+        """
         if raw is None:
             raw = value if isinstance(value, (int, float)) else None
+        norm, norm_unit = raw, unit
+        if unit == "people" and key != "present" and raw is not None:
+            norm = 100.0 * raw / n
+            norm_unit = "per 100 residents"
         return {"key": key or what, "phase": phase, "what": what, "value": value,
-                "raw": raw, "unit": unit, "why": why}
+                "raw": raw, "norm": norm, "unit": unit, "norm_unit": norm_unit,
+                "why": why}
 
     return [
         row("—", "in the building", len(present), "people",
@@ -245,9 +259,10 @@ def egress_drivers(pop: Population) -> list[dict[str, Any]]:
             sum(1 for p in present if p.commitments), "people",
             "A pet, a child, documents. Time spent before the door, not after it.",
             key="committed"),
-        row("TTS", "that gathering, all told", f"{gather / 60:.0f}", "minutes",
-            "Summed across the building, not per person.",
-            raw=gather / 60.0, key="gather_min"),
+        row("TTS", "gathering, per resident", f"{gather / n:.0f}", "seconds",
+            "Averaged over everybody in the building, so it can be compared between "
+            "buildings of different size. Time spent before the door, not after it.",
+            raw=gather / n, key="gather_per_person"),
         row("TTE", "walking speed, mean", f"{_mean(speeds):.2f}", "m/s",
             "On the level and uncrowded; the simulation slows this for density, "
             "smoke and stairs.", raw=_mean(speeds), key="speed_mean"),

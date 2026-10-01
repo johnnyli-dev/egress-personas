@@ -37,12 +37,16 @@ class Column:
     drivers: dict[str, list[float]] = field(default_factory=dict)
     meta: dict[str, Any] = field(default_factory=dict)
 
-    def mean(self, key: str) -> float | None:
-        vals = [v for v in self.drivers.get(key, []) if v is not None]
+    normed: dict[str, list[float]] = field(default_factory=dict)
+
+    def mean(self, key: str, which: str = "raw") -> float | None:
+        src = self.normed if which == "norm" else self.drivers
+        vals = [v for v in src.get(key, []) if v is not None]
         return statistics.fmean(vals) if vals else None
 
-    def spread(self, key: str) -> float | None:
-        vals = [v for v in self.drivers.get(key, []) if v is not None]
+    def spread(self, key: str, which: str = "raw") -> float | None:
+        src = self.normed if which == "norm" else self.drivers
+        vals = [v for v in src.get(key, []) if v is not None]
         return statistics.stdev(vals) if len(vals) > 1 else 0.0
 
 
@@ -71,6 +75,7 @@ def build(tables: Tables, scenario_id: str, *, seeds: list[int],
             col.runs.append(pop)
             for d in egress_drivers(pop):
                 col.drivers.setdefault(d["key"], []).append(d["raw"])
+                col.normed.setdefault(d["key"], []).append(d.get("norm"))
         columns.append(col)
     return columns
 
@@ -80,7 +85,8 @@ def rows_of(columns: list[Column]) -> list[dict[str, Any]]:
     if not columns or not columns[0].runs:
         return []
     return [{"key": d["key"], "phase": d["phase"], "what": d["what"],
-             "unit": d["unit"], "why": d["why"]}
+             "unit": d["unit"], "norm_unit": d.get("norm_unit", d["unit"]),
+             "why": d["why"]}
             for d in egress_drivers(columns[0].runs[0])]
 
 
@@ -96,7 +102,31 @@ def _fmt(value: float | None, unit: str) -> str:
     return f"{value:.1f}" if abs(value - round(value)) > 0.05 else f"{round(value):d}"
 
 
+#: Beyond this, a fold change is reported as a bound rather than a number.
+FOLD_CAP = 20.0
+
+
+def _fold(a: float, b: float, noise: float) -> tuple[float, str]:
+    """How many times apart two figures are, symmetrically, with a floor.
+
+    A halving and a doubling are the same size of move, so the measure is
+    `max(a/b, b/a)` rather than `b/a`. And a value below its own seed-to-seed spread
+    is indistinguishable from zero, so dividing by it would manufacture a huge number
+    out of noise: those are capped and marked.
+    """
+    lo, hi = sorted((abs(a), abs(b)))
+    floor = max(noise, hi / FOLD_CAP, 1e-9)
+    if lo < floor:
+        return hi / floor, "≥"
+    return hi / lo, ""
+
+
 def markdown(columns: list[Column], scenario_id: str, seeds: list[int]) -> str:
+    # Read the occupancy spread off the buildings themselves, so the sentence that
+    # explains why counts are normalised cannot go stale when a cohort changes.
+    occ = [c.runs[0].targets.persons_per_flat for c in columns if c.runs]
+    _occ_lo, _occ_hi = (min(occ), max(occ)) if occ else (0.0, 0.0)
+
     L: list[str] = [
         f"# Buildings compared — {scenario_id}, {len(seeds)} seed"
         f"{'s' if len(seeds) != 1 else ''}",
@@ -106,9 +136,19 @@ def markdown(columns: list[Column], scenario_id: str, seeds: list[int]) -> str:
         f"{len(seeds)} seeds, with the spread across those seeds in brackets — a "
         "difference smaller than the spread is not a difference.",
         "",
-        "**These are inputs to RSET, not RSET.** Nothing here simulates an evacuation. "
-        "What the columns show is what changes in the population *before* the "
-        "simulation runs, which is the half of the question this project owns.",
+        "**Read this as arithmetic, not as evidence.** Every cohort target is "
+        "`basis = team`: somebody chose it to ask a question, and no census or paper "
+        "says a building looks like that. What the table shows is the consequence of "
+        "those choices propagated through the model's own rules — including "
+        "consequences nobody typed, which is the part worth looking at. It is not a "
+        "finding about real buildings.",
+        "",
+        "**These are inputs to RSET, not RSET.** Nothing here simulates an evacuation.",
+        "",
+        f"Counts are shown per 100 residents, with the raw count in brackets. "
+        f"Occupancy across these buildings runs from {_occ_lo:g} to {_occ_hi:g} people "
+        f"a flat, so an unscaled count rising would mostly mean the building got "
+        f"fuller rather than that anybody behaved differently.",
         "",
     ]
 
@@ -131,41 +171,59 @@ def markdown(columns: list[Column], scenario_id: str, seeds: list[int]) -> str:
             tag = {"TTS": "**Before anybody moves (TTS)**",
                    "TTE": "**Getting out (TTE)**"}.get(phase, "**The building**")
             L.append(f"| {tag} |" + " |" * (len(head) - 1))
+        counted = r["unit"] == "people" and r["key"] != "present"
         cells = []
         for c in columns:
-            m, sd = c.mean(r["key"]), c.spread(r["key"])
-            cell = _fmt(m, r["unit"])
+            m = c.mean(r["key"], "norm" if counted else "raw")
+            sd = c.spread(r["key"], "norm" if counted else "raw")
+            unit = r["norm_unit"] if counted else r["unit"]
+            cell = _fmt(m, unit)
             if sd and m is not None and sd > 0:
-                cell += f" <sub>±{_fmt(sd, r['unit']).lstrip('±')}</sub>"
+                cell += f" <sub>±{_fmt(sd, unit).lstrip('±')}</sub>"
+            if counted:
+                cell += f" <sub>({_fmt(c.mean(r['key']), 'people')})</sub>"
             cells.append(cell)
-        L.append(f"| {r['what']} | {r['unit']} | " + " | ".join(cells) + " |")
+        unit_col = r["norm_unit"] if counted else r["unit"]
+        L.append(f"| {r['what']} | {unit_col} | " + " | ".join(cells) + " |")
     L.append("")
 
     L += ["## What moved most", ""]
     base = columns[0]
-    moved: list[tuple[float, str, str, str, str]] = []
+    moved: list[tuple[float, str, str, str]] = []
     for r in rows_of(columns):
-        b = base.mean(r["key"])
-        if b is None:
+        counted = r["unit"] == "people" and r["key"] != "present"
+        which = "norm" if counted else "raw"
+        unit = r["norm_unit"] if counted else r["unit"]
+        b = base.mean(r["key"], which)
+        if b is None or b == 0:
             continue
-        noise = max(base.spread(r["key"]) or 0.0, 1e-9)
         for c in columns[1:]:
-            v = c.mean(r["key"])
+            v = c.mean(r["key"], which)
             if v is None:
                 continue
-            z = abs(v - b) / noise
-            moved.append((z, c.name, r["what"],
-                          f"{_fmt(b, r['unit'])} → {_fmt(v, r['unit'])}", r["unit"]))
+            fold, mark = _fold(b, v, max(base.spread(r["key"], which) or 0.0,
+                                         c.spread(r["key"], which) or 0.0))
+            arrow = "↑" if v > b else ("↓" if v < b else "")
+            moved.append((fold, c.name, r["what"],
+                          f"{_fmt(b, unit)} → {_fmt(v, unit)}",
+                          f"{mark}×{fold:.1f} {arrow}".strip()))
     moved.sort(reverse=True)
     if moved:
-        L += ["Ranked by how large the change is against the seed-to-seed spread of the "
-              "base building, so a big absolute move in a noisy quantity does not "
-              "outrank a small move in a stable one.", "",
-              "| building | driver | base → cohort | × the base spread |",
+        L += ["Ranked by **fold change** in the comparable figure — counts per 100 "
+              "residents, means as they are — so a building being fuller does not get "
+              "mistaken for its residents behaving differently, and a halving counts as "
+              "the same size of move as a doubling.", "",
+              "A change to or from nearly nothing is shown as a bound (`≥`), because "
+              "dividing by a quantity smaller than its own seed-to-seed spread does not "
+              "mean anything.", "",
+              "A large change here means the targets were set far apart, nothing more. "
+              "Whether it matters is a question for the simulation, and which of the "
+              "underlying parameters deserve the weight is a question for a sensitivity "
+              "run. Neither has been done.", "",
+              "| building | driver | base → cohort | fold |",
               "|---|---|---|---|"]
-        for z, name, what, delta, _unit in moved[:16]:
-            z_text = "—" if z > 1e6 else f"{z:.0f}×"
-            L.append(f"| {name} | {what} | {delta} | {z_text} |")
+        for _fold_v, name, what, delta, shown in moved[:16]:
+            L.append(f"| {name} | {what} | {delta} | {shown} |")
         L.append("")
 
     warn = [(c.name, w) for c in columns for pop in c.runs for w in pop.warnings]
@@ -194,6 +252,11 @@ def markdown(columns: list[Column], scenario_id: str, seeds: list[int]) -> str:
           "- A cohort is a **question**, not a measurement. The base building's targets "
           "come from the census and the literature; a cohort's come from the team, and "
           "its rows say `basis = team` for exactly that reason.",
+          "- Most of what you see here is the arithmetic you set up. If you halve a "
+          "cohort's mean tenure and the parameter rows assign familiarity by tenure "
+          "band, mean familiarity falls — that is a weighted average, not a result. The "
+          "rows worth a second look are the ones where a consequence appears in a "
+          "quantity the cohort never named.",
           "- Mobility is conditioned on age, so a cohort that only moves the age "
           "distribution still moves the walking-difficulty share. That is the model "
           "working, not a second assumption.",

@@ -148,6 +148,45 @@ def test_the_comparison_says_it_is_not_an_evacuation_result(columns):
     assert "a difference smaller than the spread is not a difference" in text
 
 
+def test_the_comparison_says_its_targets_were_chosen_not_measured(columns):
+    """The cohort numbers are `basis = team`. Presenting their consequences as findings
+    about real buildings is the misreading the header exists to prevent."""
+    text = markdown(columns, "night_fire12", [1, 2, 3])
+    assert "arithmetic, not as evidence" in text
+    assert "basis = team" in text
+    assert "not a finding about real buildings" in text
+
+
+def test_counts_are_compared_per_resident_not_raw(columns):
+    """Occupancy runs from 0.85 to 3.1 people a flat across these buildings, so an
+    unscaled count would make a fuller building look like a differently-behaving one."""
+    text = markdown(columns, "night_fire12", [1, 2, 3])
+    assert "per 100 residents" in text
+    by = {c.cohort: c for c in columns}
+    # Students have more people than the base but the same per-head alarm failure, so
+    # the raw count rises while the rate does not.
+    assert by["student_block"].mean("unheard") > by[""].mean("unheard")
+    assert by["student_block"].mean("unheard", "norm") <= by[""].mean("unheard", "norm") * 1.3
+
+
+def test_a_fold_change_is_symmetric_and_floored():
+    from egress_personas.cohorts import _fold
+    assert _fold(10, 20, 0)[0] == pytest.approx(2.0)
+    assert _fold(20, 10, 0)[0] == pytest.approx(2.0)   # a halving is the same size move
+    # A value under its own seed spread cannot be divided by: bounded and marked.
+    fold, mark = _fold(10, 0.05, noise=0.5)
+    assert mark == "≥"
+    assert fold <= 20.0
+
+
+def test_total_gathering_is_stated_per_resident(population):
+    """The building-wide total scaled with headcount, which made a bigger building look
+    like a slower-gathering one."""
+    keys = {d["key"] for d in egress_drivers(population)}
+    assert "gather_per_person" in keys
+    assert "gather_min" not in keys
+
+
 def test_the_comparison_names_each_cohorts_question(columns):
     text = markdown(columns, "night_fire12", [1, 2, 3])
     for c in columns[1:]:

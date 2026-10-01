@@ -1308,9 +1308,12 @@ footer code { font-family: var(--mono); font-size: 11px; }
     driversBox.append(el("h2", null,
       "What each building does to an evacuation"));
     const p = el("p", "note",
-      "Inputs to RSET, not RSET: nothing here simulates an evacuation. These are the "
-      + "quantities the simulation reads, split by which half of the journey they "
-      + "land on. The column you are reading is in bold.");
+      "Inputs to RSET, not RSET: nothing here simulates an evacuation. Counts are per "
+      + "100 residents, because these buildings hold different numbers of people and a "
+      + "raw count would make a fuller one look like a differently-behaving one — hover "
+      + "a figure for the headcount behind it. Cohort targets were chosen to ask a "
+      + "question, not measured, so read the differences as arithmetic rather than as "
+      + "evidence. The column you are reading is in bold.");
     p.style.cssText = "font-size:11.5px;color:var(--ink-3);margin:4px 0 12px;max-width:72ch";
     driversBox.append(p);
 
@@ -1338,12 +1341,28 @@ footer code { font-family: var(--mono); font-size: 11px; }
       const tr = el("tr");
       const name = el("td", null, row.what);
       name.title = row.why;
-      tr.append(name, el("td", "why", row.unit));
+      tr.append(name, el("td", "why",
+        row.unit === "people" && row.key !== "present"
+          ? "per 100" : row.unit));
+      // Counts are shown per 100 residents, because occupancy differs between these
+      // buildings and a raw count would make a fuller building look like a
+      // differently-behaving one.
+      const counted = row.unit === "people" && row.key !== "present";
       makeups.forEach(m => {
         const cell = (m.egress_drivers || [])[idx];
-        const td = el("td", "n" + (m === shown ? " best" : ""),
-          cell ? String(cell.value) : "—");
-        if (cell) td.title = `${m.cohort_name}: ${cell.value} ${cell.unit}`;
+        let shownValue = "—", title = "";
+        if (cell) {
+          if (counted && cell.norm != null) {
+            shownValue = cell.norm.toFixed(1);
+            title = `${m.cohort_name}: ${cell.norm.toFixed(1)} per 100 residents `
+                  + `(${cell.value} people of ${m.residents})`;
+          } else {
+            shownValue = String(cell.value);
+            title = `${m.cohort_name}: ${cell.value} ${cell.unit}`;
+          }
+        }
+        const td = el("td", "n" + (m === shown ? " best" : ""), shownValue);
+        if (title) td.title = title;
         tr.append(td);
       });
       body.append(tr);

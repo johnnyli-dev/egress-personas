@@ -92,9 +92,12 @@ simulation run, and it transfers to every empirical thing you will ever do. The 
 trap — that enough comparisons will always produce a significant one — is worth having
 met once in your own code.
 
-**How to evidence it.** The cohort comparison ranks what moved by the change against the
-base building's own seed-to-seed spread. Explain that ranking and why the raw difference
-would have been the wrong ordering.
+**How to evidence it.** The cohort comparison went through three orderings before one of
+them was honest: the raw difference (which confused a fuller building with a
+differently-behaving one), then a ratio against the base (which made a halving look like
+a smaller move than a doubling), then a symmetric fold change on counts normalised per
+100 residents, bounded where a figure falls below its own seed spread. Writing up why
+each of the first two was wrong is a better piece of evidence than the final answer.
 
 ---
 
@@ -193,7 +196,10 @@ problem; a guess that moves everything is the project's main risk, and right now
 knows which guesses are which.
 
 **(b) Close the loop to the simulation.** The cohorts currently move *inputs* to RSET, not
-RSET. Turning "this building has a slower left tail" into "this building takes four more
+RSET — and a cohort comparison on its own is arithmetic rather than evidence, because
+every cohort target is a number somebody chose to ask a question with. What it is good
+for is catching contradictions and surfacing consequences nobody typed; what it cannot do
+is say whether any of it changes an evacuation. Turning "this building has a slower left tail" into "this building takes four more
 minutes" needs the population JSON loaded by `FireEgress-3dsim` — its own reserved roadmap
 item 3.2, with the invariants already documented in `sim-contract.md` and already
 satisfied by the output. It is a contained piece of Rust: a serde struct of `Option<f32>`,
