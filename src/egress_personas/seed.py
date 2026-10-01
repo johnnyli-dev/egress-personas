@@ -180,28 +180,89 @@ P090,Pre-movement time,tts,pre_evacuation,body.delay_s,,set,weibull,102.475,0.76
 """
 
 POPULATION = """\
-id,dimension,category,value,unit,tolerance,basis,source_ids,notes
-T001,occupancy,persons_per_flat,1.66,persons,0.15,estimate,acs_b11016,"Flats in large San Francisco buildings hold fewer people than the city average of 2.14. This is the primary occupancy target because it is plan-independent: a per-floor figure only means something once you fix how many flats a floor has."
-T010,household_size,1,40.65,share,,acs,acs_b11016,San Francisco households of one person.
-T011,household_size,2,32.67,share,,acs,acs_b11016,Two people.
-T012,household_size,3,12.12,share,,acs,acs_b11016,Three people.
-T013,household_size,4plus,14.57,share,,acs,acs_b11016,"Four or more, folded to exactly four."
-T020,age_band,0_17,0.12,share,0.04,estimate,,"Reasoned to fit a tower of mostly small flats. Needs a real San Francisco figure."
-T021,age_band,18_34,0.27,share,0.04,acs,,Ages 18 to 34 at 27 percent.
-T022,age_band,35_49,0.24,share,0.04,estimate,,Needs a real figure.
-T023,age_band,50_64,0.19,share,0.04,estimate,,Needs a real figure.
-T024,age_band,65_74,0.11,share,0.03,estimate,,Needs a real figure.
-T025,age_band,75_plus,0.07,share,0.03,estimate,,"Needs a real figure. This band and the one above it drive the stair-speed tail, so they are worth getting right early."
-T030,sex,female,0.50,share,0.04,estimate,,
-T031,sex,male,0.50,share,0.04,estimate,,
-T040,mobility,wheelchair,0.013,share,0.008,sipp,sipp_wheelchair,"About 1.3 percent use a wheelchair. These are the occupants who cannot use the stairs at all, so the count matters more than the share."
-T041,mobility,ambulatory_difficulty@18_64,0.038,share,0.015,acs,acs_b18105,Ambulatory difficulty among adults aged 35 to 64.
-T042,mobility,ambulatory_difficulty@65_plus,0.182,share,0.04,acs,acs_b18105,"Ambulatory difficulty among those 65 and over. This, not the wheelchair share, is what the team's first workbook's 'mobility impaired' category was actually describing."
-T050,absence,share,0.06,share,0.03,estimate,,"Residents not in the building. Overridden per scenario: a weekday afternoon empties a tower that a 3 a.m. fire does not."
-T060,pet,share,0.25,share,0.10,estimate,,"Share of flats keeping a pet. The team's first workbook had 11 of 92 flats, about 12 percent; US household figures are far higher. Neither is a San Francisco apartment figure."
-T070,tenure,lt_1,0.18,share,0.06,estimate,,"Residents in their first year. Drives how much of the building they know."
-T071,tenure,1_5,0.37,share,0.08,estimate,,
-T072,tenure,5_plus,0.45,share,0.08,estimate,,"Needs a real figure: San Francisco rent control makes long tenures commoner here than nationally, which would raise familiarity across the board."
+id,dimension,cohort,category,value,unit,tolerance,basis,source_ids,notes
+T001,occupancy,,persons_per_flat,1.66,persons,0.15,estimate,acs_b11016,Flats in large San Francisco buildings hold fewer people than the city average of 2.14. This is the primary occupancy target because it is plan-independent: a per-floor figure only means something once you fix how many flats a floor has.
+T010,household_size,,1,40.65,share,,acs,acs_b11016,San Francisco households of one person.
+T011,household_size,,2,32.67,share,,acs,acs_b11016,Two people.
+T012,household_size,,3,12.12,share,,acs,acs_b11016,Three people.
+T013,household_size,,4plus,14.57,share,,acs,acs_b11016,"Four or more, folded to exactly four."
+T020,age_band,,0_17,0.12,share,0.04,estimate,,Reasoned to fit a tower of mostly small flats. Needs a real San Francisco figure.
+T021,age_band,,18_34,0.27,share,0.04,acs,,Ages 18 to 34 at 27 percent.
+T022,age_band,,35_49,0.24,share,0.04,estimate,,Needs a real figure.
+T023,age_band,,50_64,0.19,share,0.04,estimate,,Needs a real figure.
+T024,age_band,,65_74,0.11,share,0.03,estimate,,Needs a real figure.
+T025,age_band,,75_plus,0.07,share,0.03,estimate,,"Needs a real figure. This band and the one above it drive the stair-speed tail, so they are worth getting right early."
+T030,sex,,female,0.50,share,0.04,estimate,,
+T031,sex,,male,0.50,share,0.04,estimate,,
+T040,mobility,,wheelchair,0.013,share,0.008,sipp,sipp_wheelchair,"About 1.3 percent use a wheelchair. These are the occupants who cannot use the stairs at all, so the count matters more than the share."
+T041,mobility,,ambulatory_difficulty@18_64,0.038,share,0.015,acs,acs_b18105,Ambulatory difficulty among adults aged 35 to 64.
+T042,mobility,,ambulatory_difficulty@65_plus,0.182,share,0.04,acs,acs_b18105,"Ambulatory difficulty among those 65 and over. This, not the wheelchair share, is what the team's first workbook's 'mobility impaired' category was actually describing."
+T050,absence,,share,0.06,share,0.03,estimate,,Residents not in the building. Overridden per scenario: a weekday afternoon empties a tower that a 3 a.m. fire does not.
+T060,pet,,share,0.25,share,0.10,estimate,,"Share of flats keeping a pet. The team's first workbook had 11 of 92 flats, about 12 percent; US household figures are far higher. Neither is a San Francisco apartment figure."
+T070,tenure,,lt_1,0.18,share,0.06,estimate,,Residents in their first year. Drives how much of the building they know.
+T071,tenure,,1_5,0.37,share,0.08,estimate,,
+T072,tenure,,5_plus,0.45,share,0.08,estimate,,"Needs a real figure: San Francisco rent control makes long tenures commoner here than nationally, which would raise familiarity across the board."
+C101,age_band,elderly_block,0_17,0.02,share,0.03,team,,A tower of older residents still has a few children in it.
+C102,age_band,elderly_block,18_34,0.07,share,0.04,team,,
+C103,age_band,elderly_block,35_49,0.08,share,0.04,team,,
+C104,age_band,elderly_block,50_64,0.17,share,0.05,team,,
+C105,age_band,elderly_block,65_74,0.36,share,0.06,team,,
+C106,age_band,elderly_block,75_plus,0.30,share,0.06,team,,Two thirds over 65. Not a census figure for anywhere - a deliberate question.
+C107,occupancy,elderly_block,persons_per_flat,1.42,persons,0.15,team,,Older households are smaller: more people living alone or as a couple.
+C108,household_size,elderly_block,1,52.0,share,,team,,
+C109,household_size,elderly_block,2,38.0,share,,team,,
+C110,household_size,elderly_block,3,7.0,share,,team,,
+C111,household_size,elderly_block,4plus,3.0,share,,team,,
+C112,tenure,elderly_block,lt_1,0.06,share,0.04,team,,"Residents who have been here for decades, which makes the building familiar and the alarm old news."
+C113,tenure,elderly_block,1_5,0.18,share,0.06,team,,
+C114,tenure,elderly_block,5_plus,0.76,share,0.08,team,,
+C201,age_band,student_block,0_17,0.01,share,0.03,team,,
+C202,age_band,student_block,18_34,0.78,share,0.06,team,,"A hall of residence, or a building let room by room."
+C203,age_band,student_block,35_49,0.13,share,0.05,team,,
+C204,age_band,student_block,50_64,0.06,share,0.04,team,,
+C205,age_band,student_block,65_74,0.015,share,0.02,team,,
+C206,age_band,student_block,75_plus,0.005,share,0.02,team,,
+C207,tenure,student_block,lt_1,0.62,share,0.08,team,,"Most residents arrived this year, so most of the building is unfamiliar to most of it."
+C208,tenure,student_block,1_5,0.33,share,0.08,team,,
+C209,tenure,student_block,5_plus,0.05,share,0.04,team,,
+C210,occupancy,student_block,persons_per_flat,2.40,persons,0.20,team,,Shared flats: more people to a flat than the city average.
+C211,household_size,student_block,1,18.0,share,,team,,
+C212,household_size,student_block,2,34.0,share,,team,,
+C213,household_size,student_block,3,26.0,share,,team,,
+C214,household_size,student_block,4plus,22.0,share,,team,,
+C215,pet,student_block,share,0.08,share,0.06,team,,Lettings of this kind usually forbid pets.
+C301,age_band,families,0_17,0.26,share,0.05,team,,"A quarter of the building under 18, about as high as a residential tower gets."
+C302,age_band,families,18_34,0.20,share,0.05,team,,
+C303,age_band,families,35_49,0.31,share,0.05,team,,
+C304,age_band,families,50_64,0.13,share,0.05,team,,
+C305,age_band,families,65_74,0.07,share,0.04,team,,
+C306,age_band,families,75_plus,0.03,share,0.03,team,,
+C307,occupancy,families,persons_per_flat,3.10,persons,0.25,team,,"Three or more to a flat. This strains the plan: four flats a floor at three people is twelve a floor, against the roadmap's ten to eleven."
+C308,household_size,families,1,8.0,share,,team,,
+C309,household_size,families,2,22.0,share,,team,,
+C310,household_size,families,3,32.0,share,,team,,
+C311,household_size,families,4plus,38.0,share,,team,,
+C312,pet,families,share,0.42,share,0.10,team,,"Households with children keep more pets, and a pet is a thing somebody goes back for."
+C401,mobility,accessible_block,wheelchair,0.14,share,0.04,team,,Fourteen percent rather than 1.3: a building let preferentially to disabled tenants. The question is how many of them have nobody to help.
+C402,mobility,accessible_block,ambulatory_difficulty@18_64,0.22,share,0.06,team,,
+C403,mobility,accessible_block,ambulatory_difficulty@65_plus,0.42,share,0.08,team,,
+C404,age_band,accessible_block,0_17,0.06,share,0.04,team,,
+C405,age_band,accessible_block,18_34,0.14,share,0.05,team,,
+C406,age_band,accessible_block,35_49,0.18,share,0.05,team,,
+C407,age_band,accessible_block,50_64,0.24,share,0.05,team,,
+C408,age_band,accessible_block,65_74,0.21,share,0.05,team,,
+C409,age_band,accessible_block,75_plus,0.17,share,0.05,team,,
+C501,occupancy,transient,persons_per_flat,0.85,persons,0.15,team,,Half the flats empty. A quieter stair and a thinner warning network at the same time.
+C502,absence,transient,share,0.14,share,0.05,team,,More of those who do live here are out when it starts.
+"""
+
+COHORTS = """\
+cohort_id,name,include_cases,question,notes
+elderly_block,Mostly elderly,FALSE,"Does a building of older residents fail on the stairs, or before anybody reaches them?","Two thirds over 65. Ambulatory difficulty follows from age at the census rate, so the walking-difficulty share roughly trebles without being set directly - which is the point of conditioning mobility on age rather than drawing it flat."
+student_block,Students and new tenants,FALSE,"What happens when almost nobody knows the building, or each other?","Young, short tenure, shared flats. Familiarity and tie formation both follow from tenure, so this tests the wayfinding and warning side rather than the walking-speed side."
+families,Families with children,FALSE,"How much does gathering children cost against how fast the adults can move?","Larger households and a quarter under 18. The interesting quantity is pre-movement, not travel: an adult carrying a toddler is slow, but the minutes go on finding them."
+accessible_block,Accessible building,FALSE,"If a tower is let preferentially to disabled tenants, how many need the lift and how many have nobody to help?","Raises the wheelchair share tenfold. Watch the caregiver gap in the report: a one-person household with a wheelchair user has nobody in the flat, and the simulation will not find a carer on the floor either."
+transient,Half the flats empty,FALSE,"Does a half-occupied tower evacuate faster, or just leave more people unwarned?","Occupancy halved. Fewer people on the stairs, but fewer neighbours to knock as well, which pull in opposite directions - the sort of thing a sensitivity run should settle rather than intuition."
 """
 
 SOCIAL = """\
@@ -396,6 +457,7 @@ FILES: dict[str, str] = {
     "sources.csv": SOURCES,
     "parameters.csv": PARAMETERS,
     "population.csv": POPULATION,
+    "cohorts.csv": COHORTS,
     "social.csv": SOCIAL,
     "scenarios.csv": SCENARIOS,
 }

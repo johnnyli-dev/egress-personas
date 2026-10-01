@@ -63,10 +63,37 @@ class Targets:
         return self.ambulatory_share.get("0_17", 0.004)
 
 
-def read_targets(tables: Tables) -> Targets:
+def cohort_ids(tables: Tables) -> list[str]:
+    tab = tables.get("cohorts")
+    return [text(r.get("cohort_id")) for r in tab] if tab else []
+
+
+def read_targets(tables: Tables, cohort: str | None = None) -> Targets:
+    """The demographic targets, with a cohort's overrides laid over the base set.
+
+    A cohort is a building worth asking a question about — mostly elderly, a student
+    block, a tower where nobody has lived long. It overrides only the targets it names,
+    so a cohort row says what is different about that building and nothing else.
+    """
     t = Targets(age_weights={}, sex_weights={}, tenure_weights={}, ambulatory_share={})
     sizes: dict[str, float] = {}
-    for row in tables["population"]:
+    rows = [r for r in tables["population"] if not text(r.get("cohort"))]
+    if cohort:
+        overrides = [r for r in tables["population"]
+                     if text(r.get("cohort")) == cohort]
+        if not overrides:
+            known = cohort_ids(tables)
+            raise KeyError(
+                f"no cohort {cohort!r} has any target rows. The Cohorts tab lists "
+                f"{known or 'none'}, and a cohort's targets are the Population rows "
+                f"whose `cohort` column names it."
+            )
+        # A cohort row replaces the base row for the same dimension and category, and
+        # a dimension it touches at all replaces that whole dimension: half-overriding
+        # a set of shares would leave them summing to something other than one.
+        touched = {text(r.get("dimension")) for r in overrides}
+        rows = [r for r in rows if text(r.get("dimension")) not in touched] + overrides
+    for row in rows:
         dim = text(row.get("dimension"))
         cat = text(row.get("category")) or ""
         val = as_float(row.get("value"))

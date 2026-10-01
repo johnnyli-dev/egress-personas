@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from egress_personas.tables import Tables, load_dir, read_csv_text
+from egress_personas.tables import TABS, Tables, load_dir, read_csv_text
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -31,8 +31,7 @@ def mutate():
     """
     def _mutate(tab: str, fn) -> Tables:
         tabs = {}
-        for name in ("parameters", "sources", "population", "social", "cases",
-                     "building", "scenarios", "enums"):
+        for name in TABS:
             text = (DATA / f"{name}.csv").read_text(encoding="utf-8-sig")
             if name == tab:
                 text = fn(text)

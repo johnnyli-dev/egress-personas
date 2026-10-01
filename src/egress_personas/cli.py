@@ -143,7 +143,7 @@ def cmd_build(args: argparse.Namespace) -> int:
             return rc
         print()
     tables = _checked(args.data)
-    pop = sample(tables, args.scenario, args.seed)
+    pop = sample(tables, args.scenario, args.seed, cohort=args.cohort)
     paths = write_all(pop, args.out,
                       generated_at=args.generated_at,
                       report_text=markdown(pop))
@@ -164,7 +164,7 @@ def cmd_report(args: argparse.Namespace) -> int:
     from .report import markdown
     from .sample import sample
     tables = _checked(args.data)
-    pop = sample(tables, args.scenario, args.seed)
+    pop = sample(tables, args.scenario, args.seed, cohort=args.cohort)
     text = markdown(pop)
     if args.out_file:
         Path(args.out_file).write_text(text, encoding="utf-8")
@@ -178,7 +178,7 @@ def cmd_compare(args: argparse.Namespace) -> int:
     from .compare import compare
     from .sample import sample
     tables = _checked(args.data)
-    pop = sample(tables, args.scenario, args.seed)
+    pop = sample(tables, args.scenario, args.seed, cohort=args.cohort)
     text = compare(pop, args.against)
     if args.out_file:
         Path(args.out_file).write_text(text, encoding="utf-8")
@@ -192,7 +192,7 @@ def cmd_show(args: argparse.Namespace) -> int:
     from .sample import sample
     from .show import pick, render, summary
     tables = _checked(args.data)
-    pop = sample(tables, args.scenario, args.seed)
+    pop = sample(tables, args.scenario, args.seed, cohort=args.cohort)
     if args.list:
         print(summary(pop))
         return 0
@@ -217,11 +217,72 @@ def cmd_explore(args: argparse.Namespace) -> int:
     from .explore import write_explorer
     from .sample import sample
     tables = _checked(args.data)
-    pop = sample(tables, args.scenario, args.seed)
+    pop = sample(tables, args.scenario, args.seed, cohort=args.cohort)
     path = write_explorer(pop, args.out_file, tables=tables,
                           generated_at=args.generated_at)
     print(f"wrote {path}")
     print(f"{len(pop.people)} residents embedded. Open it in a browser.")
+    return 0
+
+
+def cmd_distributions(args: argparse.Namespace) -> int:
+    import json as _json
+
+    from .distributions import makeup
+    from .report import distributions_markdown
+    from .sample import sample
+    tables = _checked(args.data)
+    pop = sample(tables, args.scenario, args.seed, cohort=args.cohort)
+    if args.json:
+        text = _json.dumps(makeup(pop), indent=2)
+    else:
+        text = distributions_markdown(pop)
+    if args.out_file:
+        Path(args.out_file).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out_file}")
+    else:
+        print(text)
+    return 0
+
+
+def cmd_cohorts(args: argparse.Namespace) -> int:
+    from .cohorts import build, markdown
+    from .households import cohort_ids
+    from .tables import text as _text
+    tables = _checked(args.data)
+
+    if args.list:
+        tab = tables.get("cohorts")
+        print("Buildings the Sheet describes, beyond the base one:\n")
+        for row in (tab or []):
+            cid = _text(row.get("cohort_id"))
+            n = sum(1 for r in tables["population"]
+                    if _text(r.get("cohort")) == cid)
+            print(f"  {cid:<18} {_text(row.get('name')) or ''}")
+            if _text(row.get("question")):
+                print(f"  {'':<18} {_text(row.get('question'))}")
+            print(f"  {'':<18} {n} target row(s) overridden\n")
+        if not (tab and len(tab)):
+            print("  none. Add a row to the Cohorts tab and give it Population rows.")
+        return 0
+
+    known = cohort_ids(tables)
+    which = args.cohort or None
+    if which:
+        missing = [c for c in which if c not in known]
+        if missing:
+            print(f"unknown cohort(s) {', '.join(missing)}; the Sheet has "
+                  f"{', '.join(known) or 'none'}", file=sys.stderr)
+            return 1
+    seeds = list(range(args.first_seed, args.first_seed + args.seeds))
+    columns = build(tables, args.scenario, seeds=seeds, which=which)
+    text_out = markdown(columns, args.scenario, seeds)
+    if args.out_file:
+        Path(args.out_file).write_text(text_out, encoding="utf-8")
+        print(f"wrote {args.out_file}")
+        print(f"{len(columns)} building(s) x {len(seeds)} seed(s)")
+    else:
+        print(text_out)
     return 0
 
 
@@ -266,6 +327,9 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--scenario", default="night_fire12")
         p.add_argument("--seed", type=int, default=None,
                        help="default: the scenario's own default_seed")
+        p.add_argument("--cohort", default=None,
+                       help="build a cohort instead of the base building; "
+                            "`personas cohorts --list` names them")
 
     p = sub.add_parser("init-data", help="write a starting set of tabs into data/")
     common(p)
@@ -343,6 +407,29 @@ def main(argv: list[str] | None = None) -> int:
                    help="default: out/<scenario>-<seed>.explorer.html")
     p.add_argument("--generated-at", help="fix the timestamp, for reproducible output")
     p.set_defaults(fn=cmd_explore)
+
+    p = sub.add_parser("distributions",
+                       help="the makeup of the building: age, sex, mobility, tenure, "
+                            "speed, ties")
+    common(p)
+    scen(p)
+    p.add_argument("--json", action="store_true", help="as data rather than a report")
+    p.add_argument("--out-file")
+    p.set_defaults(fn=cmd_distributions)
+
+    p = sub.add_parser("cohorts",
+                       help="compare the base building against each cohort")
+    common(p)
+    p.add_argument("--scenario", default="night_fire12")
+    p.add_argument("--cohort", action="append",
+                   help="only this cohort (repeatable); default is all of them")
+    p.add_argument("--seeds", type=int, default=5,
+                   help="how many seeds per building (default 5)")
+    p.add_argument("--first-seed", type=int, default=1)
+    p.add_argument("--list", action="store_true",
+                   help="name the cohorts and their questions instead of building them")
+    p.add_argument("--out-file")
+    p.set_defaults(fn=cmd_cohorts)
 
     p = sub.add_parser("schema", help="print the population JSON Schema")
     p.add_argument("--out-file")

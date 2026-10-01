@@ -3,10 +3,16 @@
   "meta": {
     "generator": "egress-personas 0.1.0",
     "generated_at": "2026-01-01T00:00:00+00:00",
-    "run_id": "blake2b128:db37744b4b2d4f130a3f1e63efb89788",
+    "run_id": "blake2b128:379c593ab0f443282b0b1bd7c90be10b",
     "snapshot": {
-      "content_hash": "blake2b128:2e95eff4ee4af7bb73e6407bd4083207",
+      "content_hash": "blake2b128:fdb36669d4a04e197a3545bd426aed02",
       "sheet_id": "1LRCpgreZ7_9WL4iyoEtLnuTjNqOGzTde"
+    },
+    "cohort": {
+      "id": null,
+      "name": null,
+      "question": null,
+      "includes_cases": true
     },
     "scenario": {
       "id": "night_fire12",

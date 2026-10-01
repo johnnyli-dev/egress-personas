@@ -62,6 +62,12 @@ def population_json(pop: Population, *, generated_at: str | None = None) -> dict
                 "content_hash": pop.snapshot.get("content_hash"),
                 "sheet_id": pop.snapshot.get("sheet_id"),
             },
+            "cohort": {
+                "id": pop.cohort or None,
+                "name": pop.cohort_name or None,
+                "question": pop.cohort_question or None,
+                "includes_cases": pop.include_cases,
+            },
             "scenario": {
                 "id": pop.scenario.get("scenario_id"),
                 "plan_id": pop.scenario.get("plan_id"),
@@ -233,7 +239,8 @@ def write_all(pop: Population, out_dir: Path, *, generated_at: str | None = None
               report_text: str | None = None) -> dict[str, Path]:
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    stem = f"{pop.scenario.get('scenario_id')}-{pop.seed}"
+    stem = "-".join(x for x in (str(pop.scenario.get("scenario_id")),
+                                pop.cohort or None, str(pop.seed)) if x)
     paths: dict[str, Path] = {}
 
     def dump(name: str, payload: Any) -> None:

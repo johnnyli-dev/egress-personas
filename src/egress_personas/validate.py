@@ -353,19 +353,53 @@ def problems(tables: Tables) -> list[Problem]:  # noqa: C901 - a checklist, read
                 f"num_floors = {n} but the Building tab reaches sim_floor {worst}; "
                 f"the simulation only populates floors below num_floors")
 
-    # --- 8. Population: shares that should sum to one -------------------------
+    # --- 8. Population: shares that should sum to one, per cohort -------------
+    # A cohort's rows are a complete replacement for the dimension it touches, so each
+    # cohort's shares have to sum on their own. Checking them together would add five
+    # buildings' worth of age bands and get five.
     for dim in ("age_band", "sex", "tenure", "household_size"):
-        rows = [(i, r) for i, r in enumerate(tables["population"])
-                if text(r.get("dimension")) == dim and text(r.get("unit")) == "share"]
-        if not rows:
-            continue
-        total = sum((as_float(r.get("value")) or 0.0) for _, r in rows)
-        scale = 100.0 if total > 50 else 1.0
-        if abs(total / scale - 1.0) > 0.02:
-            i = rows[0][0]
-            add(tables["population"].where(i, "value"),
-                f"the {dim} shares sum to {total:g}, not "
-                f"{'100' if scale == 100 else '1'}")
+        groups: dict[str, list[tuple[int, dict]]] = {}
+        for i, r in enumerate(tables["population"]):
+            if text(r.get("dimension")) != dim or text(r.get("unit")) != "share":
+                continue
+            groups.setdefault(text(r.get("cohort")) or "", []).append((i, r))
+        for cohort, rows in sorted(groups.items()):
+            total = sum((as_float(r.get("value")) or 0.0) for _, r in rows)
+            scale = 100.0 if total > 50 else 1.0
+            if abs(total / scale - 1.0) > 0.02:
+                i = rows[0][0]
+                whose = f"cohort {cohort!r}'s " if cohort else ""
+                add(tables["population"].where(i, "value"),
+                    f"{whose}{dim} shares sum to {total:g}, not "
+                    f"{'100' if scale == 100 else '1'}")
+
+    # --- 9. Cohorts: every one named, and every one actually overriding something ---
+    ctab = tables.get("cohorts")
+    if ctab is not None:
+        named = {text(r.get("cohort_id")) for r in ctab} - {None}
+        used: dict[str, int] = {}
+        ptab = tables["population"]
+        for i, r in enumerate(ptab):
+            c = text(r.get("cohort"))
+            if not c:
+                continue
+            used.setdefault(c, i)
+            if c not in named:
+                add(ptab.where(i, "cohort"),
+                    f"no cohort {c!r} on the Cohorts tab"
+                    f"{_suggest(c, named) if named else ''}")
+        for i, r in enumerate(ctab):
+            cid = text(r.get("cohort_id"))
+            if cid and cid not in used:
+                add(ctab.where(i, "cohort_id"),
+                    f"cohort {cid!r} overrides nothing: no Population row names it in "
+                    f"its `cohort` column, so building it would be the base building "
+                    f"under another name")
+            try:
+                as_bool(r.get("include_cases"))
+            except ValueError:
+                add(ctab.where(i, "include_cases"),
+                    f"include_cases: {r.get('include_cases')!r} is not a yes/no value")
 
     return out
 

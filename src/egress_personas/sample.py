@@ -62,6 +62,10 @@ class Population:
     conformance: list[dict[str, Any]] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
     inapplicable: list[str] = field(default_factory=list)
+    cohort: str = ""
+    cohort_name: str = ""
+    cohort_question: str = ""
+    include_cases: bool = True
     snapshot: dict[str, Any] = field(default_factory=dict)
     seed: int = 0
     run_id: str = ""
@@ -113,7 +117,8 @@ def _attrs(p: Persona, household: Household, size: int, has_children: bool,
     }
 
 
-def sample(tables: Tables, scenario_id: str, seed: int | None = None) -> Population:  # noqa: C901
+def sample(tables: Tables, scenario_id: str, seed: int | None = None,
+           cohort: str | None = None) -> Population:  # noqa: C901
     scenario = scenario_of(tables, scenario_id)
     if seed is None:
         seed = as_int(scenario.get("default_seed")) or 0
@@ -122,7 +127,16 @@ def sample(tables: Tables, scenario_id: str, seed: int | None = None) -> Populat
     absent_share = as_float(scenario.get("absent_share"))
     asleep_share = as_float(scenario.get("asleep_share"))
     out_of_flat = as_float(scenario.get("out_of_flat_share")) or 0.0
-    targets = hh.read_targets(tables)
+    targets = hh.read_targets(tables, cohort)
+    cohort_row = {}
+    if cohort:
+        tab = tables.get("cohorts")
+        for row in (tab or []):
+            if text(row.get("cohort_id")) == cohort:
+                cohort_row = dict(row)
+        if not cohort_row:
+            raise KeyError(f"cohort {cohort!r} has target rows but no row on the "
+                           f"Cohorts tab giving it a name")
     if absent_share is None:
         absent_share = targets.absence_share
 
@@ -162,7 +176,10 @@ def sample(tables: Tables, scenario_id: str, seed: int | None = None) -> Populat
         return homes[key]
 
     # --- 2. the hand-authored cases ------------------------------------------
-    for row in tables["cases"]:
+    include_cases = as_bool(cohort_row.get("include_cases"))
+    if include_cases is None:
+        include_cases = True
+    for row in (tables["cases"] if include_cases else []):
         unit = text(row.get("unit"))
         cid = text(row.get("case_id")) or "?"
         if unit not in by_label:
@@ -520,11 +537,15 @@ def sample(tables: Tables, scenario_id: str, seed: int | None = None) -> Populat
         tie_stats=tie_stats, repairs=repairs, warnings=warnings, gaps=gaps,
         snapshot=tables.snapshot, seed=seed, matched=matched, missing_attrs=missing,
         notes=notes, inapplicable=inapplicable,
+        cohort=cohort or "", cohort_name=text(cohort_row.get("name")) or "",
+        cohort_question=text(cohort_row.get("question")) or "",
+        include_cases=bool(include_cases),
     )
     pop.conformance = conformance(pop)
     pop.run_id = "blake2b128:" + hashlib.blake2b(
         "|".join([VERSION, tables.snapshot.get("content_hash", ""),
-                  scenario_id, str(seed)]).encode(), digest_size=16).hexdigest()
+                  scenario_id, cohort or "-", str(seed)]).encode(),
+        digest_size=16).hexdigest()
     return pop
 
 

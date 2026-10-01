@@ -12,7 +12,7 @@ import json
 
 from egress_personas.emit import population_json
 from egress_personas.sample import sample
-from egress_personas.tables import content_hash, load_dir, read_csv_text
+from egress_personas.tables import TABS, content_hash, load_dir, read_csv_text
 
 AT = "2026-01-01T00:00:00+00:00"
 
@@ -69,8 +69,7 @@ def test_adding_a_case_moves_only_what_it_provably_had_to(data_dir):
     from egress_personas.tables import Tables
 
     tabs = {}
-    for name in ("parameters", "sources", "population", "social", "cases",
-                 "building", "scenarios", "enums"):
+    for name in TABS:
         text = (data_dir / f"{name}.csv").read_text(encoding="utf-8-sig")
         if name == "cases":
             lines = text.rstrip("\n").splitlines()

@@ -164,6 +164,18 @@ def markdown(pop: Population) -> str:  # noqa: C901 - a report is a list of sect
           f"{sum(1 for p in people if p.situation.get('alarm_audible') is False) / n:.1%} |",
           ""]
 
+    L += ["## The makeup of the building", "",
+          "Fuller distributions, crosstabs and what they do to an evacuation: "
+          "`personas distributions`"
+          + (f" --cohort {pop.cohort}" if pop.cohort else "") + ".", ""]
+    from .distributions import distributions as _dists
+    for key in ("age", "mobility", "base_speed", "ties"):
+        d = _dists(pop)[key]
+        bits = " · ".join(f"{k} {v}" for k, v in d.counts.items() if v)
+        stat = f" (mean {d.mean:.2f} {d.unit})" if d.mean is not None else ""
+        L.append(f"- **{d.name}**{stat}: {bits}")
+    L.append("")
+
     L += ["## Floor by floor", ""]
     per_floor: dict[int, int] = {}
     for p in people:
@@ -248,4 +260,97 @@ def markdown(pop: Population) -> str:  # noqa: C901 - a report is a list of sect
           "four — so the A/B/C/D letters are annotations on a drawing, not an index we "
           "can rely on. Every `seed_tile` here is marked `estimate` for that reason.",
           ""]
+    return "\n".join(L)
+
+# ── the makeup of the building ───────────────────────────────────────────────
+
+def _hist(counts: dict[str, int], width: int = 34) -> list[str]:
+    """A bar per category, scaled to the largest, with the count and share beside it."""
+    total = sum(counts.values()) or 1
+    worst = max(counts.values()) if counts else 1
+    out = []
+    label_w = max((len(k) for k in counts), default=4)
+    for k, v in counts.items():
+        bar = "#" * int(round(v / worst * width)) if worst else ""
+        out.append(f"  {k:<{label_w}}  {v:>4}  {v / total:>5.1%}  {bar}")
+    return out
+
+
+def _crosstab_md(ct: dict, label: str) -> list[str]:
+    cols = ct["cols"]
+    L = [f"| {label} | " + " | ".join(cols) + " | all |",
+         "|" + "|".join(["---"] * (len(cols) + 2)) + "|"]
+    for r in ct["rows"]:
+        cells = [str(ct["cells"][r].get(c, 0) or "·") for c in cols]
+        L.append(f"| {r} | " + " | ".join(cells) + f" | {ct['row_totals'][r]} |")
+    totals = [str(sum(ct["cells"][r].get(c, 0) for r in ct["rows"])) for c in cols]
+    L.append("| **all** | " + " | ".join(totals) + f" | {ct['total']} |")
+    return L
+
+
+def distributions_markdown(pop: Population) -> str:
+    """The makeup of one building, on its own, as a page you can read."""
+    from .distributions import crosstabs, distributions, egress_drivers
+
+    which = pop.cohort_name if pop.cohort else "the base building"
+    L = ["# What this building is made of", "",
+         f"**{which}**"
+         + (f" (`{pop.cohort}`)" if pop.cohort else "")
+         + f" · {pop.scenario.get('scenario_id')} · seed {pop.seed}", ""]
+    if pop.cohort_question:
+        L += [f"> {pop.cohort_question}", ""]
+    L += [f"{len(pop.people)} residents in {len(pop.households)} households across "
+          f"{len(pop.units)} flats."
+          + ("" if pop.include_cases
+             else " The hand-authored cases are left out of this cohort, so what you "
+                  "see is the distribution and nothing else."),
+          ""]
+
+    dists = distributions(pop)
+    L += ["## Distributions", ""]
+    for key in ("age", "age_band", "sex", "mobility", "agent_type", "household_size",
+                "household_role", "tenure", "base_speed", "familiarity", "mill",
+                "ties", "activity"):
+        d = dists[key]
+        head = f"**{d.name}**"
+        stats = []
+        if d.mean is not None:
+            stats.append(f"mean {d.mean:.2f}")
+        if d.median is not None:
+            stats.append(f"median {d.median:.2f}")
+        if d.p5 is not None and d.p95 is not None:
+            stats.append(f"5th–95th {d.p5:.2f}–{d.p95:.2f}")
+        if stats:
+            head += f" — {', '.join(stats)} {d.unit}"
+        L += [head, "", "```"] + _hist(d.counts) + ["```", ""]
+
+    L += ["## Crosstabs", "",
+          "A marginal share can be right while the joint distribution is wrong: the "
+          "building can hold the right number of over-65s and the wrong number of them "
+          "living alone.", ""]
+    ct = crosstabs(pop)
+    for key, label, note in (
+        ("age_by_mobility", "age / mobility",
+         "Mobility is drawn conditioned on age, so this table is where that shows."),
+        ("age_by_sex", "age / sex", ""),
+        ("age_by_living_alone", "age / household",
+         "Somebody living alone has nobody in the flat to wake them or wait for them."),
+        ("mobility_by_help", "mobility / help",
+         "Of those who do not walk freely, who has somebody in the flat. The last "
+         "column is the gap the simulation cannot close either."),
+    ):
+        L += [f"**{label}**", ""]
+        if note:
+            L += [note, ""]
+        L += _crosstab_md(ct[key], label.split(" / ")[0]) + [""]
+
+    L += ["## What this does to an evacuation", "",
+          "Inputs to RSET, not RSET. Nothing here simulates anything; these are the "
+          "quantities the simulation reads, grouped by which half of the split they "
+          "land on.", "",
+          "| | driver | value | why it matters |", "|---|---|---|---|"]
+    for d in egress_drivers(pop):
+        L.append(f"| {d['phase']} | {d['what']} | **{d['value']}** {d['unit']} "
+                 f"| {d['why']} |")
+    L.append("")
     return "\n".join(L)
