@@ -1,0 +1,48 @@
+# Adapter: canonical
+#
+# The identity mapping. Writes every output under its own name, in its own unit, with
+# nothing dropped — the form to hand an engine we have not written an adapter for, or
+# to read in a notebook.
+
+[adapter]
+id = "generic"
+name = "Canonical (no engine)"
+language = ""
+note = """
+Everything the compiler produced, including outputs no engine we know of reads. Use
+this to see the whole picture; use an engine's own adapter to see what that engine
+would actually act on.
+"""
+
+[map.premovement_time_s]
+field = "premovement_time_s"
+unit = "s"
+[map.walk_speed_mps]
+field = "walk_speed_mps"
+unit = "m/s"
+[map.queue_patience_s]
+field = "queue_patience_s"
+unit = "s"
+[map.smoke_turnback_m]
+field = "smoke_turnback_m"
+unit = "m"
+[map.tries_alternate_route]
+field = "tries_alternate_route"
+unit = ""
+[map.uses_stairs]
+field = "uses_stairs"
+unit = ""
+[map.gather_time_s]
+field = "gather_time_s"
+unit = "s"
+[map.route_confusion]
+field = "route_confusion"
+unit = "share"
+[map.preferred_route]
+field = "preferred_route"
+unit = ""
+[map.warns_n_neighbours]
+field = "warns_n_neighbours"
+unit = "count"
+
+[unsupported]

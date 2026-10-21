@@ -87,6 +87,25 @@ tie_kind,group_chat,Building chat,Shares a building group chat,4
 scope,same_floor,Same floor,Only between people on one floor,1
 scope,adjacent_floor,Adjacent floor,One floor apart,2
 scope,building,Building,Anywhere in the building,3
+phase,detection,Detection,Before the cue reaches anybody,0
+dtype,float,Number,,1
+dtype,int,Whole number,,2
+dtype,bool,Yes or no,,3
+dtype,enum,One of a list,,4
+dtype,string,Text,,5
+family,weibull,Weibull,"p1 = scale, p2 = shape",1
+family,uniform,Uniform,"p1 = lo, p2 = hi",2
+family,normal,Normal,"p1 = mean, p2 = sd",3
+family,lognormal,Lognormal,"p1 = log mean, p2 = log sd",4
+family,triangular,Triangular,"p1 = lo, p2 = mode, p3 = hi",5
+family,bernoulli,Bernoulli,p1 = probability,6
+family,empirical_curve,Measured curve,Uses the curve column as value:share pairs,7
+family,const,Constant,p1 = value,8
+effect_mechanism,quantile,Quantile,"Rank a score and read the value off a published distribution",1
+effect_mechanism,direct,Direct,Carry a persona field across unchanged,2
+effect_mechanism,scale,Scale,Multiply the output by a factor,3
+effect_mechanism,gate,Gate,A condition forces the output to a fixed value,4
+effect_mechanism,sum,Sum,Add a quantity up across a resident's commitments,5
 rate_kind,per_pair,Per pair,"The rate is the chance that any one eligible pair is tied",1
 rate_kind,per_person_degree,Ties per person,"The rate is the average number of ties a person has, which does not change when the building gets bigger",2
 time_of_day,day,Day,,1
@@ -254,6 +273,48 @@ C408,age_band,accessible_block,65_74,0.21,share,0.05,team,,
 C409,age_band,accessible_block,75_plus,0.17,share,0.05,team,,
 C501,occupancy,transient,persons_per_flat,0.85,persons,0.15,team,,Half the flats empty. A quieter stair and a thinner warning network at the same time.
 C502,absence,transient,share,0.14,share,0.05,team,,More of those who do live here are out when it starts.
+"""
+
+OUTPUTS = """\
+output_id,name,unit,dtype,phase,required,reference_dist,lo,hi,decimals,vocab,what,status,notes
+premovement_time_s,Pre-movement time,s,float,tts,TRUE,premovement_{alarm_quality},0,7200,1,,"From the cue to leaving the flat: noticing, interpreting, deciding, and anything done before the door. The whole of TTS.",accepted,"Every egress model has this, under some name. Our value is read off a published fit at a quantile the persona decides."
+walk_speed_mps,Walking speed on the level,m/s,float,tte,TRUE,walk_speed_{age_class},0.1,2.5,3,,Free walking speed in an empty corridor. The model slows it for crowding and smoke itself.,accepted,
+queue_patience_s,Patience behind a blockage,s,float,tte,FALSE,queue_patience,0,1800,1,,Seconds in a stalled queue before giving up on a route and trying another.,proposed,"Some models have no equivalent and simply never reroute."
+smoke_turnback_m,Visibility at which they turn back,m,float,tte,FALSE,smoke_turnback,0,30,2,,Visibility below which this resident turns back rather than pressing on. Zero means never.,proposed,
+tries_alternate_route,Tries another route after turning back,,bool,tte,FALSE,alternate_route,,,,,"On turning back, tries a different staircase rather than returning home.",proposed,
+uses_stairs,Can use stairs,,bool,tte,TRUE,,,,,,"Whether stairs are available to this resident at all. The one output with no distribution: it is a fact about the person, not a draw.",accepted,
+gather_time_s,Gathering time,s,float,tts,FALSE,,0,3600,1,,"Seconds spent collecting a pet, a child or documents. Reported separately because some models fold it into pre-movement and some give it its own state.",proposed,"Double-counting risk: if a model's pre-movement fit already includes pre-evacuation actions, adding this on top counts them twice. See the note on effect E001."
+route_confusion,Chance of taking the wrong route,share,float,tte,FALSE,,0,1,3,,"Chance of choosing a worse route than the one available, from not knowing the building.",proposed,
+preferred_route,Habitual route,,enum,tte,FALSE,,,,,stair,"The staircase this resident reaches for by habit. Proulx found residents chose familiar stairs over nearer ones.",proposed,"No engine we know of reads this yet; it is here because the finding is solid and the output is the shape it would take."
+warns_n_neighbours,Neighbours they would warn,count,int,tts,FALSE,,0,50,,,"How many people outside the flat this resident would knock for or call on the way out.",proposed,"An input to warning propagation, which no engine we have models."
+"""
+
+DISTRIBUTIONS = """\
+dist_id,name,family,unit,evidence,applies_when,p1,p2,p3,p4,curve,source_ids,finding,status,notes
+premovement_good,"Pre-movement, good alarm",weibull,s,SOURCED,"Residential, alarm audible in the flat",102.475,0.767,,,,lovreglio2019,"Residential cluster 1, Weibull scale 102.475 s shape 0.767, 149 data points. Implied mean 120 s, median 64 s.",accepted,"Strongly right-skewed: shape below 1 means more skewed than exponential. A few residents take very much longer than the median, which is the part a mean hides."
+premovement_poor,"Pre-movement, poor alarm or real fire",weibull,s,SOURCED,"Residential, corridor-only alarm",724.617,0.978,,,,lovreglio2019;proulx_fahy1997,"Residential cluster 2, Weibull scale 724.617 s shape 0.978, 78 data points. Implied mean 732 s. Proulx and Fahy measured 515 s for poor-alarm drills.",accepted,"Six times the good-alarm mean. Audibility is the single largest lever in the whole model."
+walk_speed_adult,"Walking speed, working-age adult",normal,m/s,SOURCED,Aged 18 to 64,1.20,0.24,,,,bohannon2008;sfpe_fruin,Comfortable adult walking speed about 1.20 m/s with a standard deviation near 0.24 m/s.,accepted,"The spread matters as much as the mean: a household moves at its slowest member's pace."
+walk_speed_older,"Walking speed, 65 and over",normal,m/s,ESTIMATE,65 and over,0.95,0.22,,,,sfpe_fruin;firetech2024_stairs,Older adults are markedly slower on the level and on stairs.,proposed,"Mean reasoned from the sourced elderly range rather than read off a table."
+walk_speed_child,"Walking speed, under 18",normal,m/s,ESTIMATE,Under 18,0.95,0.20,,,,sfpe_fruin;proulx1995,Children are slower than adults; small children occupied the full stair width.,proposed,
+queue_patience,Patience behind a blockage,uniform,s,INVENTED,All,40,80,,,,,"No measurement found. Queue tolerance measured in lift queues runs one to five minutes, which suggests this range is too impatient.",parked,"Carried because an engine we use has it. A sensitivity run should settle whether it matters."
+smoke_turnback,Visibility at which people turn back,empirical_curve,m,SOURCED,All,,,,,0.0:0.63;1.83:0.385;3.66:0.24;9.14:0.14;18.3:0.015,,"Share of occupants who turn back at or below each visibility.",accepted,"Stated as published: the share who turn back at or below a visibility. A higher quantile therefore means a more tolerant resident."
+alternate_route,Tries the other staircase after turning back,bernoulli,,ESTIMATE,All,0.23,,,,,,"Of those who turn back, about a quarter try the other staircase rather than going home.",proposed,"The share is carried from an engine's sourced set; the citation behind it still needs recording here."
+"""
+
+EFFECTS = """\
+effect_id,name,output,mechanism,terms,applies_to,value,from_field,within,evidence,source_ids,finding,priority,status,enabled,notes
+E001,Who starts late,premovement_time_s,quantile,mill_tendency:1.0;seeks_confirmation:0.8;prior_false_alarms:0.06;altruism:0.3;commitments:0.9;authority_compliance:-0.7;fire_safety_training:-0.5;alarm_audible:-1.2,,,,,ESTIMATE,nist_ncstar_1_7;kuligowski_tn1632,"NIST's causal model runs cues to milling to pre-evacuation actions to delay, so the dispositions that drive milling should decide who is early and who is late.",100,proposed,TRUE,"The weights and the ordering are ours; the magnitudes are the paper's. Which published fit applies is a property of the BUILDING, selected by the scenario's alarm quality - Proulx's 515 s is a building mean that already includes the residents who could not hear it, so moving an individual to the poor-alarm fit would count audibility twice. Within that fit, not hearing the alarm is the single heaviest term, which is where audibility belongs. Three things this deliberately does not do: add gathering seconds on top (the fit already covers actions before leaving, so a commitment pushes a resident later in the same queue instead), scale for being asleep (the scenario's day/night fit carries that), or scale for anything at all (a scale on a quantile moves the realized mean off the published one)."
+E003,Asleep or deaf to the alarm,premovement_time_s,scale,,asleep == TRUE,1.0,,,ESTIMATE,proulx_fahy1997,"Waking is part of pre-movement, and the night fit already reflects a sleeping population.",120,parked,FALSE,"PARKED AND OFF, and kept to record why. Both of the obvious scalings here would double-count: being asleep is already in which distribution the scenario selects, and not hearing the alarm is handled by stratifying the ranking instead. A scale on a quantile also breaks the thing the quantile mechanism is for - it moves the realized mean off the published one."
+E010,How fast they walk,walk_speed_mps,direct,,,,base_speed,,SOURCED,bohannon2008;sfpe_fruin,The registry already draws a speed per resident from the measured mean and spread.,100,accepted,TRUE,"Carried straight across: the registry's own speed heuristics did this work already, so compiling it is a unit-for-unit copy."
+E020,Who gives up on a queue first,queue_patience_s,quantile,risk_tolerance:-1.0;authority_compliance:0.4,,,,,INVENTED,,"Nobody has measured who waits and who reroutes. Risk tolerance standing in for it is a guess.",100,proposed,TRUE,"Both the ordering and the distribution are unmeasured here, so this is the weakest chain in the model and a prime candidate for the sensitivity run."
+E030,Who presses on into smoke,smoke_turnback_m,quantile,risk_tolerance:1.0;floorplan_familiarity:0.4;authority_compliance:-0.2,,,,,ESTIMATE,,"The share who turn back at each visibility is measured; which individuals they are is not.",100,proposed,TRUE,"The distribution is SOURCED and the ordering is ESTIMATE, so the chain is ESTIMATE. The compiler reports the weaker of the two rather than the flattering one."
+E040,Who tries the other staircase,tries_alternate_route,quantile,risk_tolerance:0.6;floorplan_familiarity:0.8,,,,,ESTIMATE,,"About a quarter try the other staircase; the ones who know the building are likelier to be among them.",100,proposed,TRUE,
+E041,You cannot try a staircase you do not know about,tries_alternate_route,gate,,knows_second_stair == FALSE,0,,,SOURCED,proulx1995,"Residents chose familiar stairs over nearer ones, and cannot choose one they have never noticed.",200,accepted,TRUE,"A gate rather than a weight: this is not a tendency, it is an impossibility. Runs last so it overrides whatever the quantile assigned."
+E050,Stairs available at all,uses_stairs,direct,,,,can_use_stairs,,SOURCED,acs_b18105;sipp_wheelchair,Whether a resident can use stairs is a fact about them rather than a draw.,100,accepted,TRUE,
+E060,Time spent gathering,gather_time_s,sum,,,,delay_s,,ESTIMATE,proulx1995,Summed over whatever this resident will not leave without.,100,proposed,TRUE,"Reported for engines that model gathering as its own state. Engines whose pre-movement fit already includes pre-evacuation actions should ignore it, and the adapter decides which - see adapters/*.toml."
+E070,Not knowing the building,route_confusion,quantile,floorplan_familiarity:-1.0,,,,,INVENTED,proulx1995,"Residents chose familiar stairs over nearer ones, so unfamiliarity should cost something on route choice.",100,proposed,TRUE,"No reference distribution, so this currently produces nothing: the Outputs tab leaves route_confusion without one because no published figure was found. It is here to be visible as a gap rather than forgotten."
+E080,Habitual staircase,preferred_route,direct,,,,habitual_stair,,ESTIMATE,proulx1995,Residents chose familiar stairs over the nearest ones.,100,proposed,TRUE,
+E090,Neighbours they would warn,warns_n_neighbours,direct,,,,ties,,ESTIMATE,nist_ncstar_1_7,"30 to 34 percent of WTC occupants helped others, and this is how many they could reach.",100,proposed,TRUE,"Counts every tie, which overstates it: a building-chat tie is not a knock on the door. Narrowing it needs the tie kinds, which the compiler cannot currently see."
 """
 
 COHORTS = """\
@@ -457,6 +518,9 @@ FILES: dict[str, str] = {
     "sources.csv": SOURCES,
     "parameters.csv": PARAMETERS,
     "population.csv": POPULATION,
+    "outputs.csv": OUTPUTS,
+    "distributions.csv": DISTRIBUTIONS,
+    "effects.csv": EFFECTS,
     "cohorts.csv": COHORTS,
     "social.csv": SOCIAL,
     "scenarios.csv": SCENARIOS,

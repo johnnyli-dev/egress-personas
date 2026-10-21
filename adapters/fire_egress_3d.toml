@@ -1,0 +1,56 @@
+# Adapter: FireEgress 3D (the group's Rust simulation)
+#
+# An adapter is a mapping, not a model. It says what this engine calls each canonical
+# output, what unit it wants, and which outputs it cannot use. Nothing about the
+# population changes; only the names on the way out.
+#
+# Checked against FireEgress-3dsim at 2026-10-21. Line numbers are pointers.
+
+[adapter]
+id = "fire_egress_3d"
+name = "FireEgress 3D"
+language = "rust"
+note = """
+Reads a per-agent profile block drawn at spawn (crates/fe-core/src/agent.rs:257-275).
+The loader itself is roadmap item 3.2 and is not written yet, so this adapter describes
+the shape it should take rather than a shape it already has.
+"""
+
+[map.premovement_time_s]
+field = "delay_s"
+unit = "s"
+note = """
+Measured from the alarm, which is what the Lovreglio fit measures. The engine adds its
+own `premovement.alarm_after_s` (40 s) for the time before the alarm sounds, so do not
+add it here or it lands twice.
+"""
+
+[map.walk_speed_mps]
+field = "base_speed"
+unit = "m/s"
+note = "Level, uncrowded. The engine applies the SFPE speed-density law itself."
+
+[map.queue_patience_s]
+field = "patience_s"
+unit = "s"
+
+[map.smoke_turnback_m]
+field = "smoke_limit_m"
+unit = "m"
+note = "Zero means never turns back, matching the engine's own convention."
+
+[map.tries_alternate_route]
+field = "tries_other_stair"
+unit = ""
+
+[map.uses_stairs]
+field = "can_use_stairs"
+unit = ""
+
+# Outputs this engine cannot currently use. Listed rather than dropped, so a heuristic
+# that reaches one of them is reported as blocked on the engine rather than as working.
+[unsupported]
+gather_time_s = "AgentState::Gathering exists in the enum and is never entered (fsm.rs:11); belongings.rs is a doc-only stub."
+route_confusion = "perception.stair_confusion_chance is global, not per agent (rules.rs:692). docs/sources/B_behaviour.md recommends making it per-agent, which is what this would feed."
+preferred_route = "No route-habit bias is modelled."
+warns_n_neighbours = "groups.rs is a doc-only stub; warning across households is not modelled."

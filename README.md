@@ -203,6 +203,45 @@ src/egress_personas/
 Dependencies: `jsonschema` only. Sheets arrive as CSV over `urllib`; the generator and
 its distributions are pure Python, so there is no pandas, numpy or openpyxl to install.
 
+## From a heuristic to a number a model acts on
+
+The registry gives a resident dispositions and knowledge — how readily they confer
+before acting, whether they know a second staircase exists. No egress simulation reads
+any of that. What simulations read is a pre-movement time, a walking speed, a patience,
+a turn-back threshold. Three tabs bridge the gap, and they are engine-independent on
+purpose:
+
+- **`Outputs`** — the canonical per-occupant quantities an egress model needs, in
+  physical units, with no engine's names on them.
+- **`Distributions`** — reference distributions as *published fits*, with their
+  citations. Lovreglio's Weibull is a fact about the literature, not about any engine
+  that happens to use it.
+- **`Effects`** — how a persona decides each output. Five mechanisms: `quantile`,
+  `direct`, `scale`, `gate`, `sum`.
+
+The one worth understanding is **`quantile`**. A persona could be handed an absolute
+pre-movement time, but that would discard a distribution fitted to 149 and 78
+observations and substitute a guess. Instead: compose a score from weighted traits,
+rank it within the population, and read the value off the published fit at that
+quantile. **The literature keeps the shape of the population; the persona decides who
+is early and who is late.** The realized mean comes out on the published one to within
+1% — there is a test — while the ordering becomes something the model explains.
+
+```bash
+uv run personas adapters                              # engines we can write for
+uv run personas build --adapter fire_egress_3d        # model inputs under its names
+uv run personas trace --adapter fire_egress_3d        # the full chain, per heuristic
+```
+
+**Engines are adapters, not code.** `adapters/*.toml` maps canonical outputs to one
+engine's field names and lists what that engine cannot use. A new engine is a file.
+
+`personas trace` is the view that matters: for every heuristic, the chain from the
+literature through a persona field, an effect, a canonical output and the engine's own
+name for it — labelled by its **weakest link**. A value read off a sourced distribution
+at a quantile decided by an invented ordering is INVENTED. Reporting it as SOURCED
+would launder a guess into a citation.
+
 ## Comparing buildings
 
 A **cohort** is a building worth asking a question about, written as a set of demographic

@@ -62,6 +62,12 @@ class Population:
     conformance: list[dict[str, Any]] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
     inapplicable: list[str] = field(default_factory=list)
+    compiled: dict[str, Any] = field(default_factory=dict)
+    outputs: dict[str, Any] = field(default_factory=dict)
+    references: dict[str, Any] = field(default_factory=dict)
+    effects: list[Any] = field(default_factory=list)
+    marginals: list[dict[str, Any]] = field(default_factory=list)
+    cover: dict[str, Any] = field(default_factory=dict)
     cohort: str = ""
     cohort_name: str = ""
     cohort_question: str = ""
@@ -503,6 +509,32 @@ def sample(tables: Tables, scenario_id: str, seed: int | None = None,
         if not p.narrative:
             p.narrative = render(p, by_id[p.household], people)
 
+    # --- 14. compile to what an egress model can act on ----------------------
+    # A separate pass, after every heuristic has finished, because an effect reads the
+    # completed persona — including the dispositions and knowledge the registry wrote.
+    from . import effects as fx
+    outputs = fx.read_outputs(tables)
+    references = fx.read_references(tables)
+    effect_rows = fx.read_effects(tables)
+    scen_view = {
+        "time_of_day": text(scenario.get("time_of_day")) or "night",
+        "alarm_quality": text(scenario.get("alarm_quality")) or "good",
+    }
+
+    def _attrs_for(person: Any) -> dict[str, Any]:
+        house = by_id[person.household]
+        members = house.members
+        kids = any(q.identity["age_years"] < 18 for q in people
+                   if q.household == house.id)
+        return _attrs(person, house, len(members), kids, scenario, fire_floor)
+
+    compiled = fx.compile_population(
+        people, outputs, references, effect_rows, seed=seed, scenario=scen_view,
+        attrs_of=_attrs_for, warnings=warnings)
+    marginals = fx.marginal_check(people, compiled, outputs, references, scen_view)
+    cover = fx.coverage(outputs, effect_rows,
+                        {r.target for r in rules})
+
     scenario_attrs = {"time_of_day", "alarm_quality"}
     scenario_view = {"time_of_day": text(scenario.get("time_of_day")),
                      "alarm_quality": text(scenario.get("alarm_quality"))}
@@ -537,6 +569,8 @@ def sample(tables: Tables, scenario_id: str, seed: int | None = None,
         tie_stats=tie_stats, repairs=repairs, warnings=warnings, gaps=gaps,
         snapshot=tables.snapshot, seed=seed, matched=matched, missing_attrs=missing,
         notes=notes, inapplicable=inapplicable,
+        compiled=compiled, outputs=outputs, references=references,
+        effects=effect_rows, marginals=marginals, cover=cover,
         cohort=cohort or "", cohort_name=text(cohort_row.get("name")) or "",
         cohort_question=text(cohort_row.get("question")) or "",
         include_cases=bool(include_cases),

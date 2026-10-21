@@ -69,6 +69,25 @@ tie_kind,group_chat,Building chat,Shares a building group chat,4
 scope,same_floor,Same floor,Only between people on one floor,1
 scope,adjacent_floor,Adjacent floor,One floor apart,2
 scope,building,Building,Anywhere in the building,3
+phase,detection,Detection,Before the cue reaches anybody,0
+dtype,float,Number,,1
+dtype,int,Whole number,,2
+dtype,bool,Yes or no,,3
+dtype,enum,One of a list,,4
+dtype,string,Text,,5
+family,weibull,Weibull,"p1 = scale, p2 = shape",1
+family,uniform,Uniform,"p1 = lo, p2 = hi",2
+family,normal,Normal,"p1 = mean, p2 = sd",3
+family,lognormal,Lognormal,"p1 = log mean, p2 = log sd",4
+family,triangular,Triangular,"p1 = lo, p2 = mode, p3 = hi",5
+family,bernoulli,Bernoulli,p1 = probability,6
+family,empirical_curve,Measured curve,Uses the curve column as value:share pairs,7
+family,const,Constant,p1 = value,8
+effect_mechanism,quantile,Quantile,"Rank a score and read the value off a published distribution",1
+effect_mechanism,direct,Direct,Carry a persona field across unchanged,2
+effect_mechanism,scale,Scale,Multiply the output by a factor,3
+effect_mechanism,gate,Gate,A condition forces the output to a fixed value,4
+effect_mechanism,sum,Sum,Add a quantity up across a resident's commitments,5
 rate_kind,per_pair,Per pair,"The rate is the chance that any one eligible pair is tied",1
 rate_kind,per_person_degree,Ties per person,"The rate is the average number of ties a person has, which does not change when the building gets bigger",2
 time_of_day,day,Day,,1

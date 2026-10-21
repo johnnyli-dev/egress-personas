@@ -31,7 +31,8 @@ def _now() -> str:
     return _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat()
 
 
-def population_json(pop: Population, *, generated_at: str | None = None) -> dict[str, Any]:
+def population_json(pop: Population, *, generated_at: str | None = None,
+                    adapter: Any = None) -> dict[str, Any]:
     people = pop.people
     counts = {
         "units": len(pop.units),
@@ -112,6 +113,36 @@ def population_json(pop: Population, *, generated_at: str | None = None) -> dict
         "groups": pop.groups,
         "personas": [_persona_json(p) for p in people],
     }
+
+    # The compiled block: what an egress model can act on, under canonical names, with
+    # the quantile each distributional value was read off at. This is the half of the
+    # file a simulation loader would read.
+    if pop.compiled:
+        adapter_name = (adapter.id if adapter else "generic")
+        out["model_inputs"] = {
+            "adapter": adapter_name,
+            "note": "Canonical per-occupant quantities. `quantile` records where in "
+                    "the reference distribution each value was read off, so the "
+                    "population reproduces the published marginal while the ordering "
+                    "is the persona's.",
+            "outputs": {
+                oid: {"name": o.name, "unit": o.unit, "dtype": o.dtype,
+                      "phase": o.phase,
+                      "reference_dist": o.reference_dist or None,
+                      "engine_field": adapter.field_for(oid) if adapter else oid,
+                      "engine_supports": adapter.supports(oid) if adapter else True}
+                for oid, o in pop.outputs.items()
+            },
+            "marginal_check": pop.marginals,
+            "per_persona": {
+                p.key: {
+                    "values": (adapter.render(pop.compiled[p.key].values)
+                               if adapter else pop.compiled[p.key].values),
+                    "quantiles": pop.compiled[p.key].quantiles,
+                }
+                for p in people if p.key in pop.compiled
+            },
+        }
     return out
 
 
@@ -159,6 +190,38 @@ def _persona_json(p: Any) -> dict[str, Any]:
         "notes": p.identity.get("notes") or "",
     }
     return rec
+
+
+def model_inputs_provenance(pop: Population) -> dict[str, Any]:
+    """How each simulation-facing value was arrived at, per resident."""
+    return {
+        "references": {
+            r.id: {"name": r.name, "family": r.family, "unit": r.unit,
+                   "params": [x for x in r.params if x is not None],
+                   "curve": [list(c) for c in r.curve],
+                   "evidence": r.evidence, "sources": list(r.sources),
+                   "finding": r.finding,
+                   "published_mean": r.mean_estimate()}
+            for r in pop.references.values()
+        },
+        "effects": {
+            e.id: {"name": e.name, "output": e.output, "mechanism": e.mechanism,
+                   "terms": [[n, w] for n, w in e.terms],
+                   "applies_to": str(e.pred) if e.pred else "",
+                   "within": e.within, "evidence": e.evidence,
+                   "sources": list(e.sources), "finding": e.finding}
+            for e in pop.effects
+        },
+        "coverage": pop.cover,
+        "per_persona": {
+            key: {oid: [{"effect": s.effect, "mechanism": s.mechanism,
+                         "detail": s.detail, "result": s.result,
+                         "evidence": s.evidence, "sources": s.sources}
+                        for s in steps]
+                  for oid, steps in c.steps.items()}
+            for key, c in pop.compiled.items() if key != "__blocked__"
+        },
+    }
 
 
 def provenance_json(pop: Population) -> dict[str, Any]:
@@ -211,6 +274,7 @@ def provenance_json(pop: Population) -> dict[str, Any]:
         "notes": pop.notes,
         "not_applicable_to_this_scenario": pop.inapplicable,
         "parameters_matched": dict(sorted(pop.matched.items())),
+        "model_inputs": model_inputs_provenance(pop),
         "personas": agents,
     }
 
@@ -236,7 +300,7 @@ def cards_markdown(pop: Population) -> str:
 
 
 def write_all(pop: Population, out_dir: Path, *, generated_at: str | None = None,
-              report_text: str | None = None) -> dict[str, Path]:
+              report_text: str | None = None, adapter: Any = None) -> dict[str, Path]:
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     stem = "-".join(x for x in (str(pop.scenario.get("scenario_id")),
@@ -249,7 +313,8 @@ def write_all(pop: Population, out_dir: Path, *, generated_at: str | None = None
                         encoding="utf-8")
         paths[name.split(".", 1)[1].rsplit(".", 1)[0]] = path
 
-    dump(f"{stem}.personas.json", population_json(pop, generated_at=generated_at))
+    dump(f"{stem}.personas.json",
+         population_json(pop, generated_at=generated_at, adapter=adapter))
     dump(f"{stem}.provenance.json", provenance_json(pop))
     cards = out_dir / f"{stem}.cards.md"
     cards.write_text(cards_markdown(pop), encoding="utf-8")

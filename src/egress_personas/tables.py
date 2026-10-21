@@ -61,6 +61,25 @@ TABS: dict[str, TabSpec] = {t.name: t for t in [
         optional=("cohort", "tolerance", "basis", "source_ids", "notes"),
     ),
     TabSpec(
+        "outputs", "output_id",
+        required=("output_id", "name", "dtype", "phase", "required"),
+        optional=("unit", "reference_dist", "lo", "hi", "decimals", "vocab", "what",
+                  "status", "notes"),
+    ),
+    TabSpec(
+        "distributions", "dist_id",
+        required=("dist_id", "name", "family", "evidence"),
+        optional=("unit", "applies_when", "p1", "p2", "p3", "p4", "curve", "source_ids",
+                  "finding", "status", "notes"),
+    ),
+    TabSpec(
+        "effects", "effect_id",
+        required=("effect_id", "name", "output", "mechanism", "evidence", "status",
+                  "enabled"),
+        optional=("terms", "applies_to", "value", "from_field", "within",
+                  "source_ids", "finding", "priority", "notes"),
+    ),
+    TabSpec(
         "cohorts", "cohort_id",
         required=("cohort_id", "name"),
         optional=("include_cases", "question", "notes"),

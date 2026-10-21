@@ -144,9 +144,17 @@ def cmd_build(args: argparse.Namespace) -> int:
         print()
     tables = _checked(args.data)
     pop = sample(tables, args.scenario, args.seed, cohort=args.cohort)
+    adapter = None
+    if args.adapter:
+        from . import adapters as ad
+        try:
+            adapter = ad.resolve(args.adapter)
+        except (KeyError, FileNotFoundError) as e:
+            print(e, file=sys.stderr)
+            return 1
     paths = write_all(pop, args.out,
                       generated_at=args.generated_at,
-                      report_text=markdown(pop))
+                      report_text=markdown(pop), adapter=adapter)
     print(f"run {pop.run_id}")
     print(f"{len(pop.people)} residents, {len(pop.households)} households, "
           f"{sum(len(p.ties) for p in pop.people)} tie endpoints")
@@ -286,6 +294,48 @@ def cmd_cohorts(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_trace(args: argparse.Namespace) -> int:
+    from . import adapters as ad
+    from . import trace as tr
+    from .sample import sample
+    tables = _checked(args.data)
+    try:
+        adapter = ad.resolve(args.adapter)
+    except (KeyError, FileNotFoundError) as e:
+        print(e, file=sys.stderr)
+        return 1
+    pop = sample(tables, args.scenario, args.seed, cohort=args.cohort)
+    links = tr.build(tables, pop, adapter)
+    text_out = tr.markdown(links, pop, adapter)
+    if args.out_file:
+        Path(args.out_file).write_text(text_out, encoding="utf-8")
+        print(f"wrote {args.out_file}")
+        live = sum(1 for x in links if x.reaches_engine)
+        print(f"{live} of {len(links)} chains reach {adapter.name}")
+    else:
+        print(text_out)
+    return 0
+
+
+def cmd_adapters(args: argparse.Namespace) -> int:
+    from . import adapters as ad
+    found = ad.available()
+    if not found:
+        print("no adapters found in adapters/.", file=sys.stderr)
+        return 1
+    print("Engines this population can be written for:\n")
+    for a in found.values():
+        print(f"  {a.id:18} {a.name}")
+        if a.note:
+            for line in a.note.splitlines():
+                if line.strip():
+                    print(f"  {'':18} {line.strip()}")
+        print(f"  {'':18} maps {len(a.mapping)} output(s)"
+              + (f", cannot use {len(a.unsupported)}" if a.unsupported else ""))
+        print()
+    return 0
+
+
 def cmd_schema(args: argparse.Namespace) -> int:
     from .schema import build_schema
     text = json.dumps(build_schema(), indent=2) + "\n"
@@ -363,6 +413,9 @@ def main(argv: list[str] | None = None) -> int:
     scen(p)
     p.add_argument("--out", type=Path, default=OUT)
     p.add_argument("--generated-at", help="fix the timestamp, for reproducible output")
+    p.add_argument("--adapter", default="generic",
+                   help="write the model inputs under this engine's field names; "
+                        "`personas adapters` lists them")
     p.add_argument("--pull", metavar="SHEET_URL",
                    help="refresh data/ from this Sheet first, then build from it")
     p.add_argument("--token-file", help="with --pull, an OAuth access token file")
@@ -430,6 +483,17 @@ def main(argv: list[str] | None = None) -> int:
                    help="name the cohorts and their questions instead of building them")
     p.add_argument("--out-file")
     p.set_defaults(fn=cmd_cohorts)
+
+    p = sub.add_parser("trace",
+                       help="the chain from a heuristic to a number the engine acts on")
+    common(p)
+    scen(p)
+    p.add_argument("--adapter", default="generic")
+    p.add_argument("--out-file")
+    p.set_defaults(fn=cmd_trace)
+
+    p = sub.add_parser("adapters", help="list the engines a population can be written for")
+    p.set_defaults(fn=cmd_adapters)
 
     p = sub.add_parser("schema", help="print the population JSON Schema")
     p.add_argument("--out-file")

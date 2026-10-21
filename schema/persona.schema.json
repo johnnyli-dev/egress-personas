@@ -588,6 +588,92 @@
           }
         }
       }
+    },
+    "model_inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The canonical per-occupant quantities an egress model acts on. `quantiles` records where in each reference distribution a value was read off: the persona decides the ordering, the published fit keeps the shape.",
+      "required": [
+        "adapter",
+        "outputs",
+        "per_persona"
+      ],
+      "properties": {
+        "adapter": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "outputs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "dtype": {
+                "type": "string"
+              },
+              "phase": {
+                "type": "string"
+              },
+              "reference_dist": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "engine_field": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "engine_supports": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "marginal_check": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "output",
+              "published_mean",
+              "realized_mean"
+            ]
+          }
+        },
+        "per_persona": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "values": {
+                "type": "object"
+              },
+              "quantiles": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -29,6 +29,15 @@ VOCAB_OF: dict[tuple[str, str], str] = {
     ("population", "dimension"): "dimension",
     ("population", "basis"): "basis",
     ("social", "tie_kind"): "tie_kind",
+    ("outputs", "dtype"): "dtype",
+    ("outputs", "phase"): "phase",
+    ("outputs", "status"): "status",
+    ("distributions", "family"): "family",
+    ("distributions", "evidence"): "evidence",
+    ("distributions", "status"): "status",
+    ("effects", "mechanism"): "effect_mechanism",
+    ("effects", "evidence"): "evidence",
+    ("effects", "status"): "status",
     ("social", "scope"): "scope",
     ("social", "rate_kind"): "rate_kind",
     ("social", "strength_dist"): "dist",
@@ -54,12 +63,17 @@ FLOAT_COLS = {
               "seeks_confirmation", "authority_compliance", "altruism",
               "risk_tolerance", "leadership"),
     "scenarios": ("absent_share", "asleep_share", "out_of_flat_share"),
+    "outputs": ("lo", "hi"),
+    "distributions": ("p1", "p2", "p3", "p4"),
+    "effects": ("value",),
 }
 INT_COLS = {
     "parameters": ("priority", "sensitivity_rank"),
     "sources": ("year",),
     "cases": ("prior_false_alarms",),
     "building": ("floor_label", "sim_floor", "seed_tile_x", "seed_tile_y"),
+    "outputs": ("decimals",),
+    "effects": ("priority",),
     "scenarios": ("num_floors", "fire_floor_label", "default_seed"),
     "enums": ("sort_order",),
 }
@@ -69,6 +83,8 @@ BOOL_COLS = {
     "cases": ("present", "asleep", "alarm_audible", "has_pet",
               "knows_second_stair", "fire_safety_training"),
     "building": ("occupiable",),
+    "outputs": ("required",),
+    "effects": ("enabled",),
 }
 
 #: Cases columns that pin a persona field, and the field each pins.
@@ -372,6 +388,113 @@ def problems(tables: Tables) -> list[Problem]:  # noqa: C901 - a checklist, read
                 add(tables["population"].where(i, "value"),
                     f"{whose}{dim} shares sum to {total:g}, not "
                     f"{'100' if scale == 100 else '1'}")
+
+    # --- 8b. Outputs, Distributions and Effects: the compile layer ------------
+    from . import effects as _fx
+    from .dists_ref import FAMILIES
+
+    otab, dtab, etab = (tables.get("outputs"), tables.get("distributions"),
+                        tables.get("effects"))
+    out_ids = {text(r.get("output_id")) for r in (otab or [])} - {None}
+    dist_ids = {text(r.get("dist_id")) for r in (dtab or [])} - {None}
+    readable = _fx.readable()
+
+    #: How many positional parameters each family takes.
+    ARITY = {"const": 1, "uniform": 2, "normal": 2, "lognormal": 2, "weibull": 2,
+             "triangular": 3, "bernoulli": 1, "empirical_curve": 0}
+
+    if dtab is not None:
+        for i, row in enumerate(dtab):
+            fam = text(row.get("family"))
+            if fam not in FAMILIES:
+                continue
+            want = ARITY[fam]
+            for j in range(1, 5):
+                given = text(row.get(f"p{j}")) is not None
+                if j <= want and not given:
+                    add(dtab.where(i, f"p{j}"),
+                        f"family {fam!r} needs p{j}")
+                if j > want and given:
+                    add(dtab.where(i, f"p{j}"),
+                        f"family {fam!r} takes {want} parameter(s); p{j} is set and "
+                        f"would be ignored")
+            curve = as_list(row.get("curve"))
+            if fam == "empirical_curve" and not curve:
+                add(dtab.where(i, "curve"),
+                    "family 'empirical_curve' needs a curve of value:share pairs, "
+                    "separated by ';'")
+            for pair in curve:
+                if len(pair.split(":")) != 2:
+                    add(dtab.where(i, "curve"),
+                        f"{pair!r} should read value:share, e.g. '1.83:0.385'")
+
+    if otab is not None:
+        for i, row in enumerate(otab):
+            want = text(row.get("reference_dist"))
+            if not want or "{" in want:
+                continue   # templated references resolve at compile time
+            if want not in dist_ids:
+                add(otab.where(i, "reference_dist"),
+                    f"no distribution {want!r} on the Distributions tab"
+                    f"{_suggest(want, dist_ids) if dist_ids else ''}")
+
+    if etab is not None:
+        quantile_per_output: dict[str, list[tuple[int, str]]] = {}
+        for i, row in enumerate(etab):
+            eid = text(row.get("effect_id")) or f"row {i + 2}"
+            mech = text(row.get("mechanism"))
+            out_id = text(row.get("output"))
+            if out_id and out_id not in out_ids:
+                add(etab.where(i, "output"),
+                    f"no output {out_id!r} on the Outputs tab"
+                    f"{_suggest(out_id, out_ids) if out_ids else ''}")
+            for part in as_list(row.get("terms")):
+                name, _, weight = part.partition(":")
+                name = name.strip()
+                if name and name not in readable:
+                    add(etab.where(i, "terms"),
+                        f"term {name!r} is not a field an effect can read"
+                        f"{_suggest(name, readable)}")
+                try:
+                    float(weight)
+                except ValueError:
+                    add(etab.where(i, "terms"),
+                        f"{part!r} should read name:weight, e.g. 'mill_tendency:1.0'")
+            w = text(row.get("within"))
+            if w and w not in readable:
+                add(etab.where(i, "within"),
+                    f"within {w!r} is not a field an effect can read{_suggest(w, readable)}")
+            try:
+                pred = parse(row.get("applies_to") or "", readable)
+                del pred
+            except FilterError as e:
+                add(etab.where(i, "applies_to"), f"applies_to: {e}")
+            if mech in ("direct", "sum") and not text(row.get("from_field")):
+                add(etab.where(i, "from_field"),
+                    f"mechanism {mech!r} needs from_field: it names what to read")
+            if mech == "gate" and text(row.get("value")) is None:
+                add(etab.where(i, "value"),
+                    "mechanism 'gate' needs value: what the output is forced to")
+            if mech == "scale" and text(row.get("value")) is None \
+                    and not text(row.get("from_field")):
+                add(etab.where(i, "value"),
+                    "mechanism 'scale' needs either value or from_field as the factor")
+            if mech == "quantile" and as_bool(row.get("enabled")) is not False:
+                if not text(row.get("terms")):
+                    add(etab.where(i, "terms"),
+                        "a quantile effect needs terms: they are what decides a "
+                        "resident's place in the distribution")
+                quantile_per_output.setdefault(out_id or "", []).append((i, eid))
+
+        for out_id, rows in sorted(quantile_per_output.items()):
+            if len(rows) > 1:
+                names = ", ".join(e for _i, e in rows)
+                add(etab.where(rows[-1][0], "mechanism"),
+                    f"{names} are all quantile effects on {out_id!r}. Only one is "
+                    f"allowed: two would rank different populations and the published "
+                    f"marginal would not survive. Fold the extra conditions into one "
+                    f"row's terms — a term contributes nothing for a resident whose "
+                    f"value is zero.")
 
     # --- 9. Cohorts: every one named, and every one actually overriding something ---
     ctab = tables.get("cohorts")
