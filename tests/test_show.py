@@ -177,3 +177,72 @@ def test_the_page_defines_every_colour_before_any_theme_block(data_dir):
             assert token in declared, token
     assert 'body {' in css or 'body{' in css
     assert "background: var(--paper)" in css
+
+
+# ── the compile layer, on the page ──────────────────────────────────────────
+
+def test_the_page_carries_what_a_simulation_gets(page_payload):
+    m = page_payload["model"]
+    assert m["adapter"] and m["adapter_name"]
+    assert m["outputs"] and m["references"] and m["effects"]
+    assert m["chains"]["total"] >= m["chains"]["reaching"] > 0
+    assert sum(m["chains"]["split"].values()) == m["chains"]["reaching"]
+    assert len(m["per_persona"]) == len(page_payload["people"])
+
+
+def test_every_compiled_value_on_the_page_has_a_chain_behind_it(page_payload):
+    m = page_payload["model"]
+    for key, mine in m["per_persona"].items():
+        assert mine["values"], key
+        for oid in mine["values"]:
+            assert oid in m["outputs"], (key, oid)
+            steps = mine["steps"].get(oid)
+            assert steps, (key, oid)
+            for st in steps:
+                assert st["effect"] in m["effects"] or st["effect"] in ("case", "—")
+                assert st["evidence"] in ("SOURCED", "ESTIMATE", "INVENTED", "—")
+                assert st["detail"]
+                for sid in st["sources"]:
+                    assert sid in page_payload["sources"], (oid, sid)
+
+
+def test_every_position_track_sits_inside_its_distribution(page_payload):
+    """The marker is placed at `left: q%`, so a quantile outside (0, 1) would draw
+    outside the track."""
+    tracked = 0
+    for mine in page_payload["model"]["per_persona"].values():
+        for oid, q in mine["quantiles"].items():
+            assert 0.0 < q < 1.0, (oid, q)
+            tracked += 1
+    assert tracked > 100
+
+
+def test_the_page_says_which_outputs_the_engine_cannot_use_and_why(page_payload):
+    m = page_payload["model"]
+    blocked = [o for o in m["outputs"].values() if not o["engine_supports"]]
+    assert blocked, "the fire_egress_3d adapter should not support everything"
+    for o in blocked:
+        assert o["blocked_because"], o["name"]
+    for x in m["stops_short"]:
+        assert x["why"], x["heuristic"]
+
+
+def test_the_page_reports_the_marginal_check(page_payload):
+    m = page_payload["model"]
+    assert m["marginals"]
+    for row in m["marginals"]:
+        assert row["output"] in m["outputs"]
+        assert row["reference"] in m["references"]
+        assert row["within_1pc"] is True, row
+
+
+def test_the_rendered_page_shows_the_compile_layer(data_dir):
+    """Guards against the payload carrying the data while the page never draws it."""
+    from egress_personas.tables import load_dir
+    tables = load_dir(data_dir)
+    body = render(sample(tables, "night_fire12", 1234), tables, standalone=False,
+                  generated_at="2026-01-01T00:00:00+00:00")
+    for marker in ("What ${MODEL.adapter_name} gets", "renderChains",
+                   "Did the published fits survive?", "weakest link",
+                   "launder a guess into a citation"):
+        assert marker in body, marker

@@ -152,6 +152,57 @@ body {
 #tip b { font-family: var(--mono); font-weight: 500; }
 @media (prefers-reduced-motion: reduce) { #tip { transition: none; } }
 
+
+/* ── what a simulation gets ───────────────────────────────────────────────
+   The compile layer, shown per resident. The position track is the point: it
+   says where in a published distribution this resident sits, which is the only
+   thing the persona decides. The magnitude is the paper's. */
+.simget { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--rule-soft); }
+.simget > h4 { font-size: 10.5px; text-transform: uppercase; letter-spacing: .09em;
+               color: var(--ink-3); font-weight: 600; margin: 0 0 3px; }
+.simget > p.lede { font-size: 12px; color: var(--ink-3); margin: 0 0 12px;
+                   max-width: 70ch; }
+.simrow { display: grid; grid-template-columns: minmax(0, 1fr) 68px 92px;
+          gap: 4px 12px; align-items: baseline; padding: 8px 0;
+          border-top: 1px solid var(--rule-soft); }
+.simrow:first-of-type { border-top: 0; }
+.simrow .nm { font-size: 13px; }
+.simrow .nm em { font-style: normal; font-family: var(--mono); font-size: 10.5px;
+                 color: var(--ink-3); display: block; margin-top: 1px; }
+.simrow .val { font-family: var(--mono); font-size: 13.5px; text-align: right;
+               font-variant-numeric: tabular-nums; }
+.simrow .val s { text-decoration: none; font-size: 10px; color: var(--ink-3); }
+.simrow .ev { justify-self: start; }
+.simrow .track { grid-column: 1 / -1; height: 4px; border-radius: 2px;
+                 background: var(--rule-soft); position: relative; margin: 2px 0 1px; }
+.simrow .track i { position: absolute; top: -2px; width: 3px; height: 8px;
+                   border-radius: 1px; background: var(--blue); }
+.simrow .how { grid-column: 1 / -1; font-size: 11.5px; color: var(--ink-2);
+               line-height: 1.5; }
+.simrow .how code { font-size: 10.5px; }
+.simrow.blocked { opacity: .62; }
+.simrow.blocked .val { color: var(--ink-3); }
+
+/* ── the chain, at building level ─────────────────────────────────────────── */
+.chains { margin-top: 30px; }
+.chains > header { border-bottom: 1px solid var(--rule); padding-bottom: 12px; }
+.chainbar { display: flex; height: 14px; border-radius: 2px; overflow: hidden;
+            gap: 2px; margin-top: 14px; }
+.chainbar i { display: block; }
+.chainkey { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 11px 0 0;
+            font-size: 12.5px; color: var(--ink-2); }
+.chainkey div { display: flex; align-items: baseline; gap: 7px; }
+.chainkey b { font-family: var(--mono); font-size: 15px; font-weight: 500;
+              color: var(--ink); font-variant-numeric: tabular-nums; }
+.chainkey em { font-style: normal; width: 9px; height: 9px; border-radius: 2px;
+               display: inline-block; align-self: center; }
+.chaingrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+             gap: 16px; margin-top: 18px; align-items: start; }
+.chains table { font-size: 12px; }
+.chains td.m { font-family: var(--mono); font-variant-numeric: tabular-nums;
+               white-space: nowrap; text-align: right; }
+.chains .ok { color: var(--blue); }
+
 /* ── masthead ─────────────────────────────────────────────────────────── */
 header { display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: flex-end;
          justify-content: space-between; padding-bottom: 14px;
@@ -430,6 +481,20 @@ footer code { font-family: var(--mono); font-size: 11px; }
     </header>
     <div class="panels" id="panels"></div>
     <div class="drivers panel" id="drivers"></div>
+  </section>
+
+
+  <section class="chains" id="chains" hidden>
+    <header>
+      <h2>From a paper to a number the model acts on</h2>
+      <p class="q" id="chainlede"></p>
+    </header>
+    <div class="chainbar" id="chainbar" role="img"></div>
+    <div class="chainkey" id="chainkey"></div>
+    <div class="chaingrid">
+      <div class="panel" id="marginals"></div>
+      <div class="panel" id="stopsshort"></div>
+    </div>
   </section>
 
   <footer id="footer"></footer>
@@ -780,6 +845,9 @@ footer code { font-family: var(--mono); font-size: 11px; }
         "authority_compliance", "altruism", "risk_tolerance", "leadership"]));
     blocks.append(b1, b2, b3);
     cardBox.append(blocks);
+
+    const sim = simGet(p);
+    if (sim) cardBox.append(sim);
 
     const prov = provTable(p);
     if (prov) cardBox.append(prov);
@@ -1241,6 +1309,201 @@ footer code { font-family: var(--mono); font-size: 11px; }
     return fig;
   }
 
+
+  // ── what a simulation gets ───────────────────────────────────────────────
+  // The compile layer, per resident. Each row is one quantity an egress model
+  // reads, the chain that produced it, and the weakest link in that chain. The
+  // track underneath a distributional value is where the persona put this
+  // resident; the value itself is read off a published fit at that point.
+
+  const MODEL = D.model || null;
+  const EV_COLOUR = {
+    SOURCED: "var(--blue)", ESTIMATE: "var(--warn)", INVENTED: "var(--fire)",
+  };
+
+  function simGet(p) {
+    if (!MODEL || !MODEL.per_persona) return null;
+    const mine = MODEL.per_persona[p.key];
+    if (!mine) return null;
+
+    const box = el("div", "simget");
+    box.append(el("h4", null, `What ${MODEL.adapter_name} gets`));
+    box.append(el("p", "lede",
+      "Each row is one quantity the model reads. Where a value is read off a "
+      + "published distribution, the bar shows where in it this resident sits — that "
+      + "position is the only part the persona decides; the magnitude is the paper's."));
+
+    const order = Object.keys(MODEL.outputs);
+    order.forEach(oid => {
+      const spec = MODEL.outputs[oid];
+      const have = Object.prototype.hasOwnProperty.call(mine.values, oid);
+      if (!have) return;
+      const value = mine.values[oid];
+      const q = mine.quantiles[oid];
+      const steps = mine.steps[oid] || [];
+      const worst = steps.reduce((acc, s) =>
+        ({ SOURCED: 0, ESTIMATE: 1, INVENTED: 2 }[s.evidence] >
+        ({ SOURCED: 0, ESTIMATE: 1, INVENTED: 2 }[acc] ?? -1) ? s.evidence : acc),
+        steps.length ? steps[0].evidence : "—");
+
+      const row = el("div", "simrow" + (spec.engine_supports ? "" : " blocked"));
+      const nm = el("div", "nm");
+      nm.append(document.createTextNode(spec.name));
+      nm.append(el("em", null, spec.engine_supports
+        ? spec.engine_field
+        : "this engine has nowhere to put it"));
+      if (spec.what) nm.title = spec.what;
+      row.append(nm);
+
+      const val = el("div", "val");
+      const shown = typeof value === "number"
+        ? (Number.isInteger(value) ? String(value) : value.toFixed(
+            Math.abs(value) < 10 ? 2 : 1))
+        : String(value);
+      val.append(document.createTextNode(shown));
+      if (spec.unit) val.append(el("s", null, " " + spec.unit));
+      row.append(val);
+
+      const ev = el("span", "ev " + worst, worst);
+      row.append(ev);
+
+      if (typeof q === "number") {
+        const track = el("div", "track");
+        const mark = el("i");
+        mark.style.left = `calc(${(q * 100).toFixed(1)}% - 1.5px)`;
+        mark.style.background = EV_COLOUR[worst] || "var(--blue)";
+        track.append(mark);
+        track.title = `${(q * 100).toFixed(0)}th percentile of the population`;
+        row.append(track);
+      }
+
+      const how = el("div", "how");
+      steps.forEach((st, i) => {
+        if (i) how.append(document.createTextNode(" then "));
+        const eff = MODEL.effects[st.effect];
+        const tag = el("code", null, st.effect);
+        if (eff) tag.title = `${eff.name} — ${eff.finding || eff.mechanism}`;
+        how.append(tag, document.createTextNode(" " + st.detail));
+        if (st.sources && st.sources.length) {
+          how.append(document.createTextNode("  "));
+          st.sources.forEach((id, j) => {
+            const src = D.sources[id];
+            if (j) how.append(document.createTextNode(", "));
+            const a = src && src.url ? el("a", null, src.short) : el("span", null,
+              src ? src.short : id);
+            if (src && src.url) { a.href = src.url; a.target = "_blank";
+                                  a.rel = "noopener"; a.title = src.cite; }
+            how.append(a);
+          });
+        }
+      });
+      if (!spec.engine_supports && spec.blocked_because) {
+        how.append(el("em", null, "  " + spec.blocked_because));
+      }
+      row.append(how);
+      box.append(row);
+    });
+    return box;
+  }
+
+  // ── the chain at building level ──────────────────────────────────────────
+  function renderChains() {
+    if (!MODEL || !MODEL.chains) return;
+    const sec = document.getElementById("chains");
+    sec.hidden = false;
+    const c = MODEL.chains;
+
+    document.getElementById("chainlede").innerHTML =
+      `<b>${c.reaching} of ${c.total}</b> chains reach ${MODEL.adapter_name}. A chain `
+      + `is one heuristic, through the persona field it writes, through an effect that `
+      + `consumes that field, to a quantity the engine reads. Each is labelled by its `
+      + `<b>weakest link</b>: a value read off a sourced distribution at a quantile `
+      + `decided by an invented ordering is invented, and calling it sourced would `
+      + `launder a guess into a citation.`;
+
+    const bar = document.getElementById("chainbar");
+    bar.replaceChildren();
+    const labels = ["SOURCED", "ESTIMATE", "INVENTED"].filter(k => c.split[k]);
+    bar.setAttribute("aria-label", labels.map(k =>
+      `${c.split[k]} ${k.toLowerCase()}`).join(", "));
+    labels.forEach(k => {
+      const i = el("i");
+      i.style.flex = String(c.split[k]);
+      i.style.background = EV_COLOUR[k];
+      i.title = `${c.split[k]} chains, ${k.toLowerCase()} end to end`;
+      bar.append(i);
+    });
+    const key = document.getElementById("chainkey");
+    key.replaceChildren();
+    labels.forEach(k => {
+      const d = el("div");
+      const sw = el("em");
+      sw.style.background = EV_COLOUR[k];
+      d.append(sw, el("b", null, String(c.split[k])),
+               document.createTextNode(k.toLowerCase() + " end to end"));
+      key.append(d);
+    });
+
+    // Did the published distributions survive being assigned by trait?
+    const mg = document.getElementById("marginals");
+    mg.replaceChildren();
+    mg.append(el("h2", null, "Did the published fits survive?"));
+    const lede = el("p", "note",
+      "The mechanism claims the persona decides the ordering while the literature "
+      + "keeps the shape. This is that claim, measured against each fit's own "
+      + "published mean.");
+    lede.style.cssText =
+      "font-size:11.5px;color:var(--ink-3);margin:4px 0 10px;max-width:60ch";
+    mg.append(lede);
+    const mt = el("table");
+    const mh = el("tr");
+    ["output", "published", "realized", ""].forEach(h => mh.append(el("th", null, h)));
+    const mhead = el("thead"); mhead.append(mh); mt.append(mhead);
+    const mb = el("tbody");
+    (MODEL.marginals || []).forEach(m => {
+      const tr = el("tr");
+      const nm = el("td", null, (MODEL.outputs[m.output] || {}).name || m.output);
+      const ref = MODEL.references[m.reference];
+      if (ref) nm.title = `${ref.name} — ${ref.family}(${ref.params.join(", ")})`
+                        + (ref.finding ? `\n${ref.finding}` : "");
+      tr.append(nm,
+        el("td", "m", `${m.published_mean} ${m.unit}`),
+        el("td", "m", `${m.realized_mean} ${m.unit}`),
+        el("td", "m" + (m.within_1pc ? " ok" : ""), m.within_1pc ? "ok" : "OFF"));
+      mb.append(tr);
+    });
+    mt.append(mb);
+    const mw = el("div", "provtable"); mw.append(mt); mg.append(mw);
+
+    // What stops short, per heuristic, with the reason.
+    const ss = document.getElementById("stopsshort");
+    ss.replaceChildren();
+    ss.append(el("h2", null, `What ${MODEL.adapter_name} cannot act on`));
+    const sl = el("p", "note",
+      "Heuristics that currently change nothing this engine does. Worth knowing per "
+      + "row rather than in aggregate: some wait on the engine, some on a number "
+      + "nobody has published.");
+    sl.style.cssText =
+      "font-size:11.5px;color:var(--ink-3);margin:4px 0 10px;max-width:60ch";
+    ss.append(sl);
+    const sul = el("ul");
+    sul.style.cssText = "list-style:none;margin:0;padding:0;font-size:12px";
+    (MODEL.stops_short || []).forEach(x => {
+      const li = el("li");
+      li.style.cssText =
+        "padding:7px 0;border-top:1px solid var(--rule-soft);line-height:1.5";
+      li.append(el("code", null, x.heuristic),
+                document.createTextNode(" " + x.name + " — "));
+      li.append(el("span", null, x.why));
+      li.lastChild.style.color = "var(--ink-2)";
+      sul.append(li);
+    });
+    if (!(MODEL.stops_short || []).length) {
+      sul.append(el("li", null, "Nothing: every heuristic reaches this engine."));
+    }
+    ss.append(sul);
+  }
+
   // ── the makeup section ───────────────────────────────────────────────────
   const makeups = D.makeups || [];
   let shown = makeups[0];
@@ -1387,6 +1650,7 @@ footer code { font-family: var(--mono); font-size: 11px; }
     buildingsBox.append(b);
   });
   if (makeups.length) renderMakeup(makeups[0]);
+  renderChains();
 
   // Open on a hand-authored case, so the page starts in a real working state.
   renderList();

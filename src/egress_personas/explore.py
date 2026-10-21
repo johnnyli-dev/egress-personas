@@ -104,9 +104,83 @@ def payload(pop: Population, tables: Tables | None = None,
                 continue
             makeups.append(_slim(makeup(other)))
 
+    # What a simulation actually gets, and the chain behind each number. This is the
+    # half of the page that demonstrates the compile layer rather than the population.
+    from . import adapters as ad
+    from . import trace as tr
+
+    adapter = None
+    try:
+        adapter = ad.resolve("fire_egress_3d")
+    except (KeyError, FileNotFoundError):
+        try:
+            adapter = ad.resolve("generic")
+        except (KeyError, FileNotFoundError):
+            adapter = None
+
+    model: dict[str, Any] = {}
+    if pop.compiled and adapter is not None:
+        links = tr.build(tables, pop, adapter) if tables is not None else []
+        live = [x for x in links if x.reaches_engine]
+        split: dict[str, int] = {}
+        for x in live:
+            split[x.chain_evidence] = split.get(x.chain_evidence, 0) + 1
+        model = {
+            "adapter": adapter.id,
+            "adapter_name": adapter.name,
+            "outputs": {
+                oid: {
+                    "name": o.name, "unit": o.unit, "dtype": o.dtype,
+                    "phase": o.phase, "what": o.what,
+                    "reference": o.reference_dist or "",
+                    "engine_field": adapter.field_for(oid),
+                    "engine_supports": adapter.supports(oid),
+                    "blocked_because": adapter.unsupported.get(oid, ""),
+                }
+                for oid, o in pop.outputs.items()
+            },
+            "references": {
+                r.id: {"name": r.name, "family": r.family,
+                       "params": [x for x in r.params if x is not None],
+                       "evidence": r.evidence, "sources": list(r.sources),
+                       "finding": r.finding,
+                       "published_mean": r.mean_estimate()}
+                for r in pop.references.values()
+            },
+            "effects": {
+                e.id: {"name": e.name, "output": e.output,
+                       "mechanism": e.mechanism, "evidence": e.evidence,
+                       "finding": e.finding,
+                       "terms": [[n, w] for n, w in e.terms]}
+                for e in pop.effects
+            },
+            "marginals": pop.marginals,
+            "chains": {"reaching": len(live), "total": len(links), "split": split},
+            "stops_short": [
+                {"heuristic": x.heuristic, "name": x.heuristic_name,
+                 "field": x.field.split(".", 1)[-1], "why": x.blocked_because}
+                for x in links if not x.reaches_engine
+            ],
+            "per_persona": {
+                p.key: {
+                    "values": pop.compiled[p.key].values,
+                    "quantiles": pop.compiled[p.key].quantiles,
+                    "steps": {
+                        oid: [{"effect": st.effect, "mechanism": st.mechanism,
+                               "detail": st.detail, "evidence": st.evidence,
+                               "sources": st.sources}
+                              for st in steps]
+                        for oid, steps in pop.compiled[p.key].steps.items()
+                    },
+                }
+                for p in pop.people if p.key in pop.compiled
+            },
+        }
+
     return {
         "meta": js["meta"],
         "makeups": makeups,
+        "model": model,
         "units": js["units"],
         "households": js["households"],
         "groups": js["groups"],
