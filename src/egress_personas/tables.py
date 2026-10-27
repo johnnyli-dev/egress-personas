@@ -102,8 +102,10 @@ TABS: dict[str, TabSpec] = {t.name: t for t in [
                   "altruism", "risk_tolerance", "leadership", "commitments",
                   "narrative_override", "notes"),
     ),
+    # No single-column key: a unit label is unique within a plan, not across plans,
+    # so uniqueness is checked on (plan_id, unit_label) in validate.py.
     TabSpec(
-        "building", "unit_label",
+        "building", None,
         required=("unit_label", "floor_label", "unit_letter", "sim_floor", "plan_id",
                   "seed_tile_x", "seed_tile_y", "occupiable"),
         optional=("notes",),

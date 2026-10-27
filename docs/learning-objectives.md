@@ -7,7 +7,7 @@ below does not survive contact with your advisor, that is the doc working.
 
 The short version: **the most valuable thing this project has produced is not a model of
 people, it is a measurement of how little is known about them.** Of the 31 parameter rows
-in the registry, 8 are SOURCED, 14 are ESTIMATE and 9 are INVENTED — a quarter of a
+in the registry, 7 are SOURCED, 15 are ESTIMATE and 9 are INVENTED — a quarter of a
 behavioural model rests on numbers nobody has measured. That is not a defect to hide; it
 is a result, and it is the thing that tells you what to do next.
 
@@ -21,7 +21,10 @@ which are reasoned, and which are made up.
 
 **What it rests on.** Every parameter row carries `SOURCED` / `ESTIMATE` / `INVENTED` —
 the same three words the simulation's own provenance layer uses, so the two speak one
-language. The split is 26% / 45% / 29%. The social-tie rules are worse: of five, one is
+language. The split is 23% / 48% / 29%, and it moved in October when an audit of a
+single floor caught two rows claiming SOURCED while naming no source — both carried
+across from an engine's rule set, label and all. The validator now refuses that
+combination. The social-tie rules are worse: of five, one is
 sourced, two are estimates, two are invented. One row (`P090`, pre-movement time) is
 deliberately **parked and switched off** with its reason recorded, because the sheet's
 figure is a review midpoint and the simulation fits the distribution from 149 and 78
@@ -235,7 +238,7 @@ Worth saying plainly, so the claims above stay credible.
 | | Work | What it produces |
 |---|---|---|
 | 1 | Read Lovreglio et al. (2019) and Haghani et al. (2024) properly, and fill in the `read_by` column | 14 of 15 sources are currently carried from somewhere else rather than read first-hand. This is the cheapest credibility you will ever buy. |
-| 2 | Write up the labelling scheme and the 26/45/29 split | The methods note for objectives 1 and 6 |
+| 2 | Write up the labelling scheme and the 23/48/29 split | The methods note for objectives 1 and 6 |
 | 3 | The sensitivity analysis (§7a) | A ranked table; the project's main deliverable |
 | 4 | The limitations register, ordered by §7a's ranking | Objective 6, with evidence |
 | 5 | Either the loader (§7b) or the social literature search (§7c) | Depending on whether you want to write Rust or read papers |

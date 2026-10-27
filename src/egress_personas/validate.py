@@ -196,6 +196,21 @@ def problems(tables: Tables) -> list[Problem]:  # noqa: C901 - a checklist, read
                         f"{col}: {val!r} is not in Enums vocab {v!r}"
                         f"{_suggest(val, vocab[v])}")
 
+    # --- 2b. a SOURCED row has to name its source -----------------------------
+    for name, key in (("parameters", "id"), ("social", "id"),
+                      ("distributions", "dist_id"), ("effects", "effect_id")):
+        tab = tables.get(name)
+        if tab is None or "evidence" not in tab.columns:
+            continue
+        for i, row in enumerate(tab):
+            if text(row.get("evidence")) != "SOURCED":
+                continue
+            if not as_list(row.get("source_ids")):
+                add(tab.where(i, "source_ids"),
+                    f"{text(row.get(key))} is labelled SOURCED but names no source. "
+                    f"SOURCED means a citation was read; with nothing to point at, the "
+                    f"honest label is ESTIMATE until somebody records what it rests on.")
+
     # --- 3. source ids resolve ------------------------------------------------
     source_ids = {text(r.get("id")) for r in tables["sources"]} - {None}
     for name in ("parameters", "population", "social"):
@@ -342,6 +357,17 @@ def problems(tables: Tables) -> list[Problem]:  # noqa: C901 - a checklist, read
 
     # --- 6. Building: floors, sim floors, unit labels --------------------------
     btab = tables["building"]
+    seen_unit: dict[tuple[str | None, str | None], int] = {}
+    for i, row in enumerate(btab):
+        ident = (text(row.get("plan_id")), text(row.get("unit_label")))
+        if ident[1] is not None:
+            if ident in seen_unit:
+                add(btab.where(i, "unit_label"),
+                    f"plan {ident[0]!r} already has a unit {ident[1]!r} at "
+                    f"{btab.where(seen_unit[ident], 'unit_label')}. A label has to be "
+                    f"unique within a plan; the same label in a different plan is "
+                    f"fine, and means the same flat.")
+            seen_unit[ident] = i
     for i, row in enumerate(btab):
         label, floor = text(row.get("unit_label")), text(row.get("floor_label"))
         letter = text(row.get("unit_letter"))
@@ -363,11 +389,12 @@ def problems(tables: Tables) -> list[Problem]:  # noqa: C901 - a checklist, read
             add(stab.where(i, "fire_floor_label"),
                 f"floor {fire} has no flats in the Building tab")
         n = as_int(row.get("num_floors"))
-        worst = max((as_int(r.get("sim_floor")) or 0) for r in btab) if len(btab) else 0
+        mine = [r for r in btab if text(r.get("plan_id")) == plan]
+        worst = max((as_int(r.get("sim_floor")) or 0) for r in mine) if mine else 0
         if n is not None and worst >= n:
             add(stab.where(i, "num_floors"),
-                f"num_floors = {n} but the Building tab reaches sim_floor {worst}; "
-                f"the simulation only populates floors below num_floors")
+                f"num_floors = {n} but plan {plan!r} reaches sim_floor {worst}; "
+                f"only floors below num_floors are populated")
 
     # --- 8. Population: shares that should sum to one, per cohort -------------
     # A cohort's rows are a complete replacement for the dimension it touches, so each

@@ -91,3 +91,7 @@ unit_label,floor_label,unit_letter,sim_floor,plan_id,seed_tile_x,seed_tile_y,occ
 27B,27,B,26,plan2_drawing_v2_2,22,2,TRUE,
 27C,27,C,26,plan2_drawing_v2_2,2,15,TRUE,
 27D,27,D,26,plan2_drawing_v2_2,2,2,TRUE,
+14A,14,A,13,plan2_floor14_only,30,16,TRUE,"Floor 14 of the same plate. The only occupied floor in this plan, so a population is small enough to read in full."
+14B,14,B,13,plan2_floor14_only,22,2,TRUE,"Floor 14 of the same plate. The only occupied floor in this plan, so a population is small enough to read in full."
+14C,14,C,13,plan2_floor14_only,2,15,TRUE,"Floor 14 of the same plate. The only occupied floor in this plan, so a population is small enough to read in full."
+14D,14,D,13,plan2_floor14_only,2,2,TRUE,"Floor 14 of the same plate. The only occupied floor in this plan, so a population is small enough to read in full."

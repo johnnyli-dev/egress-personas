@@ -148,6 +148,38 @@ def test_an_undeclared_column_is_an_error_not_a_shrug():
     assert "worse than" in str(e.value)
 
 
+def test_a_sourced_row_must_name_its_source(mutate, edit_cell):
+    """SOURCED means a citation was read. A row with nothing to point at cannot claim
+    one — which is how two rows that had been carried across from an engine's rule set,
+    label and all, were caught."""
+    t = mutate("parameters", lambda x: edit_cell(x, "P007", "evidence", "SOURCED"))
+    m = messages(t)
+    assert "P007 is labelled SOURCED but names no source" in m
+    assert "the honest label is ESTIMATE" in m
+
+
+def test_the_committed_sheet_has_no_sourced_row_without_a_citation(tables):
+    from egress_personas.tables import as_list, text
+    for name, key in (("parameters", "id"), ("social", "id"),
+                      ("distributions", "dist_id"), ("effects", "effect_id")):
+        for row in tables[name]:
+            if text(row.get("evidence")) == "SOURCED":
+                assert as_list(row.get("source_ids")), \
+                    f"{name} {text(row.get(key))} claims SOURCED with no source"
+
+
+def test_a_unit_label_is_unique_within_a_plan_not_across_plans(tables):
+    """Two plans of the same tower both have a 14A, and they are the same flat."""
+    from collections import Counter
+    from egress_personas.tables import text
+    pairs = Counter((text(r.get("plan_id")), text(r.get("unit_label")))
+                    for r in tables["building"])
+    assert all(v == 1 for v in pairs.values())
+    labels = Counter(text(r.get("unit_label")) for r in tables["building"])
+    assert any(v > 1 for v in labels.values()), (
+        "the one-floor plan should reuse labels from the full plan")
+
+
 def test_shares_that_should_sum_to_one_are_checked(mutate, edit_cell):
     t = mutate("population", lambda x: edit_cell(x, "T021", "value", "0.50"))
     m = messages(t)

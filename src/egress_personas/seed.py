@@ -172,7 +172,7 @@ P004,Walking speed - wheelchair,tte,wayfinding,body.base_speed,mobility == wheel
 P005,Walking speed - ambulatory difficulty,tte,wayfinding,body.base_speed,mobility in [ambulatory_difficulty walker_cane],mul,const,0.66,,,,,,factor,,,moderate,SOURCED,acs_b18105,Occupants who walk with difficulty move at about two thirds of the able-bodied speed.,120,,,,accepted,TRUE,,,"Applied on top of the age-based speed, so an older person with a cane gets both effects."
 P006,Carrying or handling a pet,tte,pre_evacuation,body.base_speed,has_pet == TRUE,mul,const,0.90,,,,,,factor,,,small,ESTIMATE,,A pet occupies a hand and slows both level and stair movement by about a tenth.,130,,,,proposed,TRUE,,,"Carried over as a claim from the team's first workbook (rule S103). No source was attached to it there and none has been found since."
 P007,Patience behind a blockage,tte,wayfinding,body.patience_s,,set,uniform,40,80,,,,,s,60,300,moderate,INVENTED,,How long somebody stands in a stalled queue before giving up on that staircase.,100,,,,parked,TRUE,,,"The simulation uses 40-80 s and flags it as invented. Queue tolerance measured in lift queues runs 1-5 minutes, so this is probably too impatient. Worth an early sensitivity run."
-P008,Tries the other staircase after turning back,tte,wayfinding,body.tries_other_stair,,set,bernoulli,0.23,,,,,,share,,,small,SOURCED,,"Of those who turn back from smoke, about a quarter try the other staircase rather than going home.",100,,,,accepted,TRUE,,,"Matches the simulation's sourced other_stair_share. The source behind that value still needs recording here."
+P008,Tries the other staircase after turning back,tte,wayfinding,body.tries_other_stair,,set,bernoulli,0.23,,,,,,share,,,small,ESTIMATE,,"Of those who turn back from smoke, about a quarter try the other staircase rather than going home.",100,,,,proposed,TRUE,,,"Relabelled from SOURCED on 2026-10-27: the value was carried across from an engine's sourced rule set, but the citation behind it was never recorded here, and a row that names no source cannot claim one was read. ESTIMATE until somebody tracks down what the 0.23 rests on."
 P010,Milling - baseline,tts,pre_evacuation,dispositions.mill_tendency,,set,trunc_normal,0.70,0.18,0.00,1.00,,,share,0.60,0.80,dominant,SOURCED,nist_ncstar_1_7,About 70 percent of WTC occupants milled - sought information or conferred - before evacuating.,100,,,,accepted,TRUE,,,"NIST's figure is for an office population. A residential tower at night may differ, and that difference is one of the things this project is for."
 P011,Milling - a new tenant has fewer people to confer with,tts,social,dispositions.mill_tendency,tenure_years <= 1,mul,const,0.65,,,,,,factor,,,moderate,ESTIMATE,proulx1995,"Milling is information-seeking from other people; somebody who knows nobody in the building has fewer to seek it from.",110,,,,proposed,TRUE,,,"Reasoned, not measured. Proulx supports that residents rely on familiar people and routes, not this size of effect."
 P012,Milling - living alone,tts,social,dispositions.mill_tendency,lives_alone == TRUE,mul,const,0.85,,,,,,factor,,,small,ESTIMATE,proulx1995,Conferring with a household member is the commonest first response; somebody alone skips it.,110,,,,proposed,TRUE,,,Reasoned from Proulx's finding that 62 percent left in groups.
@@ -297,7 +297,7 @@ walk_speed_adult,"Walking speed, working-age adult",normal,m/s,SOURCED,Aged 18 t
 walk_speed_older,"Walking speed, 65 and over",normal,m/s,ESTIMATE,65 and over,0.95,0.22,,,,sfpe_fruin;firetech2024_stairs,Older adults are markedly slower on the level and on stairs.,proposed,"Mean reasoned from the sourced elderly range rather than read off a table."
 walk_speed_child,"Walking speed, under 18",normal,m/s,ESTIMATE,Under 18,0.95,0.20,,,,sfpe_fruin;proulx1995,Children are slower than adults; small children occupied the full stair width.,proposed,
 queue_patience,Patience behind a blockage,uniform,s,INVENTED,All,40,80,,,,,"No measurement found. Queue tolerance measured in lift queues runs one to five minutes, which suggests this range is too impatient.",parked,"Carried because an engine we use has it. A sensitivity run should settle whether it matters."
-smoke_turnback,Visibility at which people turn back,empirical_curve,m,SOURCED,All,,,,,0.0:0.63;1.83:0.385;3.66:0.24;9.14:0.14;18.3:0.015,,"Share of occupants who turn back at or below each visibility.",accepted,"Stated as published: the share who turn back at or below a visibility. A higher quantile therefore means a more tolerant resident."
+smoke_turnback,Visibility at which people turn back,empirical_curve,m,ESTIMATE,All,,,,,0.0:0.63;1.83:0.385;3.66:0.24;9.14:0.14;18.3:0.015,,Share of occupants who turn back at or below each visibility.,proposed,"Stated as published: the share who turn back at or below a visibility, so a higher quantile means a more tolerant resident. Relabelled from SOURCED on 2026-10-27 - the curve was carried across from an engine's sourced rule set without the study behind it being recorded here. The shape is very likely from the smoke-visibility work already cited elsewhere on this Sheet (Jin 1978, Frantzich and Nilsson 2003, or Fridolf et al. 2013); establishing which is a small job, and it would move several chains from ESTIMATE back to SOURCED."
 alternate_route,Tries the other staircase after turning back,bernoulli,,ESTIMATE,All,0.23,,,,,,"Of those who turn back, about a quarter try the other staircase rather than going home.",proposed,"The share is carried from an engine's sourced set; the citation behind it still needs recording here."
 """
 
@@ -340,6 +340,7 @@ scenario_id,plan_id,building_json,num_floors,time_of_day,alarm_quality,fire_floo
 night_fire12,plan2_drawing_v2_2,buildings/plan2_drawing_v2_2.json,27,night,good,12,0.04,0.95,0.00,1234,"The reference case: 3 a.m., almost everyone home and asleep, alarm audible in every flat, fire starting on floor 12."
 night_poor_alarm,plan2_drawing_v2_2,buildings/plan2_drawing_v2_2.json,27,night,poor,12,0.04,0.95,0.00,1234,"The same night with a corridor-only alarm, which is the condition Proulx measured at 515 s rather than 169 s. The comparison against night_fire12 isolates audibility."
 day_fire12,plan2_drawing_v2_2,buildings/plan2_drawing_v2_2.json,27,day,good,12,0.28,0.02,0.01,1234,"A weekday afternoon: a quarter of residents are out, nobody is asleep, and the people at home skew older and less mobile."
+one_floor,plan2_floor14_only,buildings/plan2_drawing_v2_2.json,27,night,good,12,0.04,0.95,0.00,1234,"One floor of the same tower, for checking the model by hand. Four flats and about seven residents - small enough to read every number and trace every one of them to a source. Note that at this size the published distributions are NOT reproduced: seven draws cannot recover a fitted curve, and the figures that depend on a population are reported but should not be read as conforming. Build the whole tower when you want the distributions to mean something, and this when you want to audit them."
 """
 
 CASE_COLUMNS = (
@@ -483,6 +484,10 @@ def cases_csv() -> str:
     return buf.getvalue()
 
 
+#: The one-floor plan id, used by the `one_floor` scenario.
+ONE_FLOOR_PLAN = "plan2_floor14_only"
+
+
 def building_csv(plan_id: str = "plan2_drawing_v2_2") -> str:
     """Floors 4 to 27 with no 13, four flats a floor, and one seed tile per letter.
 
@@ -510,6 +515,16 @@ def building_csv(plan_id: str = "plan2_drawing_v2_2") -> str:
                 f"{floor}{letter},{floor},{letter},{sim_floor},{plan_id},"
                 f"{x},{y},TRUE,{note[letter]}"
             )
+    # A one-floor plan, for checking the model by hand. Floor 14 because it sits two
+    # above the fire floor and already holds the hand-authored family, so a walkthrough
+    # covers a household with commitments as well as residents drawn from scratch.
+    for letter in "ABCD":
+        x, y = seeds[letter]
+        lines.append(
+            f"14{letter},14,{letter},13,{ONE_FLOOR_PLAN},{x},{y},TRUE,"
+            f'"Floor 14 of the same plate. The only occupied floor in this plan, so a '
+            f'population is small enough to read in full."'
+        )
     return "\n".join(lines) + "\n"
 
 

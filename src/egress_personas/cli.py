@@ -317,6 +317,33 @@ def cmd_trace(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_dossier(args: argparse.Namespace) -> int:
+    from . import adapters as ad
+    from .dossier import markdown
+    from .sample import sample
+    tables = _checked(args.data)
+    try:
+        adapter = ad.resolve(args.adapter)
+    except (KeyError, FileNotFoundError) as e:
+        print(e, file=sys.stderr)
+        return 1
+    pop = sample(tables, args.scenario, args.seed, cohort=args.cohort)
+    if len(pop.people) > args.max_residents:
+        print(f"{len(pop.people)} residents is too many to write out in full "
+              f"(the limit is {args.max_residents}). This report exists to be checked "
+              f"by hand; use `--scenario one_floor`, or raise --max-residents if you "
+              f"really want it.", file=sys.stderr)
+        return 1
+    text_out = markdown(tables, pop, adapter)
+    if args.out_file:
+        Path(args.out_file).write_text(text_out, encoding="utf-8")
+        print(f"wrote {args.out_file}")
+        print(f"{len(pop.people)} residents, every number traced")
+    else:
+        print(text_out)
+    return 0
+
+
 def cmd_adapters(args: argparse.Namespace) -> int:
     from . import adapters as ad
     found = ad.available()
@@ -491,6 +518,17 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--adapter", default="generic")
     p.add_argument("--out-file")
     p.set_defaults(fn=cmd_trace)
+
+    p = sub.add_parser("dossier",
+                       help="a small population written out in full, every number "
+                            "traced to its source")
+    common(p)
+    scen(p)
+    p.add_argument("--adapter", default="fire_egress_3d")
+    p.add_argument("--max-residents", type=int, default=24,
+                   help="refuse to write more than this many in full (default 24)")
+    p.add_argument("--out-file")
+    p.set_defaults(fn=cmd_dossier)
 
     p = sub.add_parser("adapters", help="list the engines a population can be written for")
     p.set_defaults(fn=cmd_adapters)
