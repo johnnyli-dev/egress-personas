@@ -225,3 +225,47 @@ def test_the_population_does_not_record_when_it_was_fetched(population):
     meta = population_json(population, generated_at="2026-01-01T00:00:00+00:00")["meta"]
     assert "content_hash" in meta["snapshot"]
     assert "pulled_at" not in meta["snapshot"]
+
+
+def test_a_missing_tab_is_refused_rather_than_silently_substituted(monkeypatch):
+    """Asking the export endpoint for a tab that does not exist returns the *first*
+    tab in the document, with no error. The data then loads correctly under the wrong
+    name, which is the one failure mode worse than a crash."""
+    def first_tab_instead(sheet_id, name, token=None, timeout=30.0):
+        return '"Egress Persona Model"\n"Upload this file to Google Drive"\n'
+
+    monkeypatch.setattr(sheet_mod.urllib.request, "urlopen",
+                        lambda *a, **k: _Resp(first_tab_instead("", "")))
+    with pytest.raises(RuntimeError) as e:
+        sheet_mod.fetch_tab("ID", "outputs")
+    msg = str(e.value)
+    assert "no tab called 'Outputs'" in msg
+    assert "returns the first tab" in msg
+    assert "personas init-sheet" in msg
+
+
+def test_a_tab_whose_columns_match_is_accepted(data_dir):
+    """The check must not reject a real tab: overlap with the required columns is
+    enough, so a Sheet with extra columns still passes."""
+    body = (data_dir / "outputs.csv").read_text(encoding="utf-8-sig")
+    text = body.replace("output_id,", "output_id,scratch_notes,", 1)
+    text = "\n".join(
+        (line if i == 0 else line.replace(",", ",,", 1))
+        for i, line in enumerate(text.splitlines())) + "\n"
+    head = {h.strip() for h in text.splitlines()[0].split(",")}
+    from egress_personas.tables import TABS
+    assert head & set(TABS["outputs"].required)
+
+
+class _Resp:
+    def __init__(self, body):
+        self._b = body.encode("utf-8")
+
+    def read(self):
+        return self._b
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False

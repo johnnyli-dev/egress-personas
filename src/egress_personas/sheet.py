@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import datetime as _dt
 import hashlib
+import csv
+import io
 import json
 import re
 import urllib.error
@@ -92,6 +94,26 @@ def fetch_tab(sheet_id: str, name: str, *, token: str | None = None,
             f"CSV, so the sheet is not shared for reading by link.\n"
             f"In Google Sheets: Share -> General access -> Anyone with the link -> "
             f"Viewer."
+        )
+
+    # Asking for a tab that does not exist does not fail: the endpoint quietly returns
+    # the *first* sheet in the document instead. That is the worst kind of error,
+    # because the data loads and is simply the wrong data — so check that what came
+    # back actually looks like the tab that was asked for.
+    required = TABS[name].required
+    header = next(csv.reader(io.StringIO(body)), [])
+    got = {h.strip() for h in header}
+    if required and not (got & set(required)):
+        raise RuntimeError(
+            f"pulling {tab_title(name)}: the sheet has no tab called "
+            f"{tab_title(name)!r}.\n"
+            f"Google does not report that as an error — it returns the first tab in "
+            f"the document instead — so this would otherwise have loaded the wrong "
+            f"data under the right name. What came back has columns "
+            f"{sorted(got)[:4]}, and none of {list(required[:4])}.\n"
+            f"Most likely the Sheet is older than this snapshot: regenerate the "
+            f"workbook with `personas init-sheet` and re-upload it, or add the tab "
+            f"by hand."
         )
     return body
 
